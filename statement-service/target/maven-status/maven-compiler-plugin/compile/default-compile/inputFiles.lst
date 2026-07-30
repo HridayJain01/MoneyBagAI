@@ -1,0 +1,14 @@
+C:\MoneyBags\moneybags\statement-service\src\main\java\com\moneybags\statement\client\AccountClient.java
+C:\MoneyBags\moneybags\statement-service\src\main\java\com\moneybags\statement\client\TransactionClient.java
+C:\MoneyBags\moneybags\statement-service\src\main\java\com\moneybags\statement\config\OpenApiConfig.java
+C:\MoneyBags\moneybags\statement-service\src\main\java\com\moneybags\statement\controller\StatementController.java
+C:\MoneyBags\moneybags\statement-service\src\main\java\com\moneybags\statement\dto\StatementResponse.java
+C:\MoneyBags\moneybags\statement-service\src\main\java\com\moneybags\statement\entity\package-info.java
+C:\MoneyBags\moneybags\statement-service\src\main\java\com\moneybags\statement\enums\package-info.java
+C:\MoneyBags\moneybags\statement-service\src\main\java\com\moneybags\statement\exception\ErrorResponse.java
+C:\MoneyBags\moneybags\statement-service\src\main\java\com\moneybags\statement\exception\GlobalExceptionHandler.java
+C:\MoneyBags\moneybags\statement-service\src\main\java\com\moneybags\statement\mapper\package-info.java
+C:\MoneyBags\moneybags\statement-service\src\main\java\com\moneybags\statement\repository\package-info.java
+C:\MoneyBags\moneybags\statement-service\src\main\java\com\moneybags\statement\service\impl\StatementServiceImpl.java
+C:\MoneyBags\moneybags\statement-service\src\main\java\com\moneybags\statement\service\StatementService.java
+C:\MoneyBags\moneybags\statement-service\src\main\java\com\moneybags\statement\StatementServiceApplication.java

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="eureka-server" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="account-service" target="17" />
+      <module name="api-gateway" target="17" />
+      <module name="customer-service" target="17" />
+      <module name="moneybags" target="1.5" />
+      <module name="product-service" target="17" />
+      <module name="security-service" target="17" />
+      <module name="statement-service" target="17" />
+      <module name="transaction-service" target="17" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="account-service" options="-parameters" />
+      <module name="api-gateway" options="-parameters" />
+      <module name="customer-service" options="-parameters" />
+      <module name="eureka-server" options="-parameters" />
+      <module name="moneybags" options="" />
+      <module name="product-service" options="-parameters" />
+      <module name="security-service" options="-parameters" />
+      <module name="statement-service" options="-parameters" />
+      <module name="transaction-service" options="-parameters" />
+    </option>
+  </component>
+</project>

@@ -1,0 +1,4 @@
+com\moneybags\product\repository\ProductRepositoryTest.class
+com\moneybags\product\service\ProductServiceImplTest.class
+com\moneybags\product\ProductServiceIntegrationTest.class
+com\moneybags\product\controller\ProductControllerTest.class
