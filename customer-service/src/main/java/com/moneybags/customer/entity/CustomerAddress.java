@@ -26,4 +26,6 @@ public class CustomerAddress {
     private String pincode;
     @Column(nullable = false, length = 80)
     private String country;
+    @Column(name = "is_current", nullable = false)
+    private Boolean isCurrent;
 }

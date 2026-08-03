@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service @RequiredArgsConstructor @Transactional(readOnly = true)
 public class CustomerServiceImpl implements CustomerService {
@@ -21,12 +22,17 @@ public class CustomerServiceImpl implements CustomerService {
     @Override @Transactional
     public CustomerResponse create(CustomerRequest request) {
         if (repository.existsByPanNo(request.panNo())) throw new ConflictException("PAN already exists");
-        securityClient.findUser(request.userId());
+        if (request.userId() != null) {
+            securityClient.findUser(request.userId());
+            if (repository.existsByUserId(request.userId())) throw new ConflictException("User already has a customer profile");
+        }
         // TODO enrich Feign error decoding so an unknown user becomes a local 404 response.
-        return mapper.toResponse(repository.save(mapper.toEntity(request)));
+        var customer = mapper.toEntity(request);
+        customer.setCifNo(nextCif());
+        return mapper.toResponse(repository.save(customer));
     }
     @Override
-    public CustomerResponse findByCif(Long cifNo) {
+    public CustomerResponse findByCif(String cifNo) {
         return mapper.toResponse(repository.findById(cifNo)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found: " + cifNo)));
     }
@@ -34,4 +40,5 @@ public class CustomerServiceImpl implements CustomerService {
     public List<CustomerResponse> findAll() {
         return repository.findAll().stream().map(mapper::toResponse).toList();
     }
+    private String nextCif() { return "CIF" + UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase(); }
 }

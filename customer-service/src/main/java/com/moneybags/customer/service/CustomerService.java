@@ -3,6 +3,6 @@ import com.moneybags.customer.dto.*;
 import java.util.List;
 public interface CustomerService {
     CustomerResponse create(CustomerRequest request);
-    CustomerResponse findByCif(Long cifNo);
+    CustomerResponse findByCif(String cifNo);
     List<CustomerResponse> findAll();
 }

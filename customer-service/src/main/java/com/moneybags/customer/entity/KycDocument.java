@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "kyc_documents")
@@ -26,6 +27,15 @@ public class KycDocument {
     private String filePath;
     @Enumerated(EnumType.STRING) @Column(name = "verify_status", nullable = false, length = 20)
     private DocumentVerifyStatus verifyStatus;
-    @Column(name = "verified_by")
-    private Long verifiedBy;
+    @Column(name = "assigned_to_emp_id")
+    private Long assignedToEmpId;
+    @Column(name = "verified_by_emp_id")
+    private Long verifiedByEmpId;
+    @Column(name = "rejection_reason", length = 500)
+    private String rejectionReason;
+    @Column(name = "submitted_at", nullable = false)
+    private LocalDateTime submittedAt;
+    @Column(name = "verified_at")
+    private LocalDateTime verifiedAt;
+    @PrePersist void onCreate() { submittedAt = submittedAt == null ? LocalDateTime.now() : submittedAt; }
 }
