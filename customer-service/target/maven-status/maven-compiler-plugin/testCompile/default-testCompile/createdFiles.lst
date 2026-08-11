@@ -1,1 +1,3 @@
+com\moneybags\customer\CustomerDemoProfileIntegrationTest.class
+com\moneybags\customer\OpenApiContractTest.class
 com\moneybags\customer\CustomerServiceIntegrationTest.class

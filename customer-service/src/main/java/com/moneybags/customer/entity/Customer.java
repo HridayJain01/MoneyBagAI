@@ -35,6 +35,16 @@ public class Customer {
     private CustomerStatus status;
     @Enumerated(EnumType.STRING) @Column(name = "kyc_status", nullable = false, length = 20)
     private KycStatus kycStatus;
+    @Enumerated(EnumType.STRING) @Column(name = "risk_classification", nullable = false, length = 20)
+    private RiskClassification riskClassification;
+    @Enumerated(EnumType.STRING) @Column(name = "preferred_communication_channel", nullable = false, length = 20)
+    private CommunicationChannel preferredCommunicationChannel;
+    @Column(name = "email_notifications_enabled", nullable = false)
+    private Boolean emailNotificationsEnabled;
+    @Column(name = "sms_notifications_enabled", nullable = false)
+    private Boolean smsNotificationsEnabled;
+    @Column(name = "push_notifications_enabled", nullable = false)
+    private Boolean pushNotificationsEnabled;
     @Column(name = "kyc_failure_count", nullable = false)
     private Integer kycFailureCount;
     @Column(name = "created_at", nullable = false)
@@ -42,7 +52,20 @@ public class Customer {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @PrePersist void onCreate() { var now = LocalDateTime.now(); createdAt = now; updatedAt = now; kycFailureCount = kycFailureCount == null ? 0 : kycFailureCount; }
+    @PrePersist
+    void onCreate() {
+        var now = LocalDateTime.now();
+        createdAt = createdAt == null ? now : createdAt;
+        updatedAt = now;
+        kycFailureCount = kycFailureCount == null ? 0 : kycFailureCount;
+        riskClassification = riskClassification == null ? RiskClassification.LOW : riskClassification;
+        preferredCommunicationChannel = preferredCommunicationChannel == null
+                ? CommunicationChannel.EMAIL
+                : preferredCommunicationChannel;
+        emailNotificationsEnabled = emailNotificationsEnabled == null || emailNotificationsEnabled;
+        smsNotificationsEnabled = smsNotificationsEnabled == null || smsNotificationsEnabled;
+        pushNotificationsEnabled = pushNotificationsEnabled != null && pushNotificationsEnabled;
+    }
     @PreUpdate void onUpdate() { updatedAt = LocalDateTime.now(); }
     public void setCifNo(String cifNo) { this.cifNo = cifNo; }
 }

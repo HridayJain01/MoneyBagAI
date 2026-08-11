@@ -1,6 +1,8 @@
 server:
   port: 8082
 spring:
+  profiles:
+    default: demo
   application:
     name: customer-service
   datasource:
@@ -15,7 +17,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://localhost:8080/eureka/
 management:
   endpoints:
     web:
@@ -26,3 +28,5 @@ springdoc:
     path: /api-docs
   swagger-ui:
     path: /swagger-ui.html
+customer:
+  kyc-expiry-alert-cron: ${KYC_EXPIRY_ALERT_CRON:0 0 8 * * *}

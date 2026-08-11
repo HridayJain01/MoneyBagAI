@@ -9,24 +9,36 @@ written to the logs directory beside this script.
 
 [CmdletBinding()]
 param(
-    [int]$EurekaStartupTimeoutSeconds = 90
+    [int]$EurekaStartupTimeoutSeconds = 90,
+    [ValidateSet('demo', 'default')]
+    [string]$CustomerProfile = 'demo'
 )
 
 $ErrorActionPreference = 'Stop'
+
+# Some Windows IDE sessions expose both PATH and Path. Start-Process rejects
+# that duplicate case-insensitive key, so retain one canonical process value.
+$pathValue = [Environment]::GetEnvironmentVariable('Path', 'Process')
+[Environment]::SetEnvironmentVariable('PATH', $null, 'Process')
+[Environment]::SetEnvironmentVariable('Path', $pathValue, 'Process')
+
 $projectRoot = $PSScriptRoot
 $logDirectory = Join-Path $projectRoot 'logs'
+$pidDirectory = Join-Path $projectRoot '.moneybags-pids'
 New-Item -ItemType Directory -Path $logDirectory -Force | Out-Null
+New-Item -ItemType Directory -Path $pidDirectory -Force | Out-Null
 
 function Test-PortListening {
     param([int]$Port)
 
-    return $null -ne (Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue)
+    return [System.Net.NetworkInformation.IPGlobalProperties]::GetIPGlobalProperties().GetActiveTcpListeners().Port -contains $Port
 }
 
 function Start-MoneyBagsService {
     param(
         [Parameter(Mandatory)] [string]$Name,
-        [Parameter(Mandatory)] [int]$Port
+        [Parameter(Mandatory)] [int]$Port,
+        [string]$Profile
     )
 
     if (Test-PortListening -Port $Port) {
@@ -42,13 +54,26 @@ function Start-MoneyBagsService {
 
     $standardOutput = Join-Path $logDirectory "$Name.out.log"
     $standardError = Join-Path $logDirectory "$Name.err.log"
+    $mavenArguments = @('-f', $pomFile, 'spring-boot:run')
+    if ($Profile -and $Profile -ne 'default') {
+        $mavenArguments += "-Dspring-boot.run.profiles=$Profile"
+    }
+
     $process = Start-Process -FilePath 'mvn.cmd' `
-        -ArgumentList '-f', $pomFile, 'spring-boot:run' `
+        -ArgumentList $mavenArguments `
         -WorkingDirectory $serviceDirectory `
         -WindowStyle Hidden `
         -RedirectStandardOutput $standardOutput `
         -RedirectStandardError $standardError `
         -PassThru
+
+    [pscustomobject]@{
+        Name = $Name
+        ProcessId = $process.Id
+        ProcessName = $process.ProcessName
+        StartedAtUtc = $process.StartTime.ToUniversalTime().ToString('o')
+        Port = $Port
+    } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $pidDirectory "$Name.json") -Encoding UTF8
 
     Write-Host "Started $Name (PID $($process.Id), port $Port)."
 }
@@ -71,19 +96,14 @@ function Wait-ForPort {
     throw "Eureka did not start on port $Port within $TimeoutSeconds seconds. Check logs\\eureka-server.err.log."
 }
 
-Start-MoneyBagsService -Name 'eureka-server' -Port 8761
-Wait-ForPort -Port 8761 -TimeoutSeconds $EurekaStartupTimeoutSeconds
+Start-MoneyBagsService -Name 'eureka-server' -Port 8080
+Wait-ForPort -Port 8080 -TimeoutSeconds $EurekaStartupTimeoutSeconds
 
 @(
-    @{ Name = 'security-service'; Port = 8081 },
-    @{ Name = 'customer-service'; Port = 8082 },
-    @{ Name = 'product-service'; Port = 8083 },
-    @{ Name = 'account-service'; Port = 8084 },
-    @{ Name = 'transaction-service'; Port = 8087 },
-    @{ Name = 'statement-service'; Port = 8086 },
+    @{ Name = 'customer-service'; Port = 8082; Profile = $CustomerProfile },
     @{ Name = 'api-gateway'; Port = 8090 }
 ) | ForEach-Object {
-    Start-MoneyBagsService -Name $_.Name -Port $_.Port
+    Start-MoneyBagsService -Name $_.Name -Port $_.Port -Profile $_.Profile
 }
 
 Write-Host "MoneyBags startup requested. Logs: $logDirectory" -ForegroundColor Green

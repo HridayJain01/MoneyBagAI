@@ -3,16 +3,18 @@ package com.moneybags.customer.mapper;
 import com.moneybags.customer.dto.CustomerRequest;
 import com.moneybags.customer.dto.CustomerResponse;
 import com.moneybags.customer.entity.Customer;
+import com.moneybags.customer.enums.CommunicationChannel;
 import com.moneybags.customer.enums.CustomerStatus;
 import com.moneybags.customer.enums.Gender;
 import com.moneybags.customer.enums.KycStatus;
+import com.moneybags.customer.enums.RiskClassification;
 import java.time.LocalDate;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-08-02T22:43:45+0530",
+    date = "2026-08-10T10:39:38+0530",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.12 (Oracle Corporation)"
 )
 @Component
@@ -58,6 +60,11 @@ public class CustomerMapperImpl implements CustomerMapper {
         String panNo = null;
         CustomerStatus status = null;
         KycStatus kycStatus = null;
+        RiskClassification riskClassification = null;
+        CommunicationChannel preferredCommunicationChannel = null;
+        Boolean emailNotificationsEnabled = null;
+        Boolean smsNotificationsEnabled = null;
+        Boolean pushNotificationsEnabled = null;
         Integer kycFailureCount = null;
 
         cifNo = customer.getCifNo();
@@ -72,9 +79,14 @@ public class CustomerMapperImpl implements CustomerMapper {
         panNo = customer.getPanNo();
         status = customer.getStatus();
         kycStatus = customer.getKycStatus();
+        riskClassification = customer.getRiskClassification();
+        preferredCommunicationChannel = customer.getPreferredCommunicationChannel();
+        emailNotificationsEnabled = customer.getEmailNotificationsEnabled();
+        smsNotificationsEnabled = customer.getSmsNotificationsEnabled();
+        pushNotificationsEnabled = customer.getPushNotificationsEnabled();
         kycFailureCount = customer.getKycFailureCount();
 
-        CustomerResponse customerResponse = new CustomerResponse( cifNo, userId, relationshipManagerEmpId, firstName, lastName, dob, gender, mobile, email, panNo, status, kycStatus, kycFailureCount );
+        CustomerResponse customerResponse = new CustomerResponse( cifNo, userId, relationshipManagerEmpId, firstName, lastName, dob, gender, mobile, email, panNo, status, kycStatus, riskClassification, preferredCommunicationChannel, emailNotificationsEnabled, smsNotificationsEnabled, pushNotificationsEnabled, kycFailureCount );
 
         return customerResponse;
     }

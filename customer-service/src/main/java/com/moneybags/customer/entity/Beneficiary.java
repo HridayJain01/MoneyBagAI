@@ -1,5 +1,6 @@
 package com.moneybags.customer.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
 @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
 public class Beneficiary {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "beneficiary_id") private Long beneficiaryId;
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, optional = false) @JoinColumn(name = "cif_no") private Customer customer;
     @Column(name = "beneficiary_name", nullable = false, length = 150) private String beneficiaryName;
     @Column(name = "beneficiary_account_no", nullable = false, length = 30) private String beneficiaryAccountNo;

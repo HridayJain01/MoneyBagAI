@@ -8,9 +8,13 @@ spring:
     hibernate:
       ddl-auto: create-drop
     database-platform: org.hibernate.dialect.H2Dialect
+    open-in-view: false
   cloud:
     discovery:
       enabled: false
 eureka:
   client:
     enabled: false
+springdoc:
+  api-docs:
+    path: /api-docs
