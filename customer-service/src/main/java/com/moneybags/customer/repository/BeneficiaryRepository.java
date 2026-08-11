@@ -5,4 +5,6 @@ import java.util.*;
 public interface BeneficiaryRepository extends JpaRepository<Beneficiary, Long> {
     List<Beneficiary> findByCustomerCifNo(String cifNo);
     boolean existsByCustomerCifNoAndBeneficiaryAccountNoAndBeneficiaryIfsc(String cifNo, String accountNo, String ifsc);
+    boolean existsByCustomerCifNoAndBeneficiaryAccountNoAndBeneficiaryIfscAndBeneficiaryIdNot(
+            String cifNo, String accountNo, String ifsc, Long beneficiaryId);
 }

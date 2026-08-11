@@ -1,5 +1,6 @@
 package com.moneybags.customer.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.moneybags.customer.enums.AddressType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -11,6 +12,7 @@ public class CustomerAddress {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "address_id")
     private Long addressId;
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "cif_no", nullable = false)
     private Customer customer;

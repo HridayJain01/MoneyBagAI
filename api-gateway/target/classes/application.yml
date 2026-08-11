@@ -11,38 +11,37 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
-        - id: security-service
-          uri: lb://security-service
-          predicates:
-            - Path=/api/v1/users/**,/api/v1/roles/**,/api/v1/branches/**,/api/v1/employees/**
         - id: customer-service
           uri: lb://customer-service
           predicates:
             - Path=/api/v1/customers/**
-        - id: product-service
-          uri: lb://product-service
+        - id: customer-service-api-docs
+          uri: lb://customer-service
           predicates:
-            - Path=/api/v1/products/**
-        - id: account-service
-          uri: lb://account-service
+            - Path=/customer-service/api-docs,/customer-service/api-docs/**
+          filters:
+            - StripPrefix=1
+        - id: customer-service-static-openapi
+          uri: lb://customer-service
           predicates:
-            - Path=/api/v1/accounts/**
-        - id: transaction-service
-          uri: lb://transaction-service
-          predicates:
-            - Path=/api/v1/transactions/**
-        - id: statement-service
-          uri: lb://statement-service
-          predicates:
-            - Path=/api/v1/statements/**
+            - Path=/customer-service/openapi.yml
+          filters:
+            - StripPrefix=1
 
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://localhost:8080/eureka/
 
 management:
   endpoints:
     web:
       exposure:
         include: health,info
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: customer-service
+        url: /customer-service/api-docs

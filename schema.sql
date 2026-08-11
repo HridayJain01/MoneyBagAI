@@ -1,7 +1,4 @@
-CREATE DATABASE IF NOT EXISTS moneybags_auth
-    CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
-USE moneybags_auth;
+USE mydb;
 
 CREATE TABLE IF NOT EXISTS users (
                                      user_id BIGINT NOT NULL AUTO_INCREMENT,
@@ -89,11 +86,6 @@ CREATE TABLE IF NOT EXISTS login_audit (
 -- BANK ORGANISATION DATABASE
 -- =====================================================
 
-CREATE DATABASE IF NOT EXISTS moneybags_bank
-    CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
-USE moneybags_bank;
-
 CREATE TABLE IF NOT EXISTS branches (
                                         branch_code VARCHAR(20) NOT NULL,
     branch_name VARCHAR(120) NOT NULL,
@@ -133,11 +125,6 @@ CREATE TABLE IF NOT EXISTS employees (
 -- CUSTOMER DATABASE
 -- =====================================================
 
-CREATE DATABASE IF NOT EXISTS moneybags_customer
-    CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
-USE moneybags_customer;
-
 CREATE TABLE IF NOT EXISTS customers (
                                          cif_no VARCHAR(30) NOT NULL,
     user_id BIGINT,
@@ -151,6 +138,11 @@ CREATE TABLE IF NOT EXISTS customers (
     pan_no VARCHAR(10) NOT NULL,
     status VARCHAR(20) NOT NULL,
     kyc_status VARCHAR(20) NOT NULL,
+    risk_classification VARCHAR(20) NOT NULL DEFAULT 'LOW',
+    preferred_communication_channel VARCHAR(20) NOT NULL DEFAULT 'EMAIL',
+    email_notifications_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    sms_notifications_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    push_notifications_enabled BOOLEAN NOT NULL DEFAULT FALSE,
     kyc_failure_count INT NOT NULL DEFAULT 0,
     created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6)
@@ -183,6 +175,7 @@ CREATE TABLE IF NOT EXISTS kyc_documents (
                                              cif_no VARCHAR(30) NOT NULL,
     doc_type VARCHAR(50) NOT NULL,
     doc_number VARCHAR(80) NOT NULL,
+    document_number_hash VARCHAR(64) NOT NULL,
     expiry_date DATE,
     file_path VARCHAR(500) NOT NULL,
     verify_status VARCHAR(20) NOT NULL,
@@ -191,6 +184,7 @@ CREATE TABLE IF NOT EXISTS kyc_documents (
     rejection_reason VARCHAR(500),
     submitted_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
     verified_at DATETIME(6),
+    expiry_alerted_at DATETIME(6),
 
     PRIMARY KEY (doc_id),
 
@@ -251,15 +245,25 @@ CREATE TABLE IF NOT EXISTS beneficiary_change_history (
     KEY idx_beneficiary_history_cif (cif_no)
 ) ENGINE = InnoDB;
 
+CREATE TABLE IF NOT EXISTS customer_domain_events (
+    event_id BIGINT NOT NULL AUTO_INCREMENT,
+    aggregate_type VARCHAR(50) NOT NULL,
+    aggregate_id VARCHAR(50) NOT NULL,
+    event_type VARCHAR(80) NOT NULL,
+    payload TEXT NOT NULL,
+    publication_status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    occurred_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    published_at DATETIME(6),
+    failure_reason VARCHAR(500),
+
+    PRIMARY KEY (event_id),
+    KEY idx_customer_event_status (publication_status, occurred_at)
+) ENGINE = InnoDB;
+
 
 -- =====================================================
 -- PRODUCT DATABASE
 -- =====================================================
-
-CREATE DATABASE IF NOT EXISTS moneybags_product
-    CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
-USE moneybags_product;
 
 CREATE TABLE IF NOT EXISTS products (
                                         product_code VARCHAR(30) NOT NULL,
@@ -337,10 +341,6 @@ CREATE TABLE IF NOT EXISTS account_approvals (
 -- LEDGER DATABASE
 -- =====================================================
 
-CREATE DATABASE IF NOT EXISTS moneybags_ledger
-    CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
-USE moneybags_ledger;
 
 CREATE TABLE IF NOT EXISTS gl_accounts (
                                            gl_code VARCHAR(30) NOT NULL,
