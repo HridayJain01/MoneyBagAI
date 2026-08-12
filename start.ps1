@@ -103,6 +103,7 @@ Wait-ForPort -Port 8080 -TimeoutSeconds $EurekaStartupTimeoutSeconds
     @{ Name = 'customer-service'; Port = 8082; Profile = $CustomerProfile },
     @{ Name = 'transaction-service'; Port = 8084 },
     @{ Name = 'ledger-service'; Port = 8085 },
+    @{ Name = 'statement-reporting-service'; Port = 8086 },
     @{ Name = 'api-gateway'; Port = 8090 }
 ) | ForEach-Object {
     Start-MoneyBagsService -Name $_.Name -Port $_.Port -Profile $_.Profile

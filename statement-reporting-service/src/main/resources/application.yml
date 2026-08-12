@@ -1,0 +1,29 @@
+server:
+  port: 8086
+spring:
+  application:
+    name: statement-reporting-service
+  datasource:
+    url: ${STATEMENT_DB_URL:jdbc:mysql://localhost:3306/moneybags_statement?createDatabaseIfNotExist=true}
+    username: ${STATEMENT_DB_USERNAME:root}
+    password: ${STATEMENT_DB_PASSWORD:password}
+  jpa:
+    hibernate.ddl-auto: validate
+    open-in-view: false
+    properties.hibernate.jdbc.time_zone: UTC
+  flyway.enabled: true
+eureka.client.service-url.defaultZone: http://localhost:8080/eureka/
+management.endpoints.web.exposure.include: health,info,metrics
+springdoc:
+  api-docs.path: /api-docs
+  swagger-ui.path: /swagger-ui.html
+moneybags.statement:
+  storage-directory: ${STATEMENT_STORAGE_DIR:./data/statements}
+  download-secret: ${STATEMENT_DOWNLOAD_SECRET:change-this-development-secret-before-production}
+  download-link-minutes: 10
+  file-retention-days: 30
+  worker-delay-ms: 2000
+  account-service-url: ${ACCOUNT_SERVICE_URL:http://localhost:8083}
+  transaction-service-url: ${TRANSACTION_SERVICE_URL:http://localhost:8084}
+  source-connect-timeout-ms: 1000
+  source-read-timeout-ms: 3000
