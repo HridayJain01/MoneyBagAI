@@ -2,7 +2,7 @@
 
 ## Ownership and consistency boundary
 
-Transaction Service owns business transactions, customer-facing legs, local hold audit records, double-entry journals, clearing work, status history, idempotency records, outbox events, callback receipts, configured limit rules, and reconciliation exceptions. Account Service remains authoritative for ledger balance, available balance, and atomic hold concurrency.
+Transaction Service is operated by bank employees and owns business transactions, account-facing legs, local hold audit records, double-entry journals, clearing work, status history, idempotency records, outbox events, callback receipts, configured limit rules, and reconciliation exceptions. Account Service remains authoritative for account holders, ledger balance, available balance, and atomic hold concurrency.
 
 ```mermaid
 erDiagram
@@ -52,13 +52,13 @@ REQUEST [sync]
  -> COMPLETED
 ```
 
-Cheque submission creates the transaction, destination leg, and clearing instruction only. Its customer credit journal and outbox event are created after a successful cheque-clearing callback.
+Cheque submission creates the transaction, destination leg, and clearing instruction only. Its account credit journal and outbox event are created after a successful cheque-clearing callback.
 
 Reversal preserves the original rows, moves the original to `REVERSAL_PENDING`, creates a linked transaction with opposite legs/journal lines/outbox instructions, and marks the original `REVERSED` only after compensating projections finish.
 
 ## Security contract
 
-The current repository has no Security Service implementation or shared security library. The gateway-facing adapter therefore consumes trusted identity headers (`X-User-Id`, `X-Customer-Id`, `X-Employee-Id`, `X-Branch-Code`, `X-Permissions`, `X-Correlation-Id`). The production gateway must strip caller-supplied copies and inject verified claims. Domain services still enforce permissions, customer scope, maker/checker separation, and maker-only cancellation server-side.
+The current repository has no Security Service implementation or shared security library. The gateway-facing adapter therefore requires trusted employee headers (`X-Employee-Id`, `X-Branch-Code`, `X-Permissions`, `X-Correlation-Id`). The production gateway must strip caller-supplied copies and inject verified claims. Domain services enforce employee permissions, branch scope, maker/checker separation, and controlled cancellation server-side. Account-holder identity is derived from Account Service and is never accepted from the caller.
 
 ## External contracts still required
 

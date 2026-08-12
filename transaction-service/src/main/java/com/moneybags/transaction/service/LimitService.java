@@ -18,7 +18,7 @@ public class LimitService {
     private final TransactionRepository transactions;
 
     @Transactional(readOnly=true)
-    public LimitQuote quote(String customerId,TransactionType type,PaymentRail rail,PaymentChannel channel,String currency,BigDecimal amount){
+    public LimitQuote quote(String accountId,TransactionType type,PaymentRail rail,PaymentChannel channel,String currency,BigDecimal amount){
         TransactionLimitRule rule=rules.findActive(currency,Instant.now()).stream()
                 .filter(r->r.getType()==null||r.getType()==type).filter(r->r.getRail()==null||r.getRail()==rail).filter(r->r.getChannel()==null||r.getChannel()==channel)
                 .max(Comparator.comparingInt(TransactionLimitRule::getPriority)).orElse(null);
@@ -27,14 +27,14 @@ public class LimitService {
         if(rule.getMinAmount()!=null&&amount.compareTo(rule.getMinAmount())<0) reason="Amount is below the configured minimum";
         if(rule.getMaxAmount()!=null&&amount.compareTo(rule.getMaxAmount())>0) reason="Amount exceeds the configured per-transaction limit";
         if(reason==null&&rule.getDailyLimit()!=null){
-            LocalDate today=LocalDate.now(ZoneOffset.UTC); BigDecimal used=transactions.sumDailyUsage(customerId,today.atStartOfDay().toInstant(ZoneOffset.UTC),today.plusDays(1).atStartOfDay().toInstant(ZoneOffset.UTC));
+            LocalDate today=LocalDate.now(ZoneOffset.UTC); BigDecimal used=transactions.sumDailyUsage(accountId,today.atStartOfDay().toInstant(ZoneOffset.UTC),today.plusDays(1).atStartOfDay().toInstant(ZoneOffset.UTC));
             if(used.add(amount).compareTo(rule.getDailyLimit())>0) reason="Amount exceeds the configured cumulative daily limit";
         }
         boolean approval=rule.getApprovalThreshold()!=null&&amount.compareTo(rule.getApprovalThreshold())>=0;
         return new LimitQuote(type,rail,channel,currency,amount,rule.getMinAmount(),rule.getMaxAmount(),rule.getDailyLimit(),rule.getApprovalThreshold(),reason==null,approval,reason);
     }
-    public LimitQuote validate(String customerId,TransactionType type,PaymentRail rail,PaymentChannel channel,String currency,BigDecimal amount){
-        LimitQuote quote=quote(customerId,type,rail,channel,currency,amount);
+    public LimitQuote validate(String accountId,TransactionType type,PaymentRail rail,PaymentChannel channel,String currency,BigDecimal amount){
+        LimitQuote quote=quote(accountId,type,rail,channel,currency,amount);
         if(!quote.allowed()) throw DomainException.invalid(type==TransactionType.RTGS&&quote.minAmount()!=null?"RTGS_MINIMUM_VIOLATION":"LIMIT_EXCEEDED",quote.reason());
         return quote;
     }

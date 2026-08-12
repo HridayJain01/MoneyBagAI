@@ -39,7 +39,7 @@ moneybags:
       max-attempts: 10
     ledger:
       cash-asset: "110100"
-      customer-deposit-control: "210000"
+      account-deposit-control: "210000"
       internal-clearing: "220100"
       external-clearing: "220200"
       fee-income: "410100"

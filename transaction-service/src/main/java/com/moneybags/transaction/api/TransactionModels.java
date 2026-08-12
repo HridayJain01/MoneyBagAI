@@ -12,7 +12,6 @@ public final class TransactionModels {
     public record CreateRequest(
             String sourceAccountId,
             String destinationAccountId,
-            @NotBlank String customerId,
             String cardId,
             @NotNull @DecimalMin(value="0.0001") BigDecimal amount,
             @DecimalMin(value="0.0000") BigDecimal feeAmount,
@@ -39,8 +38,8 @@ public final class TransactionModels {
     public record HistoryView(String fromStatus,String toStatus,String actorId,String actorSource,String reason,Instant occurredAt) {}
     public record RailDetailsView(String upiAddress,String chequeNumber,String cardId,String clientReference) {}
     public record TransactionView(String transactionId,String transactionReference,TransactionType type,PaymentRail rail,PaymentChannel channel,
-            PaymentMethod method,String sourceAccountId,String destinationAccountId,String customerId,BigDecimal amount,BigDecimal feeAmount,
-            String currency,TransactionStatus status,String makerUserId,String checkerUserId,String branchCode,String narration,String reversalOfTransactionId,
+            PaymentMethod method,String sourceAccountId,String destinationAccountId,String accountHolderId,BigDecimal amount,BigDecimal feeAmount,
+            String currency,TransactionStatus status,String makerEmployeeId,String checkerEmployeeId,String branchCode,String narration,String reversalOfTransactionId,
             String correlationId,Instant createdAt,Instant updatedAt,Instant completedAt,List<LegView> legs,HoldView hold,List<JournalView> journals,
             ClearingView clearing,RailDetailsView railDetails,List<HistoryView> history) {}
     public record LimitQuote(TransactionType transactionType,PaymentRail rail,PaymentChannel channel,String currency,BigDecimal requestedAmount,

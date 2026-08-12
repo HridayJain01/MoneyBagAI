@@ -21,5 +21,5 @@ public class ReconciliationController {
     @PostMapping("/api/v1/reconciliation/exceptions/{id}/assign") public ReconciliationException assign(@PathVariable String id,@Valid @RequestBody AssignRequest body,HttpServletRequest request){staff(request);return service.assign(id,body.investigatorId());}
     @PostMapping("/api/v1/reconciliation/exceptions/{id}/resolve") public ReconciliationException resolve(@PathVariable String id,@Valid @RequestBody ResolveRequest body,HttpServletRequest request){staff(request);return service.resolve(id,body.resolution(),body.notes());}
     @PostMapping("/internal/v1/reconciliation/runs") public Map<String,Integer> run(){return Map.of("exceptionsCreated",service.run());}
-    private void staff(HttpServletRequest request){if(actors.resolve(request).employeeId()==null)throw com.moneybags.transaction.exception.DomainException.forbidden("STAFF_SCOPE_REQUIRED","Staff scope is required");}
+    private void staff(HttpServletRequest request){actors.resolve(request).require("RECONCILIATION_MANAGE");}
 }
