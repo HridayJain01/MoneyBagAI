@@ -31,6 +31,16 @@ spring:
             - Path=/transaction-service/api-docs,/transaction-service/api-docs/**
           filters:
             - StripPrefix=1
+        - id: statement-reporting-service
+          uri: lb://statement-reporting-service
+          predicates:
+            - Path=/api/v1/statements/**,/api/v1/reports/**,/api/v1/report-schedules/**
+        - id: statement-reporting-service-api-docs
+          uri: lb://statement-reporting-service
+          predicates:
+            - Path=/statement-reporting-service/api-docs,/statement-reporting-service/api-docs/**
+          filters:
+            - StripPrefix=1
         - id: customer-service-static-openapi
           uri: lb://customer-service
           predicates:
@@ -57,3 +67,5 @@ springdoc:
         url: /customer-service/api-docs
       - name: transaction-service
         url: /transaction-service/api-docs
+      - name: statement-reporting-service
+        url: /statement-reporting-service/api-docs

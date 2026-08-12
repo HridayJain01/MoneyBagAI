@@ -1,0 +1,27 @@
+package com.moneybags.statement;
+
+import com.moneybags.statement.ApiModels.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.*;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.math.BigDecimal;
+import java.time.*;
+import java.util.*;
+
+@Service @RequiredArgsConstructor
+class ReportingService {
+    private final TransactionReadRepository transactions; private final AccountReadRepository accounts; private final ExportService exports;
+
+    @Transactional(readOnly=true) DailyReport daily(LocalDate date,Actor actor){actor.require("REPORT_VIEW");List<TransactionReadModel> rows=range(date,null,actor);return dailyView(date,rows);}
+    @Transactional(readOnly=true) DailyReport branch(String branch,LocalDate date,Actor actor){actor.require("REPORT_VIEW");if(actor.branchId()!=null&&!actor.branchId().equals(branch))throw ApiException.forbidden("BRANCH_SCOPE_DENIED","Report is outside branch scope");return dailyView(date,range(date,branch,actor));}
+    @Transactional(readOnly=true) PageView<DormantAccount> dormant(Pageable pageable,Actor actor){actor.require("REPORT_VIEW");Page<AccountReadModel> p=accounts.findByStatusIgnoreCase("DORMANT",pageable);List<DormantAccount> rows=p.getContent().stream().filter(a->actor.branchId()==null||actor.branchId().equals(a.branchId)).map(a->new DormantAccount(a.accountId,a.maskedAccountNumber,a.customerId,a.branchId,a.dormantSince,Money.of(a.currentBalance,a.currency))).toList();return new PageView<>(rows,p.getNumber(),p.getSize(),rows.size(),rows.isEmpty()?0:1);}
+    @Transactional(readOnly=true) List<InterestRow> interest(LocalDate from,LocalDate to,Actor actor){actor.require("REPORT_VIEW");Instant f=start(from),t=start(to.plusDays(1));return transactions.findByPostedAtGreaterThanEqualAndPostedAtLessThanOrderByPostedAtAsc(f,t).stream().filter(x->x.transactionType.toUpperCase().contains("INTEREST")).filter(x->actor.branchId()==null||actor.branchId().equals(x.branchId)).collect(java.util.stream.Collectors.groupingBy(x->x.accountId,LinkedHashMap::new,java.util.stream.Collectors.toList())).values().stream().map(v->new InterestRow(v.get(0).accountId,v.get(0).customerId,Money.of(v.stream().map(x->x.amount).reduce(BigDecimal.ZERO,BigDecimal::add),v.get(0).currency),from,to)).toList();}
+    @Transactional(readOnly=true) ReconciliationReport reconciliation(LocalDate date,Actor actor){actor.require("REPORT_VIEW");Instant f=start(date),t=start(date.plusDays(1));List<TransactionReadModel> all=transactions.findByPostedAtGreaterThanEqualAndPostedAtLessThanOrderByPostedAtAsc(f,t);return new ReconciliationReport(date,all.size(),transactions.countByPostedAtGreaterThanEqualAndPostedAtLessThanAndLedgerEntryIdIsNull(f,t),transactions.countByPostedAtGreaterThanEqualAndPostedAtLessThanAndReversalOfTransactionIdIsNotNull(f,t));}
+    @Transactional(readOnly=true) CertificateFile certificate(String accountId,int fiscalYear,boolean tds,Actor actor){actor.require("STATEMENT_VIEW");AccountReadModel a=accounts.findById(accountId).orElseThrow(()->ApiException.notFound("ACCOUNT_PROJECTION_NOT_FOUND","Account read model is not available"));authorize(a,actor);LocalDate from=LocalDate.of(fiscalYear,4,1),to=from.plusYears(1);BigDecimal gross=transactions.findByAccountIdAndPostedAtGreaterThanEqualAndPostedAtLessThanOrderByPostedAtAsc(accountId,start(from),start(to)).stream().filter(x->x.transactionType.toUpperCase().contains("INTEREST")&&x.direction==Direction.CREDIT).map(x->x.amount).reduce(BigDecimal.ZERO,BigDecimal::add);BigDecimal tax=tds?gross.multiply(new BigDecimal("0.10")):BigDecimal.ZERO;String type=tds?"TDS":"INTEREST";CertificateView view=new CertificateView(accountId,fiscalYear,type,Money.of(gross,a.currency),Money.of(tax,a.currency),Instant.now());return new CertificateFile(exports.certificate(view),"moneybags-"+type.toLowerCase()+"-certificate-"+fiscalYear+".pdf");}
+    record CertificateFile(byte[] bytes,String name) {}
+    private List<TransactionReadModel> range(LocalDate d,String branch,Actor a){Instant f=start(d),t=start(d.plusDays(1));return branch==null?transactions.findByPostedAtGreaterThanEqualAndPostedAtLessThanOrderByPostedAtAsc(f,t):transactions.findByBranchIdAndPostedAtGreaterThanEqualAndPostedAtLessThanOrderByPostedAtAsc(branch,f,t);}
+    private DailyReport dailyView(LocalDate d,List<TransactionReadModel> rows){String currency=rows.isEmpty()?"INR":rows.get(0).currency;BigDecimal debit=rows.stream().filter(x->x.direction==Direction.DEBIT).map(x->x.amount.add(x.feeAmount)).reduce(BigDecimal.ZERO,BigDecimal::add),credit=rows.stream().filter(x->x.direction==Direction.CREDIT).map(x->x.amount).reduce(BigDecimal.ZERO,BigDecimal::add);List<EntryView> views=rows.stream().map(x->new EntryView(x.transactionId,x.ledgerEntryId,x.transactionReference,x.postedAt,x.transactionType,x.direction,x.narration,Money.of(x.amount,x.currency),x.balanceAfter==null?null:Money.of(x.balanceAfter,x.currency),x.reversalOfTransactionId)).toList();return new DailyReport(d,rows.size(),Money.of(debit,currency),Money.of(credit,currency),views);}
+    private void authorize(AccountReadModel a,Actor x){if(x.cif()!=null&&!x.cif().equals(a.customerId))throw ApiException.forbidden("ACCOUNT_SCOPE_DENIED","Account is outside customer scope");if(x.branchId()!=null&&!x.branchId().equals(a.branchId))throw ApiException.forbidden("BRANCH_SCOPE_DENIED","Account is outside branch scope");}
+    private Instant start(LocalDate d){return d.atStartOfDay(ZoneOffset.UTC).toInstant();}
+}

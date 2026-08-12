@@ -22,6 +22,7 @@ $services = @(
     [pscustomobject]@{ Name = 'api-gateway'; Port = 8090 },
     [pscustomobject]@{ Name = 'customer-service'; Port = 8082 },
     [pscustomobject]@{ Name = 'transaction-service'; Port = 8084 },
+    [pscustomobject]@{ Name = 'statement-reporting-service'; Port = 8086 },
     [pscustomobject]@{ Name = 'eureka-server'; Port = 8080 }
 )
 
