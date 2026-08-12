@@ -15,7 +15,7 @@ API or domain event, not a cross-database foreign key.
 | Product | `products`, `product_charges` | Keep current `product-service` |
 | Bank Organisation | `branches`, `employees` | New service; extract from current `security-service` |
 | Account | `accounts`, `account_approvals` | Keep current `account-service` |
-| Ledger | `transactions`, `ledger_entries`, `gl_accounts` | Evolve and rename current `transaction-service` |
+| Transaction | `transactions`, `transaction_rail_details`, `transaction_legs`, `funds_holds`, `journal_entries`, `journal_lines`, `clearing_instructions`, `outbox_events`, `transaction_status_history`, `idempotency_records`, `callback_receipts`, `transaction_limit_rules`, `reconciliation_exceptions` | Implemented in `transaction-service` |
 | Statement | `moneybags_statement` (optional) | Optional read models: `account_statement_lines`, `statement_exports` | Keep current `statement-service` read-only |
 | API Gateway | None | None | Keep current `api-gateway` |
 | Eureka Server | None | None | Keep current `eureka-server` |
@@ -127,39 +127,41 @@ The account is the required branch relationship. A customer does not require a
 direct branch relationship unless the product later needs a home or servicing
 branch independent of account ownership.
 
-## Ledger Service
+## Transaction Service
 
-Tables: `transactions`, `ledger_entries`, `gl_accounts`.
+Transaction Service is the financial-orchestration and accounting-fact service. Its Flyway migration is the schema source of truth. Account Service remains authoritative for live ledger and available balances.
 
 Local relationships:
 
 ```text
-transactions 1 -> many ledger_entries
-transactions.reversal_of -> transactions.txn_id
-gl_accounts.parent_gl_code -> gl_accounts.gl_code
-ledger_entries.gl_code -> gl_accounts.gl_code
+transactions 1 -> many transaction_legs
+transactions 1 -> zero/one funds_holds
+transactions 1 -> many journal_entries -> many journal_lines
+transactions 1 -> zero/one clearing_instructions
+transactions 1 -> many outbox_events
+transactions 1 -> many transaction_status_history records
+transactions.reversal_of_transaction_id -> transactions.transaction_id
 ```
 
 Logical references:
 
 ```text
-ledger_entries.account_no -> Account / accounts.account_no
-transactions.posted_by_user_id -> Identity / users.user_id
-transactions.performed_by_emp_id -> Bank / employees.emp_id
+transactions.source_account_id -> Account Service
+transactions.destination_account_id -> Account Service
+transactions.maker_user_id / checker_user_id -> Identity Service
 ```
 
 Ledger rules:
 
 ```text
-Each posted transaction has two or more ledger entries.
-Sum of debit entries must equal sum of credit entries.
-Each ledger entry uses either account_no or gl_code, never both and never neither.
-Amounts are positive; dr_cr determines debit or credit.
-Posted ledger entries are immutable; reversals use a new transaction.
+Transaction legs describe customer/account effects.
+Journal lines describe accounting effects and each line is debit or credit, never both.
+Each posted journal has equal positive debit and credit totals.
+Posted financial facts are immutable; reversals use a new linked compensating transaction.
+Cross-service balance instructions are committed through the transactional outbox.
 ```
 
-Keep the three ledger tables in one service and one database transaction. Do
-not split `ledger_entries` or `gl_accounts` into separate services.
+Keep transaction facts, journals, clearing, history, and outbox records in one service consistency boundary. Ledger account mappings are configuration/reference data; live customer balances are never stored here.
 
 ## Statement Service
 

@@ -1,0 +1,18 @@
+package com.moneybags.transaction.repository;
+
+import com.moneybags.transaction.domain.TransactionStatus;
+import com.moneybags.transaction.entity.Transaction;
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.repository.*;
+import java.util.*;
+import java.math.BigDecimal;
+import java.time.Instant;
+
+public interface TransactionRepository extends JpaRepository<Transaction, String>, JpaSpecificationExecutor<Transaction> {
+    Optional<Transaction> findByReference(String reference);
+    boolean existsByReversalOfId(String transactionId);
+    Page<Transaction> findBySourceAccountIdOrDestinationAccountId(String source, String destination, Pageable pageable);
+    List<Transaction> findByStatusIn(Collection<TransactionStatus> statuses);
+    @Query("select coalesce(sum(t.amount+t.feeAmount),0) from Transaction t where t.customerId=:customerId and t.createdAt>=:from and t.createdAt<:to and t.status not in (com.moneybags.transaction.domain.TransactionStatus.FAILED,com.moneybags.transaction.domain.TransactionStatus.REJECTED,com.moneybags.transaction.domain.TransactionStatus.CANCELLED)")
+    BigDecimal sumDailyUsage(String customerId, Instant from, Instant to);
+}

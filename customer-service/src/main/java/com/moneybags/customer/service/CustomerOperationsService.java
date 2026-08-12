@@ -34,13 +34,13 @@ public interface CustomerOperationsService {
 
     CustomerAddress addAddress(String cif, Address request);
 
-    CustomerAddress updateAddress(
-            String cif,
-            Long addressId,
-            Address request
-    );
+//    CustomerAddress updateAddress(
+//            String cif,
+//            Long addressId,
+//            Address request
+//    );
 
-    void removeAddress(String cif, Long addressId);
+//    void removeAddress(String cif, Long addressId);
 
     List<CustomerAddress> addresses(String cif);
 

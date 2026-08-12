@@ -43,8 +43,8 @@ public class CustomerOperationsServiceImpl implements CustomerOperationsService 
     @Override public Customer removeManager(String cif) { return customerService.removeManager(cif); }
     @Override @Transactional(readOnly = true) public List<Customer> byManager(Long employeeId) { return customerService.findByManager(employeeId); }
     @Override public CustomerAddress addAddress(String cif, Address request) { return addressService.add(cif, request); }
-    @Override public CustomerAddress updateAddress(String cif, Long addressId, Address request) { return addressService.update(cif, addressId, request); }
-    @Override public void removeAddress(String cif, Long addressId) { addressService.remove(cif, addressId); }
+//    @Override public CustomerAddress updateAddress(String cif, Long addressId, Address request) { return addressService.update(cif, addressId, request); }
+//    @Override public void removeAddress(String cif, Long addressId) { addressService.remove(cif, addressId); }
     @Override @Transactional(readOnly = true) public List<CustomerAddress> addresses(String cif) { return addressService.findByCustomer(cif); }
     @Override public KycDocument submitKyc(String cif, KycSubmit request) { return kycDocumentService.submit(cif, request); }
     @Override public KycDocument assignKyc(String cif, Long documentId, Long employeeId) { return kycDocumentService.assign(cif, documentId, employeeId); }

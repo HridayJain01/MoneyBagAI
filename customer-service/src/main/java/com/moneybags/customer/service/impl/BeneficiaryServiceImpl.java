@@ -28,7 +28,7 @@ import java.util.Map;
 public class BeneficiaryServiceImpl
         implements BeneficiaryService {
 
-    private static final long COOLING_PERIOD_HOURS = 0; // for testing later on will increase
+    private static final long COOLING_PERIOD_HOURS = 24L; // for testing later on will increase
 
     private static final String STATUS_PENDING =
             "PENDING_ACTIVATION";

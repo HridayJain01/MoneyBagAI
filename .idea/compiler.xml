@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="api-gateway" />
         <module name="eureka-server" />
+        <module name="transaction-service" />
       </profile>
       <profile name="Annotation profile for customer-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -28,7 +29,6 @@
       <module name="product-service" target="17" />
       <module name="security-service" target="17" />
       <module name="statement-service" target="17" />
-      <module name="transaction-service" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

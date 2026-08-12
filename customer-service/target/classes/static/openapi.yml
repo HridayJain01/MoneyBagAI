@@ -238,9 +238,9 @@ paths:
               schema:
                 type: array
                 items: {$ref: '#/components/schemas/Address'}
-    post:
+    put:
       tags: [Addresses]
-      operationId: addAddress
+      operationId: putAddress
       parameters: [{$ref: '#/components/parameters/Cif'}]
       requestBody:
         required: true
@@ -256,7 +256,8 @@ paths:
               country: India
               isCurrent: true
       responses:
-        '201': {description: Address added}
+        '200':
+          description: Current address of the requested type created or replaced; non-current addresses are recorded as history
   /api/v1/customers/{cif}/addresses/{addressId}:
     parameters:
       - $ref: '#/components/parameters/Cif'
