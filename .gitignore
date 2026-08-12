@@ -1,3 +1,4 @@
 logs/
 .moneybags-pids/
 /transaction-service/target/
+/ledger-service/target/

@@ -21,6 +21,26 @@ spring:
             - Path=/customer-service/api-docs,/customer-service/api-docs/**
           filters:
             - StripPrefix=1
+        - id: transaction-service
+          uri: lb://transaction-service
+          predicates:
+            - Path=/api/v1/transactions/**,/api/v1/accounts/*/transactions,/api/v1/accounts/*/mini-statement,/api/v1/reconciliation/**
+        - id: transaction-service-api-docs
+          uri: lb://transaction-service
+          predicates:
+            - Path=/transaction-service/api-docs,/transaction-service/api-docs/**
+          filters:
+            - StripPrefix=1
+        - id: ledger-service
+          uri: lb://ledger-service
+          predicates:
+            - Path=/api/v1/ledger/**
+        - id: ledger-service-api-docs
+          uri: lb://ledger-service
+          predicates:
+            - Path=/ledger-service/api-docs,/ledger-service/api-docs/**
+          filters:
+            - StripPrefix=1
         - id: customer-service-static-openapi
           uri: lb://customer-service
           predicates:
@@ -45,3 +65,7 @@ springdoc:
     urls:
       - name: customer-service
         url: /customer-service/api-docs
+      - name: transaction-service
+        url: /transaction-service/api-docs
+      - name: ledger-service
+        url: /ledger-service/api-docs
