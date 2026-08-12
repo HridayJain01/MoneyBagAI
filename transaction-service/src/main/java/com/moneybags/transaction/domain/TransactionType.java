@@ -3,7 +3,7 @@ package com.moneybags.transaction.domain;
 public enum TransactionType {
     DEPOSIT, WITHDRAWAL, INTERNAL_TRANSFER, NEFT, RTGS, IMPS, UPI, CHEQUE, CARD_PAYMENT, REVERSAL;
 
-    public boolean debitsCustomer() {
+    public boolean debitsAccount() {
         return this != DEPOSIT && this != CHEQUE;
     }
 

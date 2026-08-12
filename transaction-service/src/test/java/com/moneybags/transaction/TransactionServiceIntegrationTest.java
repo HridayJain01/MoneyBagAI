@@ -38,8 +38,8 @@ class TransactionServiceIntegrationTest {
     RequestActor maker;
 
     @BeforeEach void setup(){
-        maker=new RequestActor("maker","C1",null,"MB001",Set.of("TRANSACTION_CREATE","TRANSACTION_APPROVE","TRANSACTION_REVERSE"),"corr-1");
-        when(accountClient.context(anyString(),any())).thenAnswer(i->new AccountClient.AccountContext(i.getArgument(0),"C1","ACTIVE","INR",new BigDecimal("5000000"),new BigDecimal("5000000"),1));
+        maker=new RequestActor("EMP-100","MB001",Set.of("TRANSACTION_CREATE","TRANSACTION_VIEW","TRANSACTION_APPROVE","TRANSACTION_CANCEL","TRANSACTION_REVERSE","RECONCILIATION_MANAGE"),"corr-1");
+        when(accountClient.context(anyString())).thenAnswer(i->new AccountClient.AccountContext(i.getArgument(0),"AH-1","ACTIVE","INR",new BigDecimal("5000000"),new BigDecimal("5000000"),1));
         when(accountClient.reserve(anyString(),anyString(),any())).thenAnswer(i->{AccountClient.HoldRequest r=i.getArgument(2);return new AccountClient.HoldResponse("H-"+r.transactionId(),"FUNDS_HELD",r.amount());});
     }
     @AfterEach void resetOutbox(){properties.getOutbox().setEnabled(false);}
@@ -56,8 +56,14 @@ class TransactionServiceIntegrationTest {
         Transaction tx=orchestrator.create(TransactionType.RTGS,PaymentRail.RTGS,external(new BigDecimal("1000000")),"approval-1",maker);assertThat(tx.getStatus()).isEqualTo(TransactionStatus.PENDING_APPROVAL);assertThat(holds.findByTransactionId(tx.getId())).isEmpty();
         assertThatThrownBy(()->orchestrator.approve(tx.getId(),"approve-self",maker)).isInstanceOf(DomainException.class).hasMessageContaining("Maker");
     }
+    @Test void employeeFromAnotherBranchCannotApproveTransaction(){
+        Transaction tx=orchestrator.create(TransactionType.RTGS,PaymentRail.RTGS,external(new BigDecimal("1000000")),"branch-approval",maker);
+        RequestActor otherBranch=new RequestActor("EMP-200","MB002",Set.of("TRANSACTION_APPROVE"),"corr-2");
+        assertThatThrownBy(()->orchestrator.approve(tx.getId(),"other-branch-approval",otherBranch))
+                .isInstanceOf(DomainException.class).hasMessageContaining("another branch");
+    }
     @Test void cancellationBeforeProcessingHasNoFinancialSideEffects(){
-        Transaction tx=orchestrator.create(TransactionType.RTGS,PaymentRail.RTGS,external(new BigDecimal("1000000")),"cancel-create",maker);Transaction cancelled=orchestrator.cancel(tx.getId(),"Customer withdrew request","cancel-action",maker);
+        Transaction tx=orchestrator.create(TransactionType.RTGS,PaymentRail.RTGS,external(new BigDecimal("1000000")),"cancel-create",maker);Transaction cancelled=orchestrator.cancel(tx.getId(),"Employee cancelled the request","cancel-action",maker);
         assertThat(cancelled.getStatus()).isEqualTo(TransactionStatus.CANCELLED);assertThat(holds.findByTransactionId(tx.getId())).isEmpty();assertThat(legs.findByTransactionIdOrderBySequenceNo(tx.getId())).isEmpty();assertThat(journals.findByTransactionIdOrderByCreatedAt(tx.getId())).isEmpty();assertThat(clearing.findByTransactionId(tx.getId())).isEmpty();assertThat(outbox.findByAggregateId(tx.getId())).isEmpty();
     }
     @Test void outboxDeliveryConsumesHoldAndCompletesWithdrawalOnce(){
@@ -75,7 +81,7 @@ class TransactionServiceIntegrationTest {
         assertThat(transactions.findById(reversal.getId()).orElseThrow().getStatus()).isEqualTo(TransactionStatus.COMPLETED);assertThat(transactions.findById(original.getId()).orElseThrow().getStatus()).isEqualTo(TransactionStatus.REVERSED);
     }
     @Test void twoWithdrawalsRacingForSameAvailableFundsCannotDoubleSpend() throws Exception {
-        when(accountClient.context(anyString(),any())).thenAnswer(i->new AccountClient.AccountContext(i.getArgument(0),"C1","ACTIVE","INR",new BigDecimal("50"),new BigDecimal("50"),1));
+        when(accountClient.context(anyString())).thenAnswer(i->new AccountClient.AccountContext(i.getArgument(0),"AH-1","ACTIVE","INR",new BigDecimal("50"),new BigDecimal("50"),1));
         AtomicReference<BigDecimal> available=new AtomicReference<>(new BigDecimal("50"));CyclicBarrier bothAtHold=new CyclicBarrier(2);
         doAnswer(i->{AccountClient.HoldRequest r=i.getArgument(2);bothAtHold.await(10,TimeUnit.SECONDS);synchronized(available){if(available.get().compareTo(r.amount())<0)throw DomainException.conflict("INSUFFICIENT_FUNDS","Atomic hold rejected");available.set(available.get().subtract(r.amount()));}return new AccountClient.HoldResponse("RACE-"+r.transactionId(),"FUNDS_HELD",r.amount());}).when(accountClient).reserve(anyString(),anyString(),any());
         long beforeTransactions=transactions.count(),beforeHolds=holds.count();ExecutorService pool=Executors.newFixedThreadPool(2);
@@ -86,8 +92,8 @@ class TransactionServiceIntegrationTest {
         Transaction tx=orchestrator.create(TransactionType.NEFT,PaymentRail.NEFT,external(new BigDecimal("500")),"neft-fail",maker);CallbackRequest cb=new CallbackRequest("rail-fail-1","NEFT-F-1",null,"FAILED","Receiving bank rejected");
         callbacks.fail(tx.getId(),cb);callbacks.fail(tx.getId(),cb);assertThat(transactions.findById(tx.getId()).orElseThrow().getStatus()).isEqualTo(TransactionStatus.FAILED);assertThat(holds.findByTransactionId(tx.getId()).orElseThrow().getStatus().name()).isEqualTo("RELEASED");verify(accountClient,times(1)).release(eq("A1"),anyString(),anyString());
     }
-    @Test void chequeCreditsCustomerOnlyAfterSuccessfulClearing(){
-        CreateRequest cheque=new CreateRequest(null,"A1","C1",null,new BigDecimal("700"),BigDecimal.ZERO,"INR",PaymentChannel.BRANCH,PaymentMethod.CHEQUE,null,"CHQ-100", "Cheque deposit",null);
+    @Test void chequeCreditsAccountOnlyAfterSuccessfulClearing(){
+        CreateRequest cheque=new CreateRequest(null,"A1",null,new BigDecimal("700"),BigDecimal.ZERO,"INR",PaymentChannel.BRANCH,PaymentMethod.CHEQUE,null,"CHQ-100", "Cheque deposit",null);
         Transaction tx=orchestrator.create(TransactionType.CHEQUE,PaymentRail.CHEQUE,cheque,"cheque-create",maker);assertThat(journals.findByTransactionIdOrderByCreatedAt(tx.getId())).isEmpty();assertThat(outbox.findByAggregateId(tx.getId())).isEmpty();
         callbacks.cheque(tx.getId(),new CallbackRequest("cheque-event-1","CLR-CHQ-1",LocalDate.now(),"SETTLED",null));assertThat(journals.findByTransactionIdOrderByCreatedAt(tx.getId())).hasSize(1);assertThat(outbox.findByAggregateId(tx.getId())).hasSize(1);properties.getOutbox().setEnabled(true);publisher.publish();assertThat(transactions.findById(tx.getId()).orElseThrow().getStatus()).isEqualTo(TransactionStatus.COMPLETED);
     }
@@ -104,11 +110,16 @@ class TransactionServiceIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.info.title").value("MoneyBags Transaction Service API"))
                 .andExpect(jsonPath("$.paths['/api/v1/transactions/deposits']").exists())
+                .andExpect(jsonPath("$.components.schemas.CreateRequest.properties.customerId").doesNotExist())
                 .andExpect(jsonPath("$.components.schemas.CreateRequest.properties.beneficiaryId").doesNotExist())
+                .andExpect(jsonPath("$.components.schemas.TransactionView.properties.accountHolderId").exists())
+                .andExpect(jsonPath("$.components.schemas.TransactionView.properties.makerEmployeeId").exists())
+                .andExpect(jsonPath("$.components.securitySchemes.employeeId.name").value("X-Employee-Id"))
+                .andExpect(jsonPath("$.components.securitySchemes.branchCode.name").value("X-Branch-Code"))
                 .andExpect(jsonPath("$.components.schemas.TransactionView.properties.beneficiaryId").doesNotExist());
     }
     private boolean attemptWithdrawal(String key){try{orchestrator.create(TransactionType.WITHDRAWAL,PaymentRail.CASH,withdrawal(),key,maker);return true;}catch(Exception expected){return false;}}
-    private CreateRequest deposit(){return new CreateRequest(null,"A1","C1",null,new BigDecimal("500"),BigDecimal.ZERO,"INR",PaymentChannel.BRANCH,PaymentMethod.CASH,null,null,"Cash deposit",null);}
-    private CreateRequest withdrawal(){return new CreateRequest("A1",null,"C1",null,new BigDecimal("40"),new BigDecimal("1"),"INR",PaymentChannel.BRANCH,PaymentMethod.CASH,null,null,"Cash withdrawal",null);}
-    private CreateRequest external(BigDecimal amount){return new CreateRequest("A1",null,"C1",null,amount,new BigDecimal("2"),"INR",PaymentChannel.WEB,amount.compareTo(new BigDecimal("200000"))>=0?PaymentMethod.RTGS:PaymentMethod.NEFT,null,null,"External transfer",null);}
+    private CreateRequest deposit(){return new CreateRequest(null,"A1",null,new BigDecimal("500"),BigDecimal.ZERO,"INR",PaymentChannel.BRANCH,PaymentMethod.CASH,null,null,"Cash deposit",null);}
+    private CreateRequest withdrawal(){return new CreateRequest("A1",null,null,new BigDecimal("40"),new BigDecimal("1"),"INR",PaymentChannel.BRANCH,PaymentMethod.CASH,null,null,"Cash withdrawal",null);}
+    private CreateRequest external(BigDecimal amount){return new CreateRequest("A1",null,null,amount,new BigDecimal("2"),"INR",PaymentChannel.WEB,amount.compareTo(new BigDecimal("200000"))>=0?PaymentMethod.RTGS:PaymentMethod.NEFT,null,null,"External transfer",null);}
 }

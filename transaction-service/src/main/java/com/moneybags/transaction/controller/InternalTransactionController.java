@@ -6,8 +6,9 @@ import com.moneybags.transaction.service.CallbackService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 
-@RestController @RequestMapping("/internal/v1/transactions") @RequiredArgsConstructor
+@RestController @RequestMapping("/internal/v1/transactions") @RequiredArgsConstructor @SecurityRequirements
 public class InternalTransactionController {
     private final CallbackService callbacks;
     @PostMapping("/{id}/settle") public Transaction settle(@PathVariable String id,@Valid @RequestBody CallbackRequest body){return callbacks.settle(id,body);}

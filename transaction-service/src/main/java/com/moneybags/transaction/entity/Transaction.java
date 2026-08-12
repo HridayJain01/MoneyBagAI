@@ -19,13 +19,13 @@ public class Transaction {
     @Enumerated(EnumType.STRING) @Column(name = "payment_method", nullable = false, length = 24) private PaymentMethod method;
     @Column(name = "source_account_id", length = 64) private String sourceAccountId;
     @Column(name = "destination_account_id", length = 64) private String destinationAccountId;
-    @Column(name = "customer_id", length = 64) private String customerId;
+    @Column(name = "account_holder_id", length = 64) private String accountHolderId;
     @Column(nullable = false, precision = 19, scale = 4) private BigDecimal amount;
     @Column(name = "fee_amount", nullable = false, precision = 19, scale = 4) private BigDecimal feeAmount;
     @Column(nullable = false, length = 3, columnDefinition = "char(3)") private String currency;
     @Enumerated(EnumType.STRING) @Column(nullable = false, length = 32) private TransactionStatus status;
-    @Column(name = "maker_user_id", nullable = false, length = 64) private String makerUserId;
-    @Column(name = "checker_user_id", length = 64) private String checkerUserId;
+    @Column(name = "maker_employee_id", nullable = false, length = 64) private String makerEmployeeId;
+    @Column(name = "checker_employee_id", length = 64) private String checkerEmployeeId;
     @Column(name = "branch_code", length = 32) private String branchCode;
     @Column(length = 500) private String narration;
     @Column(name = "approval_required", nullable = false) private boolean approvalRequired;
