@@ -1,5 +1,25 @@
 logs/
 .moneybags-pids/
-/transaction-service/target/
-/statement-reporting-service/target/
-/statement-reporting-service/data/
+
+# Build output
+**/target/
+!**/src/**/target/
+
+# Local runtime data
+data/
+**/data/statements/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Local environment overrides
+**/.env
+
+# Frontend (Oracle JET). frontend/.gitignore is generated and must stay —
+# `ojet strip` depends on it.
+frontend/node_modules/
+frontend/web/
+frontend/dist/
+frontend/staged-themes/

@@ -1,145 +1,94 @@
 <#
 .SYNOPSIS
-Stops the local MoneyBags Eureka, API Gateway and Customer Service processes.
+Stops every MoneyBags service started by run-all.ps1.
 
 .DESCRIPTION
-Stops the exact Maven process trees recorded by start-moneybags.ps1. If a
-service was started before PID tracking was added, -ForceByPort can stop the
-process listening on that service's configured port.
+Stops processes recorded in .moneybags-pids first, then sweeps any service port still
+listening -- a jar started by hand leaves no pid file but still holds its port.
 #>
 
-[CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Medium')]
+[CmdletBinding()]
 param(
-    [switch]$ForceByPort,
-    [int]$ShutdownTimeoutSeconds = 20
+    [switch]$Force
 )
 
-$ErrorActionPreference = 'Stop'
-$projectRoot = $PSScriptRoot
+$ErrorActionPreference = 'Continue'
+
+$projectRoot  = $PSScriptRoot
 $pidDirectory = Join-Path $projectRoot '.moneybags-pids'
 
+# Reverse of the startup order: edge first, registry last.
 $services = @(
-    [pscustomobject]@{ Name = 'api-gateway'; Port = 8090 },
-    [pscustomobject]@{ Name = 'customer-service'; Port = 8082 },
-    [pscustomobject]@{ Name = 'transaction-service'; Port = 8084 },
-    [pscustomobject]@{ Name = 'ledger-service'; Port = 8085 },
-    [pscustomobject]@{ Name = 'statement-reporting-service'; Port = 8086 },
-    [pscustomobject]@{ Name = 'eureka-server'; Port = 8080 }
+    @{ Name = 'api-gateway';                 Port = 8090 },
+    @{ Name = 'statement-reporting-service'; Port = 8086 },
+    @{ Name = 'transaction-service';         Port = 8084 },
+    @{ Name = 'account-service';             Port = 8083 },
+    @{ Name = 'audit-service';               Port = 8091 },
+    @{ Name = 'notification-service';        Port = 8089 },
+    @{ Name = 'ledger-service';              Port = 8085 },
+    @{ Name = 'customer-service';            Port = 8082 },
+    @{ Name = 'configuration-service';       Port = 8092 },
+    @{ Name = 'branch-employee-service';     Port = 8081 },
+    @{ Name = 'product-service';             Port = 8088 },
+    @{ Name = 'identity-service';            Port = 8087 },
+    @{ Name = 'eureka-server';               Port = 8080 }
 )
 
-function Get-ListeningProcessId {
-    param([Parameter(Mandatory)] [int]$Port)
+function Stop-ByPidFile {
+    param([string]$Name)
 
-    $listener = & netstat.exe -ano -p tcp |
-        Select-String -Pattern (':{0}\s+.*LISTENING\s+(\d+)\s*$' -f $Port) |
-        Select-Object -First 1
+    $pidFile = Join-Path $pidDirectory "$Name.json"
+    if (-not (Test-Path $pidFile)) { return $false }
 
-    if ($null -eq $listener) {
-        return $null
-    }
-
-    return [int]$listener.Matches[0].Groups[1].Value
-}
-
-function Test-RecordedProcess {
-    param(
-        [Parameter(Mandatory)] [pscustomobject]$Record,
-        [Parameter(Mandatory)] [System.Diagnostics.Process]$Process
-    )
-
-    if ($Process.ProcessName -ne $Record.ProcessName) {
+    try {
+        $record = Get-Content -LiteralPath $pidFile -Raw | ConvertFrom-Json
+        $process = Get-Process -Id $record.ProcessId -ErrorAction SilentlyContinue
+        if ($process) {
+            Stop-Process -Id $record.ProcessId -Force:$Force -ErrorAction Stop
+            Write-Host "  stopped $Name (pid $($record.ProcessId))" -ForegroundColor Green
+        } else {
+            Write-Host "  $Name was not running (stale pid file)" -ForegroundColor DarkGray
+        }
+        Remove-Item -LiteralPath $pidFile -ErrorAction SilentlyContinue
+        return $true
+    } catch {
+        Write-Host "  could not stop $Name : $($_.Exception.Message)" -ForegroundColor Yellow
         return $false
     }
-
-    $recordedStart = [DateTimeOffset]::Parse($Record.StartedAtUtc).UtcDateTime
-    $actualStart = $Process.StartTime.ToUniversalTime()
-    return [Math]::Abs(($actualStart - $recordedStart).TotalSeconds) -lt 2
 }
 
-function Stop-ProcessTree {
-    param(
-        [Parameter(Mandatory)] [int]$ProcessId,
-        [Parameter(Mandatory)] [string]$ServiceName
-    )
+function Stop-ByPort {
+    param([string]$Name, [int]$Port)
 
-    if (-not $PSCmdlet.ShouldProcess("$ServiceName process tree (PID $ProcessId)", 'Stop')) {
-        return $false
+    $owners = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue
+    if (-not $owners) { return }
+
+    foreach ($owner in $owners) {
+        $process = Get-Process -Id $owner.OwningProcess -ErrorAction SilentlyContinue
+        # Only ever kill a JVM. Something else on the port is not ours to stop.
+        if ($process -and $process.ProcessName -eq 'java') {
+            try {
+                Stop-Process -Id $process.Id -Force:$Force -ErrorAction Stop
+                Write-Host "  stopped $Name on port $Port (pid $($process.Id))" -ForegroundColor Green
+            } catch {
+                Write-Host "  could not stop pid $($process.Id) on $Port : $($_.Exception.Message)" -ForegroundColor Yellow
+            }
+        } elseif ($process) {
+            Write-Host "  port $Port is held by $($process.ProcessName) (pid $($process.Id)); leaving it alone" -ForegroundColor Yellow
+        }
     }
-
-    & taskkill.exe /PID $ProcessId /T /F | Out-Null
-    if ($LASTEXITCODE -ne 0) {
-        throw "Failed to stop $ServiceName process tree (PID $ProcessId)."
-    }
-
-    return $true
 }
+
+Write-Host ''
+Write-Host 'Stopping MoneyBags services' -ForegroundColor Cyan
 
 foreach ($service in $services) {
-    $pidFile = Join-Path $pidDirectory "$($service.Name).json"
-    $stopped = $false
-
-    if (Test-Path -LiteralPath $pidFile) {
-        try {
-            $record = Get-Content -Raw -LiteralPath $pidFile | ConvertFrom-Json
-            $process = Get-Process -Id ([int]$record.ProcessId) -ErrorAction SilentlyContinue
-
-            if ($null -ne $process -and (Test-RecordedProcess -Record $record -Process $process)) {
-                $stopped = Stop-ProcessTree `
-                    -ProcessId ([int]$record.ProcessId) `
-                    -ServiceName $service.Name
-            } elseif ($null -ne $process) {
-                Write-Warning "Ignoring stale PID record for $($service.Name); PID $($record.ProcessId) now belongs to another process."
-            }
-        } catch {
-            Write-Warning "Could not use PID record for $($service.Name): $($_.Exception.Message)"
-        }
-    }
-
-    if (-not $stopped) {
-        $listeningProcessId = Get-ListeningProcessId -Port $service.Port
-
-        if ($null -eq $listeningProcessId) {
-            Write-Host "$($service.Name) is not listening on port $($service.Port)." -ForegroundColor Yellow
-            if (Test-Path -LiteralPath $pidFile) {
-                if ($PSCmdlet.ShouldProcess($pidFile, 'Remove stale PID record')) {
-                    Remove-Item -LiteralPath $pidFile -Force
-                }
-            }
-        } elseif ($ForceByPort) {
-            $stopped = Stop-ProcessTree `
-                -ProcessId $listeningProcessId `
-                -ServiceName "$($service.Name) port fallback"
-        } else {
-            Write-Warning "$($service.Name) is listening on port $($service.Port), but no valid PID record exists. Re-run with -ForceByPort to stop that listener."
-        }
-    }
-
-    if ($stopped -and (Test-Path -LiteralPath $pidFile)) {
-        Remove-Item -LiteralPath $pidFile -Force
-    }
+    Stop-ByPidFile -Name $service.Name | Out-Null
+    Stop-ByPort -Name $service.Name -Port $service.Port
 }
 
-if ($WhatIfPreference) {
-    Write-Host 'MoneyBags stop dry run completed.' -ForegroundColor Green
-    exit 0
+if ((Test-Path $pidDirectory) -and -not (Get-ChildItem -Path $pidDirectory -ErrorAction SilentlyContinue)) {
+    Remove-Item -Path $pidDirectory -Recurse -ErrorAction SilentlyContinue
 }
 
-$deadline = (Get-Date).AddSeconds($ShutdownTimeoutSeconds)
-do {
-    $remaining = $services | Where-Object {
-        $null -ne (Get-ListeningProcessId -Port $_.Port)
-    }
-
-    if ($remaining.Count -eq 0) {
-        Write-Host 'MoneyBags services stopped.' -ForegroundColor Green
-        exit 0
-    }
-
-    Start-Sleep -Milliseconds 500
-} while ((Get-Date) -lt $deadline)
-
-$remainingDescription = ($remaining | ForEach-Object {
-    "$($_.Name):$($_.Port)"
-}) -join ', '
-
-throw "Timed out waiting for services to stop: $remainingDescription"
+Write-Host 'Done.' -ForegroundColor Green

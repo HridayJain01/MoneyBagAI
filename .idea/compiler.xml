@@ -7,12 +7,20 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="branch-employee-service" />
+        <module name="configuration-service" />
+        <module name="audit-service" />
+        <module name="ledger-service" />
         <module name="api-gateway" />
         <module name="transaction-service" />
+        <module name="product-service" />
         <module name="statement-reporting-service" />
+        <module name="account-service" />
         <module name="eureka-server" />
+        <module name="identity-service" />
+        <module name="notification-service" />
       </profile>
-      <profile name="Annotation profile for customer-service" enabled="true">
+      <profile name="Annotation profile for MoneyBags Banking System" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -27,9 +35,17 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="account-service" options="-parameters" />
       <module name="api-gateway" options="-parameters" />
+      <module name="audit-service" options="-parameters" />
+      <module name="branch-employee-service" options="-parameters" />
+      <module name="configuration-service" options="-parameters" />
       <module name="customer-service" options="-parameters" />
       <module name="eureka-server" options="-parameters" />
+      <module name="identity-service" options="-parameters" />
+      <module name="ledger-service" options="-parameters" />
+      <module name="notification-service" options="-parameters" />
+      <module name="product-service" options="-parameters" />
       <module name="statement-reporting-service" options="-parameters" />
       <module name="transaction-service" options="-parameters" />
     </option>

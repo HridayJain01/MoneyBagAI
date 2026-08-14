@@ -6,12 +6,12 @@ on:
       - master
       - develop
     paths:
-      - "customer-service/**"
+      - "services/customer-service/**"
       - ".github/workflows/customer-service-tests.yml"
 
   pull_request:
     paths:
-      - "customer-service/**"
+      - "services/customer-service/**"
       - ".github/workflows/customer-service-tests.yml"
 
   workflow_dispatch:
@@ -21,10 +21,6 @@ jobs:
     name: Run Customer Service Tests
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: customer-service
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -33,21 +29,14 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: "21"
+          java-version: "17"
           cache: maven
-          cache-dependency-path: customer-service/pom.xml
+          cache-dependency-path: "**/pom.xml"
 
-      - name: Make Maven Wrapper executable
-        if: ${{ hashFiles('customer-service/mvnw') != '' }}
-        run: chmod +x mvnw
-
-      - name: Run all tests with Maven Wrapper
-        if: ${{ hashFiles('customer-service/mvnw') != '' }}
-        run: ./mvnw --batch-mode clean verify
-
-      - name: Run all tests with installed Maven
-        if: ${{ hashFiles('customer-service/mvnw') == '' }}
-        run: mvn --batch-mode clean verify
+      # Built through the root aggregator so the module resolves the same way it
+      # does locally. -am builds any reactor dependencies customer-service needs.
+      - name: Run customer-service tests
+        run: mvn --batch-mode -pl services/customer-service -am clean verify
 
       - name: Upload test reports
         if: always()
@@ -55,7 +44,7 @@ jobs:
         with:
           name: customer-service-test-reports
           path: |
-            customer-service/target/surefire-reports/**
-            customer-service/target/failsafe-reports/**
+            services/customer-service/target/surefire-reports/**
+            services/customer-service/target/failsafe-reports/**
           if-no-files-found: ignore
           retention-days: 7

@@ -172,6 +172,62 @@ statement generation needs independent query scale or stored exports.
 
 ## Services not required yet
 
-Do not create separate Notification, Payment, Reporting, Card, or Loan
-services yet. Add them only when they have their own workflow, external
-integration, or independent lifecycle.
+Do not create separate Payment or Loan services yet. Add them only when they
+have their own workflow, external integration, or independent lifecycle.
+
+Notification and Audit **have** since been built: both have an independent
+lifecycle and must not participate in a financial commit, which is exactly the
+bar above. They consume domain events through a database outbox plus a scheduled
+HTTP push, because this deployment has no message broker.
+
+**Card is deliberately still not a service.** transaction-service has a
+`CardClient` expecting `GET /internal/v1/cards/{cardId}/payment-context`, and
+Account Service serves that contract from its `linked_cards` table. A card is a
+secondary product linked to an account, which is how the endpoint catalogue
+models it (`/api/v1/accounts/{accountId}/linked-products`); it does not have a
+lifecycle of its own yet.
+
+## Current module layout
+
+Thirteen modules under `services/`, built by the root aggregator `pom.xml`.
+
+| Port | Module | Eureka name | Schema |
+|---|---|---|---|
+| 8080 | eureka-server | — | — |
+| 8081 | branch-employee-service | `branch-employee-service` | `moneybags_branch` |
+| 8082 | customer-service | `customer-service` | `moneybags_customer` |
+| 8083 | account-service | `account-service` | `moneybags_account` |
+| 8084 | transaction-service | `transaction-service` | `moneybags_transaction` |
+| 8085 | ledger-service | `ledger-service` | `moneybags_ledger` |
+| 8086 | statement-reporting-service | `statement-reporting-service` | `moneybags_statement` |
+| 8087 | identity-service | **`security-service`** | `moneybags_identity` |
+| 8088 | product-service | `product-service` | `moneybags_product` |
+| 8089 | notification-service | `notification-service` | `moneybags_notification` |
+| 8090 | api-gateway | `api-gateway` | — |
+| 8091 | audit-service | `audit-service` | `moneybags_audit` |
+| 8092 | configuration-service | `configuration-service` | `moneybags_configuration` |
+
+Two things worth knowing before changing any of it:
+
+- **identity-service registers as `security-service`**, not as its module name.
+  customer-service's `SecurityClient` resolves that id. The service logs an error
+  at startup if the name is ever changed.
+- **Port 8083 is pinned.** statement-reporting-service hardcodes
+  `http://localhost:8083` as its account-service default.
+
+## Authentication
+
+There is no JWT. identity-service issues an opaque session id; the gateway
+resolves it (behind a 30-second cache) and injects `X-User-Id`, `X-Employee-Id`,
+`X-Branch-Code`, `X-Branch-Id`, `X-Permissions` and `X-Correlation-Id`
+downstream. It strips all of those from inbound requests first, so a client
+cannot forge them.
+
+`X-Branch-Code` and `X-Branch-Id` deliberately carry the same value:
+transaction-service reads the first, statement-reporting-service the second.
+
+**Only employees authenticate.** Customers are data in this system, never API
+callers; every mutation is performed by an employee on behalf of a CIF.
+
+Consequence: the service ports must not be exposed beyond localhost. A direct
+request to `:8084` with hand-written actor headers bypasses the gateway entirely.
