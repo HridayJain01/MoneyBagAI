@@ -1,0 +1,107 @@
+<div>
+
+  <header class="mb-page-header">
+    <div>
+      <h1 class="mb-page-header__title">Approvals</h1>
+      <p class="mb-page-header__lede">
+        Transactions waiting on a checker, oldest first. You cannot approve work you made yourself —
+        the server enforces that.
+      </p>
+    </div>
+  </header>
+
+  <!-- ko if: hasBanner -->
+  <div data-bind="css: bannerClass" role="status" style="margin-bottom:24px">
+    <div>
+      <strong data-bind="text: banner().title"></strong>
+      <span data-bind="text: banner().detail"></span>
+    </div>
+    <button type="button" class="mb-banner__close" data-bind="click: dismissBanner" aria-label="Dismiss">×</button>
+  </div>
+  <!-- /ko -->
+
+  <section class="mb-card mb-card--flush">
+    <div class="mb-card__bar">
+      <h2 class="mb-card__title">Pending queue</h2>
+
+      <div class="mb-inline" style="flex-wrap:nowrap">
+        <!-- A fixed enum with no async source — a native select is lighter than
+             wiring a DataProvider into oj-select-single. -->
+        <select class="mb-field"
+                aria-label="Rail"
+                data-bind="value: rail,
+                           options: railList,
+                           optionsText: function (v) { return v === '' ? 'All rails' : v; }"></select>
+
+        <input class="mb-field"
+               style="width:120px"
+               aria-label="Minimum amount"
+               placeholder="Min amount"
+               inputmode="decimal"
+               data-bind="textInput: minAmount" />
+
+        <oj-button chroming="outlined" on-oj-action="[[applyFilters]]">Apply</oj-button>
+      </div>
+    </div>
+
+    <div class="mb-table-host">
+      <oj-table id="approvalsTable"
+                aria-label="Transactions pending approval"
+                data="[[provider]]"
+                columns="[[columns]]"
+                scroll-policy="loadMoreOnScroll"
+                scroll-policy-options.fetch-size="25"
+                selection-mode.row="none"
+                selection-mode.column="none">
+
+        <template slot="refTemplate" data-oj-as="cell">
+          <div>
+            <div class="mb-mono" style="font-size:12px" data-bind="text: cell.row.transactionReference"></div>
+            <div class="mb-muted" style="font-size:11px" data-bind="text: cell.row.narration || '—'"></div>
+          </div>
+        </template>
+
+        <template slot="typeTemplate" data-oj-as="cell">
+          <span class="mb-pill mb-pill--accent" data-bind="text: $data.fmtType(cell.row)"></span>
+        </template>
+
+        <template slot="amountTemplate" data-oj-as="cell">
+          <span class="mb-money" style="font-weight:600" data-bind="text: $data.fmtMoney(cell.row)"></span>
+        </template>
+
+        <template slot="createdTemplate" data-oj-as="cell">
+          <span class="mb-muted" style="font-size:12px" data-bind="text: $data.fmtCreated(cell.row)"></span>
+        </template>
+
+        <template slot="actionsTemplate" data-oj-as="cell">
+          <div class="mb-inline" style="justify-content:flex-end;flex-wrap:nowrap">
+            <oj-button chroming="callToAction"
+                       on-oj-action="[[function () { $data.approveRow(cell.row); }]]">Approve</oj-button>
+            <oj-button chroming="outlined"
+                       on-oj-action="[[function () { $data.rejectRow(cell.row); }]]">Reject</oj-button>
+          </div>
+        </template>
+
+      </oj-table>
+    </div>
+  </section>
+
+  <oj-dialog id="confirmDialog"
+             dialog-title="[[dialogTitle]]"
+             cancel-behavior="icon"
+             initial-visibility="hide">
+    <div slot="body" class="mb-stack mb-stack--tight">
+      <p style="margin:0" data-bind="text: dialogSummary"></p>
+      <!-- ko if: isReject -->
+      <oj-input-text label-hint="Reason" value="{{reason}}"></oj-input-text>
+      <!-- /ko -->
+    </div>
+    <div slot="footer">
+      <oj-button chroming="outlined" on-oj-action="[[cancelDialog]]">Cancel</oj-button>
+      <oj-button chroming="callToAction" disabled="[[busy]]" on-oj-action="[[confirm]]">
+        <span data-bind="text: confirmLabel"></span>
+      </oj-button>
+    </div>
+  </oj-dialog>
+
+</div>

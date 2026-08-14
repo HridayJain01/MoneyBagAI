@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<!--
+ Moneybags employee banking console.
+ Oracle JET (MVVM / Knockout), served same-origin against the API gateway.
+ -->
+<html lang="en-us">
+  <head>
+    <title>Moneybags Console</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1"/>
+    <meta name="description" content="Moneybags employee banking console" />
+    <link rel="icon" href="styles/images/JET-Favicon-Red-32x32.png" type="image/x-icon" />
+    <!-- This is injects main css file for the default theme -->
+		<!-- injector:theme -->
+		<!-- endinjector -->
+    <!-- This contains icon fonts used by the starter template -->
+		<!-- injector:font -->
+		<!-- endinjector:font -->
+    <!-- App styling. tokens.css must load before the others: they all consume
+         the custom properties it defines. theme-overrides.css binds Redwood's
+         --oj-* variables to those tokens, and loads after the injected theme
+         above so it wins at equal specificity. -->
+    <link rel="stylesheet" href="styles/tokens.css" type="text/css" />
+    <link rel="stylesheet" href="styles/theme-overrides.css" type="text/css" />
+    <link rel="stylesheet" href="styles/layout.css" type="text/css" />
+    <link rel="stylesheet" href="styles/app.css" type="text/css" />
+  </head>
+  <body>
+    <div id="globalBody">
+
+      <!-- Signed out: the login screen replaces the whole shell. -->
+      <!-- ko if: !authenticated() -->
+      <div data-bind="ojModule: { name: 'login', params: { onSignedIn: onSignedIn } }"></div>
+      <!-- /ko -->
+
+      <!-- Signed in -->
+      <!-- ko if: authenticated() -->
+      <div class="mb-shell">
+
+        <nav class="mb-nav" aria-label="Main">
+          <div class="mb-nav__brand">
+            <span class="mb-nav__mark" aria-hidden="true"></span>
+            <span>Moneybags</span>
+          </div>
+
+          <!-- ko foreach: navSections -->
+          <div>
+            <div class="mb-nav__section" data-bind="text: title"></div>
+            <!-- ko foreach: items -->
+            <button type="button"
+                    class="mb-nav__item"
+                    data-bind="css: { 'is-active': $root.activePath() === path },
+                               attr: { 'aria-current': $root.activePath() === path ? 'page' : null },
+                               click: function () { $root.navigate(path); }">
+              <span aria-hidden="true" data-bind="text: glyph"></span>
+              <span data-bind="text: label"></span>
+            </button>
+            <!-- /ko -->
+          </div>
+          <!-- /ko -->
+        </nav>
+
+        <div class="mb-shell__main">
+          <header class="mb-topbar">
+            <span class="mb-label" data-bind="text: pageLabel"></span>
+            <div class="mb-topbar__user">
+              <div class="mb-topbar__identity">
+                <span class="mb-topbar__name" data-bind="text: userName"></span>
+                <span class="mb-topbar__meta" data-bind="text: userMeta"></span>
+              </div>
+              <span class="mb-glyph" aria-hidden="true" data-bind="text: userInitials"></span>
+              <oj-button display="label" chroming="outlined" on-oj-action="[[signOut]]">
+                Sign out
+              </oj-button>
+            </div>
+          </header>
+
+          <main class="mb-shell__content">
+            <oj-module config="[[moduleConfig]]"></oj-module>
+          </main>
+        </div>
+      </div>
+      <!-- /ko -->
+
+    </div>
+
+    <!--
+      Shared markup for the read-only service screens (ledger, products,
+      branches, notifications, audit). Defined once here and referenced by each
+      of those views, so the layout has a single source rather than five copies.
+      Its binding context is the screen's own view model, which inherits from
+      viewModels/genericList.js.
+    -->
+    <script type="text/html" id="mbGenericList">
+      <header class="mb-page-header">
+        <div>
+          <h1 class="mb-page-header__title" data-bind="text: title"></h1>
+          <p class="mb-page-header__lede" data-bind="text: lede"></p>
+        </div>
+      </header>
+
+      <section class="mb-card mb-card--flush">
+        <div class="mb-card__bar">
+          <div>
+            <h2 class="mb-card__title" data-bind="text: title"></h2>
+            <p class="mb-card__subtitle" data-bind="text: subtitle"></p>
+          </div>
+        </div>
+
+        <!-- ko if: loading -->
+        <div class="mb-empty"><p class="mb-empty__body">Loading…</p></div>
+        <!-- /ko -->
+
+        <!-- ko if: hasError -->
+        <div class="mb-empty">
+          <p class="mb-empty__title" style="color:var(--mb-danger)">Could not load this</p>
+          <p class="mb-empty__body" data-bind="text: error"></p>
+        </div>
+        <!-- /ko -->
+
+        <!-- ko if: isEmpty -->
+        <div class="mb-empty"><p class="mb-empty__title">Nothing to show</p></div>
+        <!-- /ko -->
+
+        <!-- ko if: rows().length > 0 -->
+        <div class="mb-scroll-x">
+          <table class="mb-plain-table">
+            <thead>
+              <tr data-bind="foreach: columns">
+                <th data-bind="text: label"></th>
+              </tr>
+            </thead>
+            <tbody data-bind="foreach: rows">
+              <tr data-bind="foreach: $data">
+                <td><span data-bind="text: text, css: cls"></span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- /ko -->
+      </section>
+    </script>
+
+    <!-- This injects script tags for the main javascript files -->
+		<!-- injector:scripts -->
+		<!-- endinjector -->
+  </body>
+</html>

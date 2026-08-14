@@ -1,0 +1,55 @@
+<div>
+  <header class="mb-page-header">
+    <div>
+      <h1 class="mb-page-header__title">Accounts</h1>
+      <p class="mb-page-header__lede">Every account on the books, filterable by customer and status.</p>
+    </div>
+  </header>
+
+  <section class="mb-card mb-card--flush">
+    <div class="mb-card__bar">
+      <h2 class="mb-card__title">Accounts</h2>
+      <div class="mb-inline" style="flex-wrap:nowrap">
+        <input class="mb-field" style="width:140px" aria-label="CIF number" placeholder="CIF"
+               data-bind="textInput: cifNo" />
+        <select class="mb-field" aria-label="Status"
+                data-bind="value: status,
+                           options: statusList,
+                           optionsText: function (v) { return v === '' ? 'All statuses' : v; }"></select>
+        <oj-button chroming="outlined" on-oj-action="[[applyFilters]]">Apply</oj-button>
+      </div>
+    </div>
+
+    <div class="mb-table-host">
+      <oj-table aria-label="Accounts"
+                data="[[provider]]"
+                columns="[[columns]]"
+                scroll-policy="loadMoreOnScroll"
+                scroll-policy-options.fetch-size="25"
+                selection-mode.row="none"
+                selection-mode.column="none">
+
+        <template slot="nameTemplate" data-oj-as="cell">
+          <div>
+            <div style="font-weight:600" data-bind="text: cell.row.accountName"></div>
+            <div class="mb-muted mb-mono" style="font-size:11px" data-bind="text: cell.row.maskedAccountNumber"></div>
+          </div>
+        </template>
+
+        <template slot="statusTemplate" data-oj-as="cell">
+          <span data-bind="css: $data.statusClassFor(cell.row), text: cell.row.status"></span>
+        </template>
+
+        <template slot="balanceTemplate" data-oj-as="cell">
+          <span class="mb-money" style="font-weight:600" data-bind="text: $data.fmtBalance(cell.row)"></span>
+        </template>
+
+        <template slot="actionsTemplate" data-oj-as="cell">
+          <oj-button chroming="outlined"
+                     on-oj-action="[[function () { $data.openAccount(cell.row.accountId); }]]">Open</oj-button>
+        </template>
+
+      </oj-table>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,49 @@
+server:
+  port: 8087
+  forward-headers-strategy: framework
+
+spring:
+  application:
+    name: security-service
+  datasource:
+    url: ${IDENTITY_DB_URL:jdbc:mysql://localhost:3306/moneybags_identity?createDatabaseIfNotExist=true&serverTimezone=UTC}
+    username: ${IDENTITY_DB_USERNAME:root}
+    password: ${IDENTITY_DB_PASSWORD:password}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    database-platform: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
+    properties:
+      hibernate.jdbc.time_zone: UTC
+  flyway:
+    enabled: true
+    # Seed data contains BCrypt hashes ($2a$10$...). Flyway's ${} placeholders
+    # would not match those, but disabling substitution removes the question.
+    placeholder-replacement: false
+
+moneybags:
+  identity:
+    session-ttl-minutes: ${SESSION_TTL_MINUTES:480}
+    max-failed-attempts: ${MAX_FAILED_ATTEMPTS:5}
+    lock-duration-minutes: ${LOCK_DURATION_MINUTES:15}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8080/eureka/}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html

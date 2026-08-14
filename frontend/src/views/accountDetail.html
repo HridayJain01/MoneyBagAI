@@ -1,0 +1,148 @@
+<div class="mb-stack">
+
+  <header class="mb-page-header">
+    <div>
+      <h1 class="mb-page-header__title" data-bind="text: accountName"></h1>
+      <p class="mb-page-header__lede" data-bind="text: subtitle"></p>
+    </div>
+    <div class="mb-page-header__actions">
+      <span data-bind="css: statusClass, text: status"></span>
+    </div>
+  </header>
+
+  <!-- ko if: hasError -->
+  <div class="mb-banner mb-banner--error" role="alert">
+    <div><strong>Some data could not load</strong> <span data-bind="text: error"></span></div>
+  </div>
+  <!-- /ko -->
+
+  <div class="mb-grid mb-grid--hero">
+    <section class="mb-hero">
+      <p class="mb-hero__label">Available balance</p>
+      <p class="mb-figure">
+        <span class="mb-figure__currency" data-bind="text: currency"></span><span data-bind="text: availableDisplay"></span>
+      </p>
+      <div class="mb-hero__foot">
+        <div class="mb-hero__stat">
+          <span class="mb-hero__stat-value" data-bind="text: ledgerDisplay"></span>
+          <span class="mb-hero__stat-label">Ledger</span>
+        </div>
+        <div class="mb-hero__stat">
+          <span class="mb-hero__stat-value" data-bind="text: heldDisplay"></span>
+          <span class="mb-hero__stat-label">On hold</span>
+        </div>
+        <div class="mb-hero__stat">
+          <span class="mb-hero__stat-value" data-bind="text: asOf"></span>
+          <span class="mb-hero__stat-label">As of</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-card">
+      <div class="mb-card__header">
+        <h2 class="mb-card__title">Account</h2>
+      </div>
+      <dl class="mb-kv" data-bind="foreach: facts">
+        <dt class="mb-kv__k" data-bind="text: key"></dt>
+        <dd class="mb-kv__v" data-bind="text: value, css: { 'mb-mono': mono }"></dd>
+      </dl>
+    </section>
+  </div>
+
+  <div class="mb-grid mb-grid--split">
+    <section class="mb-card">
+      <div class="mb-card__header">
+        <div>
+          <h2 class="mb-card__title">Balance trend</h2>
+          <p class="mb-card__subtitle">Ledger balance after each posting</p>
+        </div>
+      </div>
+
+      <!-- ko if: historyEmpty -->
+      <div class="mb-empty">
+        <p class="mb-empty__title">No balance history</p>
+        <p class="mb-empty__body">This account has no postings yet.</p>
+      </div>
+      <!-- /ko -->
+
+      <!-- ko ifnot: historyEmpty -->
+      <div class="mb-chart-host">
+        <oj-chart type="area"
+                  aria-label="Balance history"
+                  series="[[historySeries]]"
+                  groups="[[historyGroups]]"
+                  style-defaults="[[chartStyleDefaults]]"
+                  legend.rendered="off">
+        </oj-chart>
+      </div>
+      <!-- /ko -->
+    </section>
+
+    <section class="mb-card mb-card--flush">
+      <div class="mb-card__bar">
+        <div>
+          <h2 class="mb-card__title">Mini statement</h2>
+          <p class="mb-card__subtitle">Last 8 postings</p>
+        </div>
+      </div>
+
+      <!-- ko if: miniEmpty -->
+      <div class="mb-empty"><p class="mb-empty__title">Nothing yet</p></div>
+      <!-- /ko -->
+
+      <ul class="mb-rows" data-bind="foreach: mini">
+        <li class="mb-row">
+          <span data-bind="css: glyphClass, text: arrow" aria-hidden="true"></span>
+          <div class="mb-row__body">
+            <div class="mb-row__title" data-bind="text: title"></div>
+            <div class="mb-row__meta" data-bind="text: when"></div>
+          </div>
+          <div class="mb-row__end">
+            <span data-bind="css: moneyClass, text: amount"></span>
+          </div>
+        </li>
+      </ul>
+    </section>
+  </div>
+
+  <section class="mb-card mb-card--flush">
+    <div class="mb-card__bar">
+      <div>
+        <h2 class="mb-card__title">Transactions</h2>
+        <p class="mb-card__subtitle">Newest first</p>
+      </div>
+    </div>
+
+    <div class="mb-table-host">
+      <oj-table aria-label="Account transactions"
+                data="[[provider]]"
+                columns="[[columns]]"
+                scroll-policy="loadMoreOnScroll"
+                scroll-policy-options.fetch-size="25"
+                selection-mode.row="none"
+                selection-mode.column="none">
+
+        <template slot="refTemplate" data-oj-as="cell">
+          <span class="mb-mono" style="font-size:12px" data-bind="text: cell.row.transactionReference"></span>
+        </template>
+
+        <template slot="typeTemplate" data-oj-as="cell">
+          <span data-bind="text: $data.fmtType(cell.row)"></span>
+        </template>
+
+        <template slot="statusTemplate" data-oj-as="cell">
+          <span data-bind="css: $data.statusClassFor(cell.row), text: cell.row.status"></span>
+        </template>
+
+        <template slot="amountTemplate" data-oj-as="cell">
+          <span data-bind="css: $data.amountClass(cell.row), text: $data.fmtAmount(cell.row)"></span>
+        </template>
+
+        <template slot="whenTemplate" data-oj-as="cell">
+          <span class="mb-muted" style="font-size:12px" data-bind="text: $data.fmtWhen(cell.row)"></span>
+        </template>
+
+      </oj-table>
+    </div>
+  </section>
+</div>

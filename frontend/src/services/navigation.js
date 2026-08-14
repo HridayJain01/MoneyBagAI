@@ -1,0 +1,81 @@
+/**
+ * The router, and the only place that knows how to reach a screen.
+ *
+ * This lives apart from appController so view models can navigate without
+ * reaching through Knockout's binding context. Inside an oj-table cell
+ * template `$root` is not the app controller, so `$root.openAccount(...)`
+ * silently does nothing — requiring this module instead is unambiguous.
+ *
+ * Routing state lives in the query string (?ojr=accountDetail&id=ACC001) via
+ * UrlParamAdapter. That is deliberate over path-style URLs: parameters survive
+ * a cold load without the route having to encode them positionally, and the
+ * server needs no index.html fallback because every URL is still "/". The
+ * dev-server fallback in before_serve.js remains as a safety net.
+ */
+define(['ojs/ojcorerouter', 'ojs/ojurlparamadapter', './session'], function (
+  CoreRouter,
+  UrlParamAdapter,
+  session
+) {
+  'use strict';
+
+  // Permission strings gate both the route and its nav entry, and must match
+  // the seeded values in the identity schema.
+  var routes = [
+    { path: '', redirect: 'overview' },
+    { path: 'overview', detail: { label: 'Overview' } },
+    { path: 'approvals', detail: { label: 'Approvals', permission: 'TRANSACTION_APPROVE' } },
+    { path: 'customers', detail: { label: 'Customers', permission: 'CUSTOMER_READ' } },
+    { path: 'customerDetail', detail: { label: 'Customer' } },
+    { path: 'accounts', detail: { label: 'Accounts', permission: 'ACCOUNT_VIEW' } },
+    { path: 'accountDetail', detail: { label: 'Account' } },
+    { path: 'transactions', detail: { label: 'Transactions', permission: 'TRANSACTION_VIEW' } },
+    { path: 'ledger', detail: { label: 'Ledger' } },
+    { path: 'products', detail: { label: 'Products', permission: 'PRODUCT_READ' } },
+    { path: 'branches', detail: { label: 'Branches' } },
+    { path: 'notifications', detail: { label: 'Notifications', permission: 'NOTIFICATION_MANAGE' } },
+    { path: 'audit', detail: { label: 'Audit trail', permission: 'AUDIT_VIEW' } }
+  ];
+
+  var router = new CoreRouter(routes, { urlAdapter: new UrlParamAdapter() });
+
+  // Client-side gate. Cosmetic only — the gateway is the real authority, so
+  // every screen still handles a 403 from any call.
+  router.beforeStateChange.subscribe(function (args) {
+    var required = args.state && args.state.detail && args.state.detail.permission;
+    if (required && !session.hasPermission(required)) {
+      args.accept(Promise.reject(new Error('Missing permission: ' + required)));
+    }
+  });
+
+  // Track the live route state. ModuleRouterAdapter does not forward router
+  // params into the module's config, so detail screens read them from here
+  // rather than from their own view-model context.
+  var state = null;
+  router.currentState.subscribe(function (change) {
+    state = (change && change.state) || null;
+  });
+
+  /** Value of a route parameter, e.g. param('id') on accountDetail. */
+  function param(name) {
+    return (state && state.params && state.params[name]) || null;
+  }
+
+  function go(path, params) {
+    return router.go({ path: path, params: params || {} }).catch(function () {
+      // beforeStateChange rejects transitions the user cannot make.
+    });
+  }
+
+  return {
+    router: router,
+    go: go,
+    param: param,
+    openAccount: function (accountId) {
+      return go('accountDetail', { id: accountId });
+    },
+    openCustomer: function (cifNo) {
+      return go('customerDetail', { cif: cifNo });
+    }
+  };
+});

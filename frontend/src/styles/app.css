@@ -1,0 +1,42 @@
+/*
+ * App-specific overrides that must win over the compiled Redwood stylesheet.
+ *
+ * Structural styling lives in layout.css; this file is only for nudging JET
+ * components whose own CSS is loaded after ours. Keep it small — anything that
+ * can be expressed as an --oj-* binding belongs in the theme's
+ * _moneybags.cssvars.settings.scss instead.
+ */
+
+/* The theme paints its own page background; ours must win. */
+body.oj-web-applayout-body,
+body {
+  background-color: var(--mb-canvas);
+}
+
+/* Redwood buttons sit slightly tighter in our dense toolbars. */
+oj-c-button,
+oj-c-progress-button {
+  --oj-button-height: 34px;
+}
+
+/* Charts inherit a transparent ground so they sit on the card face. */
+oj-chart,
+oj-c-area-chart,
+oj-c-line-chart {
+  background-color: transparent;
+  width: 100%;
+  height: 100%;
+}
+
+/* Dialog surfaces follow the card recipe rather than Redwood's default. */
+oj-c-dialog {
+  --oj-core-border-radius-lg: var(--mb-radius-lg);
+}
+
+/* Native controls used for simple enum filters, kept visually consistent
+   with the JET inputs beside them. */
+select:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--mb-accent);
+  outline-offset: 1px;
+}

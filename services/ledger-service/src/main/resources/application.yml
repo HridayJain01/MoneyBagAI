@@ -1,0 +1,60 @@
+server:
+  port: 8085
+  forward-headers-strategy: framework
+
+spring:
+  application:
+    name: ledger-service
+  datasource:
+    url: ${LEDGER_DB_URL:jdbc:mysql://localhost:3306/moneybags_ledger?createDatabaseIfNotExist=true&serverTimezone=UTC}
+    username: ${LEDGER_DB_USERNAME:root}
+    password: ${LEDGER_DB_PASSWORD:password}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    database-platform: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
+    properties:
+      hibernate.jdbc.time_zone: UTC
+  flyway:
+    enabled: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8080/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+moneybags:
+  ledger:
+    # INR to match transaction-service, product-service and account-service. A USD
+    # default here would reject every journal the rest of the system posts.
+    default-currency: INR
+    accounts:
+      cash-asset: "110100"
+      account-deposit-control: "210000"
+      internal-clearing: "220100"
+      external-clearing: "220200"
+      fee-income: "410100"
+    fake-accounts:
+      enabled: true
+      accounts:
+        10001:
+          customer-id: 101
+          currency-code: USD
+          status: ACTIVE
+        20001:
+          customer-id: 202
+          currency-code: USD
+          status: ACTIVE

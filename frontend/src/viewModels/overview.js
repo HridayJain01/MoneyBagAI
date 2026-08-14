@@ -1,0 +1,175 @@
+/**
+ * Overview — the branch-day dashboard.
+ *
+ * Every tile here is backed by a real endpoint. Tiles from consumer-fintech
+ * mockups that have nothing behind them in this backend (cards, FX,
+ * investments, rewards, revenue) are deliberately absent: linked cards exist
+ * only behind /internal/**, which the gateway blocks by design.
+ *
+ * The rail breakdown is aggregated client-side over one page of the approval
+ * queue, and is labelled as such — there is no server-side aggregation endpoint.
+ */
+define([
+  'knockout',
+  '../services/endpoints',
+  '../services/format',
+  '../services/http',
+  '../services/navigation',
+  'ojs/ojarraydataprovider',
+  'ojs/ojchart',
+  'ojs/ojbutton'
+], function (ko, endpoints, fmt, http, navigation, ArrayDataProvider) {
+  'use strict';
+
+  var QUEUE_SAMPLE = 100;
+
+  function OverviewViewModel() {
+    var self = this;
+
+    self.loading = ko.observable(true);
+    self.error = ko.observable(null);
+    self.hasError = ko.pureComputed(function () {
+      return !!self.error();
+    });
+
+    self.queueCount = ko.observable(0);
+    self.queueValue = ko.observable(0);
+    self.queueSampled = ko.observable(false);
+    self.sampleSize = ko.observable(0);
+    self.todayCount = ko.observable(null);
+    self.applicationCount = ko.observable(null);
+    self.recent = ko.observableArray([]);
+    self.railSeries = ko.observableArray([]);
+    self.railGroups = ko.observableArray(['Pending']);
+
+    self.heroValue = ko.pureComputed(function () {
+      return fmt.amount(self.queueValue());
+    });
+
+    self.queueHint = ko.pureComputed(function () {
+      return self.queueSampled()
+        ? 'Value shown covers the oldest ' + self.sampleSize()
+        : 'Full queue valued';
+    });
+
+    self.todayDisplay = ko.pureComputed(function () {
+      var value = self.todayCount();
+      return value === null ? '—' : value;
+    });
+
+    self.applicationDisplay = ko.pureComputed(function () {
+      var value = self.applicationCount();
+      return value === null ? '—' : value;
+    });
+
+    self.recentEmpty = ko.pureComputed(function () {
+      return !self.loading() && self.recent().length === 0;
+    });
+
+    self.railEmpty = ko.pureComputed(function () {
+      return !self.loading() && self.railSeries().length === 0;
+    });
+
+    // Chart colours must be set in code: CSS variables do not reach chart marks.
+    self.chartColors = ['#6d4aff', '#3d7dff', '#ff5fa2', '#0f9d6b', '#b7791f', '#7b8496'];
+    self.chartStyleDefaults = { colors: self.chartColors, barGapRatio: 0.4 };
+
+    self.goToApprovals = function () {
+      navigation.go('approvals');
+    };
+
+    function loadQueue() {
+      return endpoints.transactions.approvals({ page: 0, size: QUEUE_SAMPLE }).then(function (page) {
+        var items = (page && page.content) || [];
+        var total = (page && page.totalElements) || 0;
+
+        self.queueCount(total);
+        self.sampleSize(items.length);
+        self.queueSampled(total > items.length);
+        self.queueValue(
+          items.reduce(function (sum, tx) {
+            return sum + (tx.amount || 0);
+          }, 0)
+        );
+
+        var counts = {};
+        items.forEach(function (tx) {
+          var key = tx.rail || 'UNKNOWN';
+          counts[key] = (counts[key] || 0) + 1;
+        });
+
+        // oj-chart's series/groups form: one series per rail, one shared group.
+        self.railSeries(
+          Object.keys(counts)
+            .sort(function (a, b) {
+              return counts[b] - counts[a];
+            })
+            .map(function (rail) {
+              return { name: rail, items: [counts[rail]] };
+            })
+        );
+      });
+    }
+
+    function loadToday() {
+      return endpoints.transactions
+        .search({ from: fmt.startOfTodayIso(), to: fmt.endOfTodayIso(), page: 0, size: 1 })
+        .then(function (page) {
+          self.todayCount((page && page.totalElements) || 0);
+        });
+    }
+
+    function loadRecent() {
+      return endpoints.transactions.search({ page: 0, size: 8 }).then(function (page) {
+        var rows = (page && page.content) || [];
+        self.recent(
+          rows.map(function (tx) {
+            var dir = fmt.direction(tx);
+            return {
+              id: tx.transactionId,
+              title: tx.narration || fmt.humanize(tx.type),
+              reference: tx.transactionReference,
+              when: fmt.relativeDateTime(tx.createdAt),
+              amount: (dir === 'credit' ? '+' : '−') + fmt.money(Math.abs(tx.amount), tx.currency),
+              status: tx.status,
+              statusTone: 'mb-pill mb-pill--' + fmt.toneFor(tx.status),
+              glyphClass: 'mb-glyph mb-glyph--' + dir,
+              moneyClass: 'mb-money mb-money--' + dir,
+              arrow: dir === 'credit' ? '↓' : '↑'
+            };
+          })
+        );
+      });
+    }
+
+    function loadApplications() {
+      // ApplicationStatus is DRAFT | SUBMITTED | PENDING_APPROVAL | APPROVED |
+      // REJECTED | CANCELLED — there is no plain "PENDING". Applications
+      // awaiting a decision are PENDING_APPROVAL.
+      return endpoints.accounts
+        .applications({ status: 'PENDING_APPROVAL', page: 0, size: 1 })
+        .then(function (envelope) {
+          self.applicationCount((envelope && envelope.totalItems) || 0);
+        });
+    }
+
+    // Each tile fails independently: one dead endpoint should not blank the page.
+    function guard(promise) {
+      return promise.catch(function (err) {
+        if (!err || !err.isSessionExpired) {
+          self.error(http.messageFor(err));
+        }
+      });
+    }
+
+    Promise.all([guard(loadQueue()), guard(loadToday()), guard(loadRecent()), guard(loadApplications())]).then(
+      function () {
+        self.loading(false);
+      }
+    );
+
+    self.recentProvider = new ArrayDataProvider(self.recent, { keyAttributes: 'id' });
+  }
+
+  return OverviewViewModel;
+});

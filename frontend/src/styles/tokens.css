@@ -1,0 +1,93 @@
+/*
+ * Moneybags design tokens — the single source of truth for the console's look.
+ *
+ * Direction: crisp, not glassmorphic. Solid near-white cards, hairline borders,
+ * soft low-opacity shadows, generous whitespace. The mesh gradient is hero art
+ * only — it never sits behind body copy or tabular data.
+ *
+ * The Redwood theme's --oj-* variables are bound to these in
+ * src/themes/moneybags/web/_moneybags.cssvars.settings.scss so JET components
+ * inherit the look instead of being overridden after the fact.
+ */
+
+:root {
+  /* Canvas and surfaces */
+  --mb-canvas: #eef1f6;
+  --mb-canvas-deep: #e5e9f1;
+  --mb-surface: #ffffff;
+  --mb-surface-subtle: #fafbfd;
+
+  /* Ink */
+  --mb-ink: #0d1117;
+  --mb-ink-secondary: #4a5262;
+  --mb-ink-muted: #7b8496;
+  --mb-ink-inverse: #ffffff;
+
+  /* Hairlines and shadows. Opacity stays low so cards read as paper, not chrome. */
+  --mb-hairline: #e3e7ee;
+  --mb-hairline-strong: #d2d8e3;
+  --mb-shadow-xs: 0 1px 2px rgba(13, 17, 23, 0.04);
+  --mb-shadow-sm: 0 1px 3px rgba(13, 17, 23, 0.05), 0 6px 16px -8px rgba(13, 17, 23, 0.08);
+  --mb-shadow-md: 0 2px 6px rgba(13, 17, 23, 0.06), 0 18px 36px -20px rgba(13, 17, 23, 0.14);
+
+  /* Accent ramp */
+  --mb-accent: #6d4aff;
+  --mb-accent-hover: #5b38f0;
+  --mb-accent-active: #4c2bd6;
+  --mb-accent-soft: #efeaff;
+  --mb-accent-pink: #ff5fa2;
+  --mb-accent-blue: #3d7dff;
+  --mb-accent-contrast: #ffffff;
+
+  /* Semantic */
+  --mb-success: #0f9d6b;
+  --mb-success-soft: #e6f6ef;
+  --mb-warning: #b7791f;
+  --mb-warning-soft: #fdf3e2;
+  --mb-danger: #d92d43;
+  --mb-danger-soft: #fdecef;
+  --mb-info: #3d7dff;
+  --mb-info-soft: #eaf1ff;
+
+  /* Money direction */
+  --mb-credit: #0f9d6b;
+  --mb-debit: #d92d43;
+
+  /* Radius */
+  --mb-radius-sm: 6px;
+  --mb-radius-md: 10px;
+  --mb-radius-lg: 16px;
+  --mb-radius-pill: 999px;
+
+  /* Space — 8pt, deliberately generous */
+  --mb-space-1: 4px;
+  --mb-space-2: 8px;
+  --mb-space-3: 12px;
+  --mb-space-4: 16px;
+  --mb-space-5: 24px;
+  --mb-space-6: 32px;
+  --mb-space-7: 48px;
+  --mb-space-8: 64px;
+
+  /* Type */
+  --mb-font: "Inter", "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
+  --mb-font-num: "Inter", "SF Mono", "Cascadia Mono", ui-monospace, monospace;
+  --mb-display-1: 56px;
+  --mb-display-2: 40px;
+  --mb-display-3: 28px;
+  --mb-weight-display: 300;
+  --mb-weight-body: 400;
+  --mb-weight-strong: 600;
+
+  /* Layout */
+  --mb-nav-width: 240px;
+  --mb-topbar-height: 64px;
+  --mb-content-max: 1440px;
+
+  /* The only gradient in the app. Hero surfaces only. */
+  --mb-mesh:
+    radial-gradient(60% 90% at 12% 18%, rgba(109, 74, 255, 0.55) 0%, rgba(109, 74, 255, 0) 62%),
+    radial-gradient(55% 85% at 82% 10%, rgba(255, 95, 162, 0.48) 0%, rgba(255, 95, 162, 0) 60%),
+    radial-gradient(70% 100% at 60% 100%, rgba(61, 125, 255, 0.42) 0%, rgba(61, 125, 255, 0) 65%),
+    linear-gradient(135deg, #2a1d5e 0%, #3b2a7a 55%, #1f2a55 100%);
+}

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.moneybags</groupId>
+    <artifactId>moneybags-aggregator</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>MoneyBags Banking System</name>
+    <description>
+        Pure aggregator. Each module declares its own spring-boot-starter-parent; this POM only
+        defines the reactor so the whole system builds with a single command. Deliberately not a
+        shared parent -- that would require editing the parent of every module, including six that
+        already build and run correctly.
+    </description>
+
+    <modules>
+        <!-- Infrastructure -->
+        <module>services/eureka-server</module>
+        <module>services/api-gateway</module>
+
+        <!-- Layer 1: access and cross-cutting -->
+        <module>services/identity-service</module>
+        <module>services/configuration-service</module>
+
+        <!-- Layer 2: master data -->
+        <module>services/customer-service</module>
+        <module>services/branch-employee-service</module>
+        <module>services/product-service</module>
+
+        <!-- Layer 3: account lifecycle -->
+        <module>services/account-service</module>
+
+        <!-- Layer 4: financial processing -->
+        <module>services/transaction-service</module>
+        <module>services/ledger-service</module>
+
+        <!-- Layer 5: downstream consumers -->
+        <module>services/statement-reporting-service</module>
+        <module>services/notification-service</module>
+        <module>services/audit-service</module>
+    </modules>
+</project>

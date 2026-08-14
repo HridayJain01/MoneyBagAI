@@ -1,0 +1,83 @@
+/*
+ * Redwood CSS-variable bindings.
+ *
+ * Bindings ONLY — every value points at a token from tokens.css, so JET
+ * components inherit the design instead of being fought with !important.
+ *
+ * This is a plain stylesheet rather than a generated SCSS theme on purpose: the
+ * theme's compiled CSS is injected into <head> above our <link> tags, so these
+ * :root declarations come later in document order and win at equal specificity.
+ * That keeps the whole design in two readable files and avoids maintaining a
+ * theme build. If you later run `ojet create theme moneybags --basetheme=redwood`,
+ * move this block into its _moneybags.cssvars.settings.scss verbatim.
+ *
+ * Caveat worth knowing: a few legacy components (notably parts of oj-table and
+ * oj-chart) bake Sass values in at build time, and no CSS variable reaches
+ * those. Chart colours are therefore set in TypeScript via styleDefaults.
+ */
+
+:root {
+  /* ------------------------------------------------------------- brand --- */
+  --oj-core-brand-1: #6d4aff;
+  --oj-core-brand-2: #5b38f0;
+  --oj-core-brand-3: #4c2bd6;
+  --oj-core-brand-contrast: #ffffff;
+  --oj-palette-brand-rgb-100: 109, 74, 255;
+
+  /* ---------------------------------------------------------- surfaces --- */
+  /* Component backgrounds stay white. The grey-blue canvas belongs on <body>,
+     not on the cards and controls sitting on top of it. */
+  --oj-core-bg-color-content: #ffffff;
+  --oj-core-bg-color-hover: #f5f6fa;
+  --oj-core-bg-color-active: #eef0f7;
+  --oj-core-bg-color-selected: #efeaff;
+
+  /* --------------------------------------------------------------- ink --- */
+  --oj-core-text-color-primary: #0d1117;
+  --oj-core-text-color-secondary: #4a5262;
+  --oj-core-text-color-disabled: #a7aebd;
+  --oj-core-text-color-brand: #6d4aff;
+  --oj-core-text-color-danger: #d92d43;
+  --oj-core-text-color-warning: #b7791f;
+  --oj-core-text-color-success: #0f9d6b;
+
+  /* --------------------------------------------------------- hairlines --- */
+  --oj-core-border-color-enabled: #e3e7ee;
+  --oj-core-border-color-selected: #6d4aff;
+  --oj-core-divider-color: #e3e7ee;
+  --oj-core-focus-border-color: #6d4aff;
+
+  /* ------------------------------------------------------------- radii --- */
+  /* Redwood ships 2–6px, tighter and more utilitarian than this console's
+     rounded card language. */
+  --oj-core-border-radius-sm: 6px;
+  --oj-core-border-radius-md: 8px;
+  --oj-core-border-radius-lg: 12px;
+  --oj-core-border-radius-xl: 16px;
+
+  /* ----------------------------------------------------------- shadows --- */
+  --oj-core-box-shadow-xs: 0 1px 2px rgba(13, 17, 23, 0.04);
+  --oj-core-box-shadow-sm: 0 1px 3px rgba(13, 17, 23, 0.05), 0 6px 16px -8px rgba(13, 17, 23, 0.08);
+  --oj-core-box-shadow-md: 0 2px 6px rgba(13, 17, 23, 0.06), 0 18px 36px -20px rgba(13, 17, 23, 0.14);
+
+  /* -------------------------------------------------------- typography --- */
+  --oj-html-font-family: "Inter", "Segoe UI", Roboto, system-ui, sans-serif;
+  --oj-core-font-family: "Inter", "Segoe UI", Roboto, system-ui, sans-serif;
+  --oj-typography-heading-2xl-font-size: 40px;
+  --oj-typography-heading-xl-font-size: 28px;
+  --oj-typography-body-md-font-size: 14px;
+
+  /* ---------------------------------------------------------- controls --- */
+  --oj-button-height: 34px;
+
+  /* Redwood's call-to-action button does NOT read --oj-core-brand-1; it has its
+     own chrome variables (verified at runtime: the default is a near-black
+     rgb(49,45,42)). Setting brand alone leaves every primary button dark, so
+     these three must be overridden explicitly. */
+  --oj-button-call-to-action-chrome-bg-color: #6d4aff;
+  --oj-button-call-to-action-chrome-bg-color-hover: #5b38f0;
+  --oj-button-call-to-action-chrome-bg-color-active: #4c2bd6;
+  --oj-button-call-to-action-chrome-text-color: #ffffff;
+  --oj-button-call-to-action-chrome-border-color: transparent;
+  --oj-button-call-to-action-chrome-border-color-hover: transparent;
+}

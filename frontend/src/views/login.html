@@ -1,0 +1,49 @@
+<div class="mb-login">
+  <aside class="mb-login__art">
+    <span class="mb-nav__mark" aria-hidden="true"></span>
+    <div>
+      <h1 class="mb-login__headline">A new era of banking operations</h1>
+      <p class="mb-login__sub">
+        Accounts, transactions, approvals and the audit trail — one console for the branch floor.
+      </p>
+    </div>
+    <p class="mb-login__sub" style="opacity:.55;font-size:12px">Moneybags · Mumbai</p>
+  </aside>
+
+  <div class="mb-login__panel">
+    <div class="mb-login__form" data-bind="event: { keyup: onKeyUp }">
+      <div class="mb-card">
+        <h2 style="margin:0 0 4px;font-size:20px;letter-spacing:-.02em">Sign in</h2>
+        <p class="mb-muted" style="margin:0 0 24px;font-size:13px">Use your employee credentials.</p>
+
+        <!-- ko if: hasError -->
+        <div class="mb-banner mb-banner--error" role="alert">
+          <strong>Sign in failed</strong>
+          <span data-bind="text: error"></span>
+        </div>
+        <!-- /ko -->
+
+        <div class="mb-stack mb-stack--tight">
+          <oj-input-text label-hint="Username"
+                         autocomplete="username"
+                         value="{{username}}">
+          </oj-input-text>
+
+          <oj-input-password label-hint="Password"
+                             autocomplete="current-password"
+                             value="{{password}}">
+          </oj-input-password>
+        </div>
+
+        <div style="margin-top:24px">
+          <oj-button chroming="callToAction"
+                     class="mb-button-block"
+                     disabled="[[busy]]"
+                     on-oj-action="[[submit]]">
+            <span data-bind="text: submitLabel"></span>
+          </oj-button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,55 @@
+<div>
+  <header class="mb-page-header">
+    <div>
+      <h1 class="mb-page-header__title">Transactions</h1>
+      <p class="mb-page-header__lede">Bank-wide transaction search across every rail.</p>
+    </div>
+  </header>
+
+  <section class="mb-card mb-card--flush">
+    <div class="mb-card__bar">
+      <h2 class="mb-card__title">Transactions</h2>
+      <div class="mb-inline" style="flex-wrap:nowrap">
+        <input class="mb-field" style="width:180px" aria-label="Reference" placeholder="Reference"
+               data-bind="textInput: reference" />
+        <select class="mb-field" aria-label="Status"
+                data-bind="value: status,
+                           options: statusList,
+                           optionsText: function (v) { return v === '' ? 'All statuses' : v.replace(/_/g, ' '); }"></select>
+        <oj-button chroming="outlined" on-oj-action="[[applyFilters]]">Apply</oj-button>
+      </div>
+    </div>
+
+    <div class="mb-table-host">
+      <oj-table aria-label="Transactions"
+                data="[[provider]]"
+                columns="[[columns]]"
+                scroll-policy="loadMoreOnScroll"
+                scroll-policy-options.fetch-size="25"
+                selection-mode.row="none"
+                selection-mode.column="none">
+
+        <template slot="refTemplate" data-oj-as="cell">
+          <span class="mb-mono" style="font-size:12px" data-bind="text: cell.row.transactionReference"></span>
+        </template>
+
+        <template slot="typeTemplate" data-oj-as="cell">
+          <span data-bind="text: $data.fmtType(cell.row)"></span>
+        </template>
+
+        <template slot="statusTemplate" data-oj-as="cell">
+          <span data-bind="css: $data.statusClassFor(cell.row), text: cell.row.status"></span>
+        </template>
+
+        <template slot="amountTemplate" data-oj-as="cell">
+          <span data-bind="css: $data.amountClass(cell.row), text: $data.fmtAmount(cell.row)"></span>
+        </template>
+
+        <template slot="whenTemplate" data-oj-as="cell">
+          <span class="mb-muted" style="font-size:12px" data-bind="text: $data.fmtWhen(cell.row)"></span>
+        </template>
+
+      </oj-table>
+    </div>
+  </section>
+</div>

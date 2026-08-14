@@ -1,0 +1,42 @@
+server:
+  port: 8082
+  forward-headers-strategy: framework
+spring:
+  # The `demo` profile is H2 in-memory with Flyway disabled. It used to be the DEFAULT,
+  # which meant that starting this service normally ran it against a throwaway database
+  # while every other service used MySQL -- account-service's eligibility checks would
+  # then resolve against data that vanished on restart. Run it explicitly when wanted:
+  #   java -jar customer-service.jar --spring.profiles.active=demo
+  application:
+    name: customer-service
+  datasource:
+    # Own schema, matching every other service. This used to be `mydb`, a generic
+    # database that already held unrelated tables (Spring Batch metadata and other
+    # scratch work) -- Flyway refuses to migrate a non-empty schema that has no history
+    # table, so customer-service could not have started against it.
+    url: ${CUSTOMER_DB_URL:jdbc:mysql://localhost:3306/moneybags_customer?createDatabaseIfNotExist=true&serverTimezone=UTC}
+    username: ${CUSTOMER_DB_USERNAME:root}
+    password: ${CUSTOMER_DB_PASSWORD:password}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    database-platform: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
+  flyway:
+    enabled: true
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8080/eureka/
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+customer:
+  kyc-expiry-alert-cron: ${KYC_EXPIRY_ALERT_CRON:0 0 8 * * *}

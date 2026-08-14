@@ -1,0 +1,66 @@
+<div>
+
+  <header class="mb-page-header">
+    <div>
+      <h1 class="mb-page-header__title">Customers</h1>
+      <p class="mb-page-header__lede">
+        Search by name, CIF, mobile or PAN. Search returns every match at once — narrow the term
+        rather than paging.
+      </p>
+    </div>
+  </header>
+
+  <section class="mb-card mb-card--flush">
+    <div class="mb-card__bar">
+      <div>
+        <h2 class="mb-card__title" data-bind="text: heading"></h2>
+        <p class="mb-card__subtitle" data-bind="text: subtitle"></p>
+      </div>
+
+      <div class="mb-inline" style="flex-wrap:nowrap" data-bind="event: { keyup: onKeyUp }">
+        <input class="mb-field"
+               style="width:260px"
+               aria-label="Search customers"
+               placeholder="Name, CIF, mobile, PAN…"
+               data-bind="textInput: term" />
+        <oj-button chroming="callToAction" on-oj-action="[[search]]">Search</oj-button>
+      </div>
+    </div>
+
+    <!-- ko if: loading -->
+    <div class="mb-empty"><p class="mb-empty__body">Loading…</p></div>
+    <!-- /ko -->
+
+    <!-- ko if: hasError -->
+    <div class="mb-empty">
+      <p class="mb-empty__title" style="color:var(--mb-danger)">Could not load customers</p>
+      <p class="mb-empty__body" data-bind="text: error"></p>
+    </div>
+    <!-- /ko -->
+
+    <!-- ko if: isEmpty -->
+    <div class="mb-empty">
+      <p class="mb-empty__title">No customers found</p>
+      <p class="mb-empty__body" data-bind="text: emptyMessage"></p>
+    </div>
+    <!-- /ko -->
+
+    <ul class="mb-rows" data-bind="foreach: rows">
+      <li class="mb-row">
+        <span class="mb-glyph" aria-hidden="true" data-bind="text: initials"></span>
+        <div class="mb-row__body">
+          <div class="mb-row__title" data-bind="text: name"></div>
+          <div class="mb-row__meta mb-truncate" data-bind="text: meta"></div>
+        </div>
+        <div class="mb-row__end">
+          <div class="mb-inline" style="flex-wrap:nowrap">
+            <span data-bind="css: kycClass, text: kycStatus"></span>
+            <span data-bind="css: statusClass, text: status"></span>
+          </div>
+        </div>
+        <oj-button chroming="outlined"
+                   on-oj-action="[[function () { $parent.openCustomer($data.cifNo); }]]">Open</oj-button>
+      </li>
+    </ul>
+  </section>
+</div>

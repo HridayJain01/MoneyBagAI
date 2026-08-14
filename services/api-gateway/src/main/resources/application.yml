@@ -1,0 +1,255 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      # Service OpenAPI documents must advertise the gateway origin, but not
+      # their docs-only aggregation prefix (for example /product-service).
+      x-forwarded:
+        prefix-enabled: false
+      discovery:
+        locator:
+          # Deliberately OFF. When enabled it auto-exposes every registered service
+          # under /<service-id>/**, including their /internal/** routes, which would
+          # bypass the session filter's internal-path block entirely.
+          enabled: false
+      routes:
+        # ---------------------------------------------------------------------
+        # ORDER MATTERS. /api/v1/accounts/** (account-service) would otherwise
+        # swallow /api/v1/accounts/*/transactions and /api/v1/accounts/*/mini-statement,
+        # which belong to transaction-service. Spring Cloud Gateway matches by `order`
+        # first and only then by declaration order -- and YAML list position is not a
+        # contract worth betting routing on. So the narrower routes get order -10.
+        # ---------------------------------------------------------------------
+        - id: transaction-service-account-scoped
+          uri: lb://transaction-service
+          order: -10
+          predicates:
+            - Path=/api/v1/accounts/*/transactions,/api/v1/accounts/*/mini-statement
+
+        - id: statement-service-account-scoped
+          uri: lb://statement-reporting-service
+          order: -10
+          predicates:
+            - Path=/api/v1/statements/accounts/**
+
+        # --- Layer 1: access and cross-cutting -------------------------------
+        - id: security-service
+          uri: lb://security-service
+          predicates:
+            - Path=/api/v1/auth/**,/api/v1/users/**,/api/v1/roles/**,/api/v1/permissions/**
+
+        - id: configuration-service
+          uri: lb://configuration-service
+          predicates:
+            - Path=/api/v1/configuration/**
+
+        # --- Layer 2: master data --------------------------------------------
+        - id: customer-service
+          uri: lb://customer-service
+          predicates:
+            - Path=/api/v1/customers/**
+
+        - id: branch-employee-service
+          uri: lb://branch-employee-service
+          predicates:
+            - Path=/api/v1/branches/**,/api/v1/employees/**
+
+        - id: product-service
+          uri: lb://product-service
+          predicates:
+            - Path=/api/v1/products/**
+
+        # --- Layer 3: account lifecycle --------------------------------------
+        - id: account-service
+          uri: lb://account-service
+          predicates:
+            - Path=/api/v1/accounts/**
+
+        # --- Layer 4: financial processing -----------------------------------
+        - id: transaction-service
+          uri: lb://transaction-service
+          predicates:
+            - Path=/api/v1/transactions/**,/api/v1/reconciliation/**
+
+        - id: ledger-service
+          uri: lb://ledger-service
+          predicates:
+            - Path=/api/v1/ledger/**
+
+        # --- Layer 5: downstream consumers -----------------------------------
+        - id: statement-reporting-service
+          uri: lb://statement-reporting-service
+          predicates:
+            - Path=/api/v1/statements/**,/api/v1/reports/**,/api/v1/report-schedules/**
+
+        - id: notification-service
+          uri: lb://notification-service
+          predicates:
+            - Path=/api/v1/notifications/**,/api/v1/notification-templates/**
+
+        - id: audit-service
+          uri: lb://audit-service
+          predicates:
+            - Path=/api/v1/audit-events/**
+
+        # --- OpenAPI aggregation ---------------------------------------------
+        - id: security-service-api-docs
+          uri: lb://security-service
+          predicates:
+            - Path=/security-service/api-docs,/security-service/api-docs/**
+          filters:
+            - StripPrefix=1
+            - PreserveHostHeader
+        - id: customer-service-api-docs
+          uri: lb://customer-service
+          predicates:
+            - Path=/customer-service/api-docs,/customer-service/api-docs/**
+          filters:
+            - StripPrefix=1
+            - PreserveHostHeader
+        - id: customer-service-static-openapi
+          uri: lb://customer-service
+          predicates:
+            - Path=/customer-service/openapi.yml
+          filters:
+            - StripPrefix=1
+            - PreserveHostHeader
+        - id: branch-employee-service-api-docs
+          uri: lb://branch-employee-service
+          predicates:
+            - Path=/branch-employee-service/api-docs,/branch-employee-service/api-docs/**
+          filters:
+            - StripPrefix=1
+            - PreserveHostHeader
+        - id: configuration-service-api-docs
+          uri: lb://configuration-service
+          predicates:
+            - Path=/configuration-service/api-docs,/configuration-service/api-docs/**
+          filters:
+            - StripPrefix=1
+            - PreserveHostHeader
+        - id: product-service-api-docs
+          uri: lb://product-service
+          predicates:
+            - Path=/product-service/api-docs,/product-service/api-docs/**
+          filters:
+            - StripPrefix=1
+            - PreserveHostHeader
+        - id: account-service-api-docs
+          uri: lb://account-service
+          predicates:
+            - Path=/account-service/api-docs,/account-service/api-docs/**
+          filters:
+            - StripPrefix=1
+            - PreserveHostHeader
+        - id: transaction-service-api-docs
+          uri: lb://transaction-service
+          predicates:
+            - Path=/transaction-service/api-docs,/transaction-service/api-docs/**
+          filters:
+            - StripPrefix=1
+            - PreserveHostHeader
+        - id: ledger-service-api-docs
+          uri: lb://ledger-service
+          predicates:
+            - Path=/ledger-service/api-docs,/ledger-service/api-docs/**
+          filters:
+            - StripPrefix=1
+            - PreserveHostHeader
+        - id: statement-reporting-service-api-docs
+          uri: lb://statement-reporting-service
+          predicates:
+            - Path=/statement-reporting-service/api-docs,/statement-reporting-service/api-docs/**
+          filters:
+            - StripPrefix=1
+            - PreserveHostHeader
+        - id: notification-service-api-docs
+          uri: lb://notification-service
+          predicates:
+            - Path=/notification-service/api-docs,/notification-service/api-docs/**
+          filters:
+            - StripPrefix=1
+            - PreserveHostHeader
+        - id: audit-service-api-docs
+          uri: lb://audit-service
+          predicates:
+            - Path=/audit-service/api-docs,/audit-service/api-docs/**
+          filters:
+            - StripPrefix=1
+            - PreserveHostHeader
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8080/eureka/}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+  endpoint:
+    health:
+      show-details: always
+
+moneybags:
+  gateway:
+    # Identity is reached through the load balancer, not a fixed host, so the
+    # gateway keeps working if identity moves or scales out.
+    identity-uri: lb://security-service
+    session-cache-ttl-seconds: 30
+    session-cache-max-size: 10000
+    # Paths reachable without a session. Everything else requires one.
+    public-paths:
+      - /api/v1/auth/login
+      - /api/v1/auth/password/forgot
+      - /api/v1/auth/password/reset
+      - /actuator
+      - /swagger-ui
+      - /v3/api-docs
+      - /webjars
+      # Swagger UI fetches each service definition through these gateway
+      # aggregation routes before a user has a session.
+      - /security-service/api-docs
+      - /customer-service/api-docs
+      - /customer-service/openapi.yml
+      - /branch-employee-service/api-docs
+      - /configuration-service/api-docs
+      - /product-service/api-docs
+      - /account-service/api-docs
+      - /transaction-service/api-docs
+      - /ledger-service/api-docs
+      - /statement-reporting-service/api-docs
+      - /notification-service/api-docs
+      - /audit-service/api-docs
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: security-service
+        url: /security-service/api-docs
+      - name: customer-service
+        url: /customer-service/api-docs
+      - name: branch-employee-service
+        url: /branch-employee-service/api-docs
+      - name: configuration-service
+        url: /configuration-service/api-docs
+      - name: product-service
+        url: /product-service/api-docs
+      - name: account-service
+        url: /account-service/api-docs
+      - name: transaction-service
+        url: /transaction-service/api-docs
+      - name: ledger-service
+        url: /ledger-service/api-docs
+      - name: statement-reporting-service
+        url: /statement-reporting-service/api-docs
+      - name: notification-service
+        url: /notification-service/api-docs
+      - name: audit-service
+        url: /audit-service/api-docs

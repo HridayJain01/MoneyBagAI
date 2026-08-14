@@ -1,0 +1,123 @@
+<div class="mb-stack">
+
+  <header class="mb-page-header">
+    <div>
+      <h1 class="mb-page-header__title" data-bind="text: name"></h1>
+      <p class="mb-page-header__lede" data-bind="text: cifLabel"></p>
+    </div>
+    <div class="mb-page-header__actions">
+      <span data-bind="css: kycClass, text: kycStatus"></span>
+      <span data-bind="css: statusClass, text: status"></span>
+    </div>
+  </header>
+
+  <!-- ko if: hasError -->
+  <div class="mb-banner mb-banner--error" role="alert">
+    <div><strong>Some data could not load</strong> <span data-bind="text: error"></span></div>
+  </div>
+  <!-- /ko -->
+
+  <div class="mb-inline" role="tablist" data-bind="foreach: tabs">
+    <button type="button"
+            role="tab"
+            data-bind="text: label,
+                       css: $parent.tabClass($data.id),
+                       attr: { 'aria-selected': $parent.isTab($data.id) },
+                       click: function () { $parent.selectTab($data.id); }"></button>
+  </div>
+
+  <!-- ko if: isTab('profile') -->
+  <div class="mb-grid mb-grid--split">
+    <section class="mb-card">
+      <div class="mb-card__header"><h2 class="mb-card__title">Profile</h2></div>
+      <dl class="mb-kv" data-bind="foreach: profile">
+        <dt class="mb-kv__k" data-bind="text: key"></dt>
+        <dd class="mb-kv__v" data-bind="text: value, css: { 'mb-mono': mono }"></dd>
+      </dl>
+    </section>
+
+    <section class="mb-card">
+      <div class="mb-card__header"><h2 class="mb-card__title">Profile completeness</h2></div>
+
+      <!-- ko if: hasCompleteness -->
+      <div class="mb-stack mb-stack--tight">
+        <span class="mb-stat__value" data-bind="text: completenessPct() + '%'"></span>
+        <oj-progress-bar value="[[completenessPct]]" max="100"></oj-progress-bar>
+        <dl class="mb-kv" style="margin-top:8px" data-bind="foreach: completenessRows">
+          <dt class="mb-kv__k" data-bind="text: key"></dt>
+          <dd class="mb-kv__v mb-mono" data-bind="text: value"></dd>
+        </dl>
+      </div>
+      <!-- /ko -->
+
+      <!-- ko ifnot: hasCompleteness -->
+      <div class="mb-empty"><p class="mb-empty__title">Not available</p></div>
+      <!-- /ko -->
+    </section>
+  </div>
+  <!-- /ko -->
+
+  <!-- ko if: isTab('accounts') -->
+  <section class="mb-card mb-card--flush">
+    <div class="mb-card__bar"><h2 class="mb-card__title">Accounts</h2></div>
+
+    <!-- ko ifnot: accountsLoaded -->
+    <div class="mb-empty"><p class="mb-empty__body">Loading…</p></div>
+    <!-- /ko -->
+
+    <!-- ko if: accountsEmpty -->
+    <div class="mb-empty">
+      <p class="mb-empty__title">No accounts</p>
+      <p class="mb-empty__body">This customer holds no accounts yet.</p>
+    </div>
+    <!-- /ko -->
+
+    <ul class="mb-rows" data-bind="foreach: accounts">
+      <li class="mb-row">
+        <span class="mb-glyph" aria-hidden="true">▤</span>
+        <div class="mb-row__body">
+          <div class="mb-row__title" data-bind="text: accountName"></div>
+          <div class="mb-row__meta mb-mono" data-bind="text: meta"></div>
+        </div>
+        <div class="mb-row__end">
+          <span class="mb-money" style="font-weight:600" data-bind="text: balance"></span>
+          <span data-bind="css: statusClass, text: status"></span>
+        </div>
+        <oj-button chroming="outlined"
+                   on-oj-action="[[function () { $parent.openAccount($data.accountId); }]]">Open</oj-button>
+      </li>
+    </ul>
+  </section>
+  <!-- /ko -->
+
+  <!-- ko if: isTab('kyc') -->
+  <div class="mb-grid mb-grid--split">
+    <section class="mb-card">
+      <div class="mb-card__header"><h2 class="mb-card__title">KYC &amp; risk</h2></div>
+      <dl class="mb-kv">
+        <dt class="mb-kv__k">KYC status</dt>
+        <dd class="mb-kv__v"><span data-bind="css: kycClass, text: kycStatus"></span></dd>
+        <dt class="mb-kv__k">Risk classification</dt>
+        <dd class="mb-kv__v"><span class="mb-pill mb-pill--neutral" data-bind="text: riskLabel"></span></dd>
+        <dt class="mb-kv__k">Failed KYC attempts</dt>
+        <dd class="mb-kv__v mb-mono" data-bind="text: kycFailures"></dd>
+        <dt class="mb-kv__k">Customer status</dt>
+        <dd class="mb-kv__v"><span data-bind="css: statusClass, text: status"></span></dd>
+      </dl>
+    </section>
+
+    <section class="mb-card">
+      <div class="mb-card__header">
+        <div>
+          <h2 class="mb-card__title">Summary</h2>
+          <p class="mb-card__subtitle">Fields as returned by the service</p>
+        </div>
+      </div>
+      <dl class="mb-kv" data-bind="foreach: summaryRows">
+        <dt class="mb-kv__k" data-bind="text: key"></dt>
+        <dd class="mb-kv__v" data-bind="text: value"></dd>
+      </dl>
+    </section>
+  </div>
+  <!-- /ko -->
+</div>
