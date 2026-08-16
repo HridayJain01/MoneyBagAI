@@ -87,9 +87,12 @@ a seeded account falls back to the source API instead of reading the projection.
 
 ## General ledger
 
-Control accounts `110100`, `210000`, `220100`, `220200`, `410100`, referenced by
+Control accounts `110100`, `210000`, `210100`, `220100`, `220200`, `410100`, referenced by
 configuration in both transaction-service and ledger-service. `V3` realigns them from USD
 to **INR** to match the rest of the system.
+
+`210100` is the static **Term Deposit Control** liability used by the `FD-12M`
+product-purchase journal.
 
 ## Permissions
 

@@ -1,11 +1,13 @@
 package com.moneybags.account.controller;
 
 import com.moneybags.account.api.ApiModels.*;
+import com.moneybags.account.dto.OwnedProductView;
 import com.moneybags.account.entity.AccountStatus;
 import com.moneybags.account.entity.ApplicationStatus;
 import com.moneybags.account.security.RequestActorResolver;
 import com.moneybags.account.service.AccountApplicationService;
 import com.moneybags.account.service.AccountServicingService;
+import com.moneybags.account.service.AccountProductOwnershipService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -26,6 +28,7 @@ public class AccountController {
 
     private final AccountApplicationService applicationService;
     private final AccountServicingService servicingService;
+    private final AccountProductOwnershipService productOwnershipService;
     private final RequestActorResolver actors;
 
     // --- Applications ------------------------------------------------------
@@ -114,6 +117,13 @@ public class AccountController {
     @GetMapping("/{accountId}/status-history")
     public List<StatusHistoryEntry> statusHistory(@PathVariable String accountId, HttpServletRequest http) {
         return servicingService.statusHistory(actors.resolve(http), accountId);
+    }
+
+    @Operation(summary = "List the catalogue products owned by an account")
+    @GetMapping("/{accountId}/products")
+    public List<OwnedProductView> ownedProducts(@PathVariable String accountId,
+                                                HttpServletRequest http) {
+        return productOwnershipService.list(actors.resolve(http), accountId);
     }
 
     // --- Lifecycle ---------------------------------------------------------

@@ -1,6 +1,8 @@
 package com.moneybags.transaction.service;
 
 import com.moneybags.transaction.api.TransactionModels.*;
+import com.moneybags.transaction.api.ProductPurchaseRequest;
+import com.moneybags.transaction.api.ProductPurchaseResponse;
 import com.moneybags.transaction.client.*;
 import com.moneybags.transaction.domain.*;
 import com.moneybags.transaction.domain.FinancialEnums.*;
@@ -13,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.*;
 import java.util.*;
 
 import lombok.extern.slf4j.Slf4j;
@@ -27,8 +29,10 @@ public class TransactionOrchestrator {
     private final ClearingInstructionRepository clearing;
     private final TransactionLegRepository legs;
     private final TransactionRailDetailsRepository railDetails;
+    private final ProductPurchaseRepository productPurchases;
     private final AccountClient accounts;
     private final CardClient cards;
+    private final ProductClient products;
     private final LimitService limits;
     private final TransactionStateMachine states;
     private final JournalService journals;
@@ -53,6 +57,95 @@ public class TransactionOrchestrator {
                 ? UUID.randomUUID().toString() : request.correlationId());
         return create(TransactionType.DEPOSIT, PaymentRail.CASH, deposit,
                 idempotencyKey, actor, true);
+    }
+
+    @Transactional
+    public ProductPurchaseResponse createProductPurchase(ProductPurchaseRequest request,
+                                                         String idempotencyKey,
+                                                         RequestActor actor) {
+        actor.require("TRANSACTION_CREATE");
+        ProductClient.EffectiveProduct product = purchasableProduct(request);
+        String narration = request.narration() == null || request.narration().isBlank()
+                ? "Purchase of " + product.productName() : request.narration();
+        CreateRequest financialRequest = new CreateRequest(
+                request.sourceAccountId(), null, null, request.amount(), BigDecimal.ZERO,
+                request.currency(), request.paymentChannel(), PaymentMethod.ACCOUNT,
+                null, null, narration, request.clientReference());
+
+        validateShape(TransactionType.PRODUCT_PURCHASE, PaymentRail.INTERNAL, financialRequest);
+        AccountClient.AccountContext operatingAccount = validateAccounts(
+                TransactionType.PRODUCT_PURCHASE, financialRequest);
+        LimitQuote quote = limits.validate(operatingAccount.accountId(),
+                TransactionType.PRODUCT_PURCHASE, PaymentRail.INTERNAL,
+                request.paymentChannel(), request.currency(), request.amount());
+        var claim = idempotency.claim(actor.callerScope(), "CREATE_PRODUCT_PURCHASE",
+                idempotencyKey, hasher.hash(List.of(TransactionType.PRODUCT_PURCHASE,
+                        PaymentRail.INTERNAL, request)));
+        if (claim.replay()) {
+            ProductPurchase replay = productPurchases.findByTransaction_Id(
+                            claim.record().getTransaction().getId())
+                    .orElseThrow(() -> DomainException.conflict("PURCHASE_REPLAY_INCOMPLETE",
+                            "The original product purchase record is unavailable"));
+            return purchaseResponse(claim.record().getTransaction(), replay);
+        }
+
+        boolean approvalRequired = quote.approvalRequired();
+        Transaction tx = Transaction.builder()
+                .reference(reference(request.clientReference()))
+                .type(TransactionType.PRODUCT_PURCHASE)
+                .rail(PaymentRail.INTERNAL)
+                .channel(request.paymentChannel())
+                .method(PaymentMethod.ACCOUNT)
+                .sourceAccountId(request.sourceAccountId())
+                .accountHolderId(operatingAccount.accountHolderId())
+                .amount(request.amount())
+                .feeAmount(BigDecimal.ZERO)
+                .currency(request.currency())
+                .status(TransactionStatus.RECEIVED)
+                .makerEmployeeId(actor.employeeId())
+                .branchCode(actor.branchCode())
+                .narration(narration)
+                .approvalRequired(approvalRequired)
+                .correlationId(actor.correlationId())
+                .build();
+        transactions.saveAndFlush(tx);
+        railDetails.save(TransactionRailDetails.builder()
+                .transaction(tx).clientReference(request.clientReference()).build());
+
+        LocalDate purchasedOn = LocalDate.now(ZoneOffset.UTC);
+        ProductPurchase purchase = productPurchases.save(ProductPurchase.builder()
+                .transaction(tx)
+                .ownerAccountId(request.sourceAccountId())
+                .productCode(product.productCode())
+                .productName(product.productName())
+                .productType(product.productType())
+                .productVersionId(product.productVersionId())
+                .productVersionNumber(product.versionNumber())
+                .principalAmount(request.amount())
+                .currency(request.currency())
+                .interestRate(product.interestRate())
+                .tenureMonths(product.tenureMonths())
+                .purchasedOn(purchasedOn)
+                .maturityDate(purchasedOn.plusMonths(product.tenureMonths()))
+                .status(ProductPurchaseStatus.PENDING)
+                .build());
+
+        states.initial(tx, actor.employeeId(), "API", "Product purchase request accepted");
+        states.transition(tx, TransactionStatus.VALIDATED, actor.employeeId(), "API",
+                "Product, funding account, amount, and currency validated");
+        if (approvalRequired) {
+            states.transition(tx, TransactionStatus.PENDING_APPROVAL, actor.employeeId(), "API",
+                    "Configured approval threshold reached");
+        } else {
+            try {
+                process(tx, actor.employeeId(), "API", false);
+            } catch (RuntimeException failure) {
+                releaseAfterOrchestrationFailure(tx, failure);
+                throw failure;
+            }
+        }
+        idempotency.complete(claim.record(), tx, 201);
+        return purchaseResponse(tx, purchase);
     }
 
     private Transaction create(TransactionType type, PaymentRail rail, CreateRequest request,
@@ -125,6 +218,7 @@ public class TransactionOrchestrator {
         tx.setCheckerEmployeeId(actor.employeeId());
         tx.setRejectionReason(requireReason(reason));
         states.transition(tx, TransactionStatus.REJECTED, actor.employeeId(), "CHECKER", reason);
+        cancelProductPurchase(tx);
         idempotency.complete(claim.record(), tx, 200);
         return tx;
     }
@@ -140,12 +234,14 @@ public class TransactionOrchestrator {
             throw DomainException.forbidden("CANCEL_NOT_ALLOWED", "Only the maker or an authorized supervisor can cancel this transaction");
         if (Set.of(TransactionStatus.RECEIVED, TransactionStatus.VALIDATED, TransactionStatus.PENDING_APPROVAL, TransactionStatus.APPROVED).contains(tx.getStatus())) {
             states.transition(tx, TransactionStatus.CANCELLED, actor.employeeId(), "API", requireReason(reason));
+            cancelProductPurchase(tx);
             idempotency.complete(claim.record(), tx, 200);
             return tx;
         }
         if (tx.getStatus() == TransactionStatus.FUNDS_RESERVED) {
             releaseHold(tx, "cancel");
             states.transition(tx, TransactionStatus.CANCELLED, actor.employeeId(), "API", requireReason(reason));
+            cancelProductPurchase(tx);
             idempotency.complete(claim.record(), tx, 200);
             return tx;
         }
@@ -160,6 +256,15 @@ public class TransactionOrchestrator {
             throw DomainException.conflict("TRANSACTION_NOT_REVERSIBLE", "Only a completed transaction can be reversed");
         if (original.getType() == TransactionType.REVERSAL)
             throw DomainException.conflict("TRANSACTION_NOT_REVERSIBLE", "A reversal cannot itself be reversed");
+        if (original.getType() == TransactionType.PRODUCT_PURCHASE) {
+            ProductPurchase purchase = productPurchases.findByTransaction_Id(original.getId())
+                    .orElseThrow(() -> DomainException.conflict("PRODUCT_PURCHASE_NOT_FOUND",
+                            "The completed transaction has no product purchase record"));
+            if (purchase.getStatus() != ProductPurchaseStatus.ACTIVE) {
+                throw DomainException.conflict("PRODUCT_PURCHASE_NOT_REVERSIBLE",
+                        "Only an active product purchase can be reversed");
+            }
+        }
         if (transactions.existsByReversalOfId(original.getId()))
             throw DomainException.conflict("TRANSACTION_ALREADY_REVERSED", "A reversal already exists");
         var claim = idempotency.claim(actor.callerScope(), "REVERSE:" + original.getId(), idempotencyKey, hasher.hash(List.of(original.getId(), reason)));
@@ -196,7 +301,12 @@ public class TransactionOrchestrator {
                     null, "deposit-credit");
         else {
             String hold = holds.findByTransactionId(tx.getId()).map(FundsHold::getExternalHoldId).orElse(null);
-            outbox.accountProjection(tx, tx.getSourceAccountId(), "DEBIT", tx.totalDebit(), tx.getType() == TransactionType.WITHDRAWAL ? "WITHDRAWAL_POSTED" : "PAYMENT_POSTED", hold, "source-debit");
+            String eventType = switch (tx.getType()) {
+                case WITHDRAWAL -> "WITHDRAWAL_POSTED";
+                case PRODUCT_PURCHASE -> "PRODUCT_PURCHASE_POSTED";
+                default -> "PAYMENT_POSTED";
+            };
+            outbox.accountProjection(tx, tx.getSourceAccountId(), "DEBIT", tx.totalDebit(), eventType, hold, "source-debit");
             if (tx.getType() == TransactionType.INTERNAL_TRANSFER) {
                 journals.createSettlementJournal(tx);
                 outbox.accountProjection(tx, tx.getDestinationAccountId(), "CREDIT", tx.getAmount(), "CREDIT_POSTED", null, "destination-credit");
@@ -288,6 +398,7 @@ public class TransactionOrchestrator {
             case UPI -> PaymentRail.UPI;
             case CHEQUE -> PaymentRail.CHEQUE;
             case CARD_PAYMENT -> PaymentRail.CARD;
+            case PRODUCT_PURCHASE -> PaymentRail.INTERNAL;
             case REVERSAL -> PaymentRail.INTERNAL;
         };
         if (rail != expected)
@@ -341,5 +452,53 @@ public class TransactionOrchestrator {
 
     private String reference(String client) {
         return client != null && !client.isBlank() ? client : "TXN-" + UUID.randomUUID().toString().replace("-", "").substring(0, 20).toUpperCase();
+    }
+
+    private ProductClient.EffectiveProduct purchasableProduct(ProductPurchaseRequest request) {
+        ProductClient.EffectiveProduct product;
+        try {
+            product = products.effective(request.productCode());
+        } catch (Exception exception) {
+            throw DomainException.invalid("PRODUCT_NOT_AVAILABLE",
+                    "Could not resolve product " + request.productCode() + ": " + exception.getMessage());
+        }
+        if (product == null) {
+            throw DomainException.invalid("PRODUCT_NOT_AVAILABLE",
+                    "Product service returned no terms for " + request.productCode());
+        }
+        if (!"FD-12M".equals(product.productCode())
+                || !"TERM_DEPOSIT".equals(product.productType())
+                || !product.requiresFunding()
+                || product.tenureMonths() == null
+                || product.tenureMonths() != 12) {
+            throw DomainException.invalid("PRODUCT_NOT_PURCHASABLE",
+                    "Only FD-12M is available through product-purchase transactions");
+        }
+        if (!request.currency().equals(product.currency())) {
+            throw DomainException.invalid("CURRENCY_MISMATCH",
+                    "Purchase currency does not match the product currency");
+        }
+        if (request.amount().compareTo(product.minOpeningDeposit()) < 0) {
+            throw DomainException.invalid("MINIMUM_PURCHASE_AMOUNT",
+                    "FD-12M requires at least " + product.minOpeningDeposit() + " " + product.currency());
+        }
+        return product;
+    }
+
+    private void cancelProductPurchase(Transaction tx) {
+        if (tx.getType() != TransactionType.PRODUCT_PURCHASE) return;
+        productPurchases.findByTransaction_Id(tx.getId())
+                .ifPresent(purchase -> purchase.setStatus(ProductPurchaseStatus.CANCELLED));
+    }
+
+    private ProductPurchaseResponse purchaseResponse(Transaction tx, ProductPurchase purchase) {
+        return new ProductPurchaseResponse(
+                purchase.getPurchaseId(), tx.getId(), tx.getReference(), tx.getStatus(),
+                purchase.getOwnerAccountId(), purchase.getProductCode(), purchase.getProductName(),
+                purchase.getProductType(), purchase.getProductVersionId(),
+                purchase.getProductVersionNumber(), purchase.getPrincipalAmount(),
+                purchase.getCurrency(), purchase.getInterestRate(), purchase.getTenureMonths(),
+                purchase.getPurchasedOn(), purchase.getMaturityDate(), purchase.getStatus(),
+                purchase.getReversalTransactionId(), purchase.getCreatedAt(), purchase.getUpdatedAt());
     }
 }

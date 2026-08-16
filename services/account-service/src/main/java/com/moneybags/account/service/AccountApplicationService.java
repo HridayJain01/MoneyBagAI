@@ -41,6 +41,7 @@ public class AccountApplicationService {
     private final ProductClient productClient;
     private final CustomerClient customerClient;
     private final AccountEventPublisher eventPublisher;
+    private final AccountProductOwnershipService productOwnerships;
     private final ObjectMapper objectMapper;
 
     @Transactional
@@ -238,6 +239,9 @@ public class AccountApplicationService {
                 .status("ACTIVE")
                 .addedAt(Instant.now())
                 .build());
+
+        productOwnerships.recordAccountOpening(
+                account, product, application.getRequestedInitialDeposit());
 
         statusHistory.save(AccountStatusHistory.builder()
                 .accountId(account.getAccountId())

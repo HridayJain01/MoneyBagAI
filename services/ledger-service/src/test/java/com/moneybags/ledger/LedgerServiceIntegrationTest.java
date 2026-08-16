@@ -47,9 +47,10 @@ class LedgerServiceIntegrationTest {
     void loadsConfiguredSeedAccountsWithCorrectNormalSides() {
         assertThat(accountRepository.findAllByOrderByCodeAsc())
                 .extracting(account -> account.getCode())
-                .containsExactly("110100", "210000", "220100", "220200", "410100");
+                .containsExactly("110100", "210000", "210100", "220100", "220200", "410100");
         assertThat(accountRepository.findByCode("110100").orElseThrow().getNormalSide()).isEqualTo(EntrySide.DEBIT);
         assertThat(accountRepository.findByCode("210000").orElseThrow().getNormalSide()).isEqualTo(EntrySide.CREDIT);
+        assertThat(accountRepository.findByCode("210100").orElseThrow().getNormalSide()).isEqualTo(EntrySide.CREDIT);
         assertThat(accountRepository.findByCode("220100").orElseThrow().getNormalSide()).isEqualTo(EntrySide.CREDIT);
         assertThat(accountRepository.findByCode("220200").orElseThrow().getNormalSide()).isEqualTo(EntrySide.CREDIT);
         assertThat(accountRepository.findByCode("410100").orElseThrow().getNormalSide()).isEqualTo(EntrySide.CREDIT);

@@ -1,6 +1,7 @@
 package com.moneybags.transaction.controller;
 
 import com.moneybags.transaction.api.TransactionModels.*;
+import com.moneybags.transaction.api.ProductPurchaseResponse;
 import com.moneybags.transaction.config.TransactionProperties;
 import com.moneybags.transaction.domain.*;
 import com.moneybags.transaction.security.*;
@@ -26,6 +27,7 @@ public class TransactionQueryController {
     @GetMapping("/api/v1/transactions/by-reference/{reference}") public TransactionView reference(@PathVariable String reference,HttpServletRequest request){return queries.byReference(reference,actors.resolve(request));}
     @GetMapping("/api/v1/transactions/{id}/status") public StatusView status(@PathVariable String id,HttpServletRequest request){return queries.status(id,actors.resolve(request));}
     @GetMapping("/api/v1/transactions/{id}") public TransactionView get(@PathVariable String id,HttpServletRequest request){return queries.byId(id,actors.resolve(request));}
+    @GetMapping("/api/v1/transactions/{id}/product-purchase") public ProductPurchaseResponse productPurchase(@PathVariable String id,HttpServletRequest request){return queries.productPurchase(id,actors.resolve(request));}
     @GetMapping("/api/v1/accounts/{accountId}/transactions") public Page<TransactionView> account(@PathVariable String accountId,@PageableDefault(size=20,sort="createdAt",direction=Sort.Direction.DESC)Pageable page,HttpServletRequest request){return queries.account(accountId,page,actors.resolve(request));}
     @GetMapping("/api/v1/accounts/{accountId}/mini-statement") public List<TransactionView> mini(@PathVariable String accountId,@RequestParam(required=false)Integer size,HttpServletRequest request){return queries.miniStatement(accountId,size==null?properties.getMiniStatementSize():size,actors.resolve(request));}
     @GetMapping("/api/v1/transactions/approvals") public Page<TransactionView> approvals(@RequestParam(required=false)String branch,@RequestParam(required=false)BigDecimal minAmount,@RequestParam(required=false)BigDecimal maxAmount,@RequestParam(required=false)PaymentRail rail,@PageableDefault(size=20,sort="createdAt",direction=Sort.Direction.ASC)Pageable page,HttpServletRequest request){return queries.approvals(branch,minAmount,maxAmount,rail,page,actors.resolve(request));}

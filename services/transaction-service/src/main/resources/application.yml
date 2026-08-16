@@ -41,6 +41,7 @@ moneybags:
     ledger:
       cash-asset: "110100"
       account-deposit-control: "210000"
+      term-deposit-control: "210100"
       internal-clearing: "220100"
       external-clearing: "220200"
       fee-income: "410100"

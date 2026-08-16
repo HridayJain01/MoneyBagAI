@@ -36,6 +36,7 @@ public class ProjectionService {
     private final AccountStatusHistoryRepository statusHistory;
     private final HoldService holdService;
     private final AccountEventPublisher eventPublisher;
+    private final AccountProductOwnershipService productOwnerships;
 
     /**
      * Idempotent on BOTH the eventId (primary key) and the Idempotency-Key
@@ -106,6 +107,7 @@ public class ProjectionService {
         }
 
         accounts.saveAndFlush(account);
+        productOwnerships.syncPrimaryStatus(account);
 
         balanceHistory.save(BalanceHistory.builder()
                 .accountId(account.getAccountId())

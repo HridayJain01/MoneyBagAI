@@ -1,6 +1,8 @@
 package com.moneybags.transaction.controller;
 
 import com.moneybags.transaction.api.TransactionModels.*;
+import com.moneybags.transaction.api.ProductPurchaseRequest;
+import com.moneybags.transaction.api.ProductPurchaseResponse;
 import com.moneybags.transaction.domain.*;
 import com.moneybags.transaction.entity.Transaction;
 import com.moneybags.transaction.security.*;
@@ -23,6 +25,7 @@ public class TransactionCommandController {
     @PostMapping("/transfers/upi") public ResponseEntity<Transaction> upi(@RequestHeader("Idempotency-Key") String key,@Valid @RequestBody CreateRequest body,HttpServletRequest request){return created(service.create(TransactionType.UPI,PaymentRail.UPI,body,key,actors.resolve(request)));}
     @PostMapping("/cheques") public ResponseEntity<Transaction> cheque(@RequestHeader("Idempotency-Key") String key,@Valid @RequestBody CreateRequest body,HttpServletRequest request){return created(service.create(TransactionType.CHEQUE,PaymentRail.CHEQUE,body,key,actors.resolve(request)));}
     @PostMapping("/card-payments") public ResponseEntity<Transaction> card(@RequestHeader("Idempotency-Key") String key,@Valid @RequestBody CreateRequest body,HttpServletRequest request){return created(service.create(TransactionType.CARD_PAYMENT,PaymentRail.CARD,body,key,actors.resolve(request)));}
+    @PostMapping("/product-purchases") public ResponseEntity<ProductPurchaseResponse> productPurchase(@RequestHeader("Idempotency-Key") String key,@Valid @RequestBody ProductPurchaseRequest body,HttpServletRequest request){return ResponseEntity.status(HttpStatus.CREATED).body(service.createProductPurchase(body,key,actors.resolve(request)));}
     @PostMapping("/{id}/approve") public Transaction approve(@PathVariable String id,@RequestHeader("Idempotency-Key") String key,HttpServletRequest request){return service.approve(id,key,actors.resolve(request));}
     @PostMapping("/{id}/reject") public Transaction reject(@PathVariable String id,@RequestHeader("Idempotency-Key") String key,@Valid @RequestBody ActionRequest body,HttpServletRequest request){return service.reject(id,body.reason(),key,actors.resolve(request));}
     @PostMapping("/{id}/cancel") public Transaction cancel(@PathVariable String id,@RequestHeader("Idempotency-Key") String key,@Valid @RequestBody ActionRequest body,HttpServletRequest request){return service.cancel(id,body.reason(),key,actors.resolve(request));}

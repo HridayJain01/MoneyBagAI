@@ -16,6 +16,7 @@ import java.util.*;
 public class JournalService {
     private static final String CASH_ASSET = "Cash and Settlement Asset";
     private static final String CUSTOMER_DEPOSIT_CONTROL = "Customer Deposit Control";
+    private static final String TERM_DEPOSIT_CONTROL = "Term Deposit Control";
     private static final String INTERNAL_CLEARING = "Internal Payment Clearing";
     private static final String EXTERNAL_CLEARING = "External Clearing";
     private static final String FEE_INCOME = "Payment Fee Income";
@@ -31,6 +32,9 @@ public class JournalService {
             case WITHDRAWAL -> save(tx,"POSTING",debitWithFee(tx,properties.getLedger().getCashAsset(),CASH_ASSET));
             case INTERNAL_TRANSFER -> save(tx,"PAYMENT",debitWithFee(tx,properties.getLedger().getInternalClearing(),INTERNAL_CLEARING));
             case NEFT,RTGS,IMPS,UPI,CARD_PAYMENT -> save(tx,"PAYMENT",debitWithFee(tx,properties.getLedger().getExternalClearing(),EXTERNAL_CLEARING));
+            case PRODUCT_PURCHASE -> save(tx,"PRODUCT_PURCHASE",List.of(
+                    dr(properties.getLedger().getAccountDepositControl(),tx.getSourceAccountId(),tx.getAmount(),CUSTOMER_DEPOSIT_CONTROL),
+                    cr(properties.getLedger().getTermDepositControl(),null,tx.getAmount(),TERM_DEPOSIT_CONTROL)));
             case CHEQUE -> { }
             case REVERSAL -> throw new IllegalArgumentException("Reversal journals are created from the original transaction");
         }

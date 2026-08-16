@@ -1,6 +1,7 @@
 package com.moneybags.transaction;
 
 import com.moneybags.transaction.api.TransactionModels.*;
+import com.moneybags.transaction.api.ProductPurchaseRequest;
 import com.moneybags.transaction.client.*;
 import com.moneybags.transaction.config.TransactionProperties;
 import com.moneybags.transaction.domain.*;
@@ -16,6 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Instant;
@@ -37,7 +39,7 @@ class TransactionServiceIntegrationTest {
     @Autowired TransactionRepository transactions; @Autowired TransactionLegRepository legs; @Autowired FundsHoldRepository holds; @Autowired JournalEntryRepository journals;
     @Autowired ClearingInstructionRepository clearing; @Autowired OutboxEventRepository outbox;
     @Autowired MockMvc mockMvc;
-    @MockBean AccountClient accountClient; @MockBean CardClient cardClient; @MockBean LedgerClient ledgerClient; @MockBean StatementClient statementClient;
+    @MockBean AccountClient accountClient; @MockBean CardClient cardClient; @MockBean LedgerClient ledgerClient; @MockBean StatementClient statementClient; @MockBean ProductClient productClient;
     RequestActor maker;
 
     @BeforeEach void setup(){
@@ -47,6 +49,15 @@ class TransactionServiceIntegrationTest {
         AtomicLong ids=new AtomicLong(1);
         when(ledgerClient.post(eq("transaction-service"),any())).thenAnswer(i->{LedgerClient.JournalPostRequest r=i.getArgument(1);List<LedgerClient.JournalLineResponse> lines=r.lines().stream().map(l->new LedgerClient.JournalLineResponse(ids.getAndIncrement(),1,l.ledgerCode(),l.description(),l.customerAccountId(),l.side(),l.amount(),l.description(),Instant.now())).toList();return new LedgerClient.JournalResponse(ids.getAndIncrement(),r.journalReference(),r.transactionId(),r.journalType(),r.description(),"POSTED",r.currencyCode(),r.lines().stream().filter(l->"DEBIT".equals(l.side())).map(LedgerClient.JournalLineRequest::amount).reduce(BigDecimal.ZERO,BigDecimal::add),r.lines().stream().filter(l->"CREDIT".equals(l.side())).map(LedgerClient.JournalLineRequest::amount).reduce(BigDecimal.ZERO,BigDecimal::add),null,Instant.now(),Instant.now(),"transaction-service",lines);});
         when(statementClient.push(eq("transaction-service"),any())).thenAnswer(i->{StatementClient.TransactionEvent e=i.getArgument(1);return new StatementClient.IngestResult(e.sourceEventId(),"APPLIED");});
+        when(productClient.effective("FD-12M")).thenReturn(new ProductClient.EffectiveProduct(
+                "FD-12M","12-Month Fixed Deposit","TERM_DEPOSIT","INR",
+                new BigDecimal("6.75"),BigDecimal.ZERO,new BigDecimal("5000"),
+                BigDecimal.ZERO,0,12,BigDecimal.ZERO,false,true,18,"ACTIVE",
+                LocalDate.now(),41L,4));
+        when(accountClient.projectOwnedProduct(eq("transaction-service"),any())).thenAnswer(i->{
+            AccountClient.OwnedProductProjection p=i.getArgument(1);
+            return new AccountClient.OwnedProductResult(p.ownershipId(),p.ownerAccountId(),p.productCode(),p.productName(),p.productType(),p.productVersionId(),p.productVersionNumber(),"TRANSACTION_PURCHASE",p.principalAmount(),p.currency(),p.interestRate(),p.tenureMonths(),p.acquiredOn(),p.maturityDate(),"ACTIVATE".equals(p.action())?"ACTIVE":"REVERSED",p.purchaseTransactionId(),p.reversalTransactionId());
+        });
     }
     @AfterEach void resetOutbox(){properties.getOutbox().setEnabled(false);}
 
@@ -150,6 +161,40 @@ class TransactionServiceIntegrationTest {
                 .containsExactly(tuple("210000","DEBIT","Customer Deposit Control"),tuple("220100","CREDIT","Internal Payment Clearing"));
         assertThat(transactions.findById(tx.getId()).orElseThrow().getStatus()).isEqualTo(TransactionStatus.COMPLETED);
     }
+    @Test void fixedDepositPurchaseCompletesAfterLedgerStatementAndOwnership(){
+        ProductPurchaseRequest request=new ProductPurchaseRequest("A1","FD-12M",new BigDecimal("5000"),"INR",PaymentChannel.WEB,"Twelve month investment","TXN-FD-001");
+        var purchase=orchestrator.createProductPurchase(request,"fd-purchase-1",maker);
+        assertThat(purchase.transactionStatus()).isEqualTo(TransactionStatus.PROJECTION_PENDING);
+        assertThat(purchase.productVersionNumber()).isEqualTo(4);
+        properties.getOutbox().setEnabled(true);publisher.publish();
+        assertThat(transactions.findById(purchase.transactionId()).orElseThrow().getStatus()).isEqualTo(TransactionStatus.COMPLETED);
+        ArgumentCaptor<LedgerClient.JournalPostRequest> journal=ArgumentCaptor.forClass(LedgerClient.JournalPostRequest.class);
+        verify(ledgerClient,atLeastOnce()).post(eq("transaction-service"),journal.capture());
+        LedgerClient.JournalPostRequest purchaseJournal=journal.getAllValues().stream()
+                .filter(value->value.transactionId().equals(purchase.transactionId()))
+                .findFirst().orElseThrow();
+        assertThat(purchaseJournal.journalReference()).isEqualTo("JRN-TXN-FD-001-PRODUCT_PURCHASE");
+        assertThat(purchaseJournal.journalType()).isEqualTo("PRODUCT_PURCHASE");
+        assertThat(purchaseJournal.lines()).extracting(LedgerClient.JournalLineRequest::ledgerCode,LedgerClient.JournalLineRequest::side,LedgerClient.JournalLineRequest::description)
+                .containsExactly(tuple("210000","DEBIT","Customer Deposit Control"),tuple("210100","CREDIT","Term Deposit Control"));
+        verify(statementClient).push(eq("transaction-service"),argThat(e->e.transactionId().equals(purchase.transactionId())&&"PRODUCT_PURCHASE".equals(e.transactionType())&&"DEBIT".equals(e.direction())));
+        verify(accountClient).projectOwnedProduct(eq("transaction-service"),argThat(p->"ACTIVATE".equals(p.action())&&"FD-12M".equals(p.productCode())&&p.productVersionNumber()==4));
+        InOrder completionOrder=inOrder(accountClient,ledgerClient,statementClient);
+        completionOrder.verify(accountClient).project(anyString(),argThat(p->p.transactionId().equals(purchase.transactionId())));
+        completionOrder.verify(ledgerClient).post(eq("transaction-service"),argThat(j->j.transactionId().equals(purchase.transactionId())));
+        completionOrder.verify(statementClient).push(eq("transaction-service"),argThat(e->e.transactionId().equals(purchase.transactionId())));
+        completionOrder.verify(accountClient).projectOwnedProduct(eq("transaction-service"),argThat(p->p.purchaseTransactionId().equals(purchase.transactionId())));
+    }
+    @Test void completedFixedDepositPurchaseReversalRefundsAndReversesOwnership(){
+        ProductPurchaseRequest request=new ProductPurchaseRequest("A1","FD-12M",new BigDecimal("5000"),"INR",PaymentChannel.WEB,null,"TXN-FD-REV-001");
+        var purchase=orchestrator.createProductPurchase(request,"fd-purchase-reverse",maker);properties.getOutbox().setEnabled(true);publisher.publish();
+        clearInvocations(accountClient,ledgerClient,statementClient);
+        Transaction reversal=orchestrator.reverse(purchase.transactionId(),"Customer cancellation","fd-reversal",maker);publisher.publish();
+        assertThat(transactions.findById(reversal.getId()).orElseThrow().getStatus()).isEqualTo(TransactionStatus.COMPLETED);
+        verify(accountClient).project(anyString(),argThat(p->p.accountId().equals("A1")&&"CREDIT".equals(p.direction())&&p.amount().compareTo(new BigDecimal("5000"))==0));
+        verify(accountClient).projectOwnedProduct(eq("transaction-service"),argThat(p->"REVERSE".equals(p.action())&&reversal.getId().equals(p.reversalTransactionId())));
+        verify(statementClient).push(eq("transaction-service"),argThat(e->e.transactionId().equals(reversal.getId())&&"CREDIT".equals(e.direction())));
+    }
     @Test void completedInternalTransferReversalRestoresBothAccountsLedgerAndStatements(){
         CreateRequest transfer=new CreateRequest("A1","A2",null,new BigDecimal("300"),BigDecimal.ZERO,"INR",PaymentChannel.BRANCH,PaymentMethod.ACCOUNT,null,null,"Internal transfer to reverse",null);
         Transaction original=orchestrator.create(TransactionType.INTERNAL_TRANSFER,PaymentRail.INTERNAL,transfer,"transfer-to-reverse",maker);properties.getOutbox().setEnabled(true);publisher.publish();
@@ -187,6 +232,7 @@ class TransactionServiceIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.info.title").value("MoneyBags Transaction Service API"))
                 .andExpect(jsonPath("$.paths['/api/v1/transactions/deposits']").exists())
+                .andExpect(jsonPath("$.paths['/api/v1/transactions/product-purchases']").exists())
                 .andExpect(jsonPath("$.components.schemas.CreateRequest.properties.customerId").doesNotExist())
                 .andExpect(jsonPath("$.components.schemas.CreateRequest.properties.beneficiaryId").doesNotExist())
                 .andExpect(jsonPath("$.components.schemas.TransactionView.properties.accountHolderId").exists())

@@ -19,6 +19,7 @@ import java.util.UUID;
 public class OutboxService {
     public static final String LEDGER_POST = "LEDGER_POST";
     public static final String STATEMENT_POST = "STATEMENT_POST";
+    public static final String OWNERSHIP_POST = "OWNERSHIP_POST";
 
     private final OutboxEventRepository repository;
     private final JournalEntryRepository journals;
@@ -58,6 +59,20 @@ public class OutboxService {
                 tx.getNarration(), tx.getReversalOf() == null ? null : tx.getReversalOf().getId(),
                 postedAt, account.ledgerBalance(), Instant.now());
         enqueue(eventId, tx, STATEMENT_POST, deduplicationKey, payload);
+    }
+
+    public void productOwnership(Transaction tx, ProductPurchase purchase, String action) {
+        String deduplicationKey = tx.getId() + ":ownership:" + action;
+        if (repository.existsByDeduplicationKey(deduplicationKey)) return;
+        AccountClient.OwnedProductProjection payload = new AccountClient.OwnedProductProjection(
+                purchase.getPurchaseId(), action, purchase.getTransaction().getId(),
+                "REVERSE".equals(action) ? tx.getId() : null,
+                purchase.getOwnerAccountId(), purchase.getProductCode(), purchase.getProductName(),
+                purchase.getProductType(), purchase.getProductVersionId(),
+                purchase.getProductVersionNumber(), purchase.getPrincipalAmount(),
+                purchase.getCurrency(), purchase.getInterestRate(), purchase.getTenureMonths(),
+                purchase.getPurchasedOn(), purchase.getMaturityDate());
+        enqueue(tx, OWNERSHIP_POST, deduplicationKey, payload);
     }
 
     private void enqueue(Transaction tx, String eventType, String deduplicationKey, Object payload) {

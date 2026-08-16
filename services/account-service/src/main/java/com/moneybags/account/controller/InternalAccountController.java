@@ -1,6 +1,10 @@
 package com.moneybags.account.controller;
 
 import com.moneybags.account.api.InternalModels.*;
+import com.moneybags.account.dto.OwnedProductProjectionRequest;
+import com.moneybags.account.dto.OwnedProductView;
+import com.moneybags.account.support.ApiException;
+import com.moneybags.account.service.AccountProductOwnershipService;
 import com.moneybags.account.service.AccountQueryService;
 import com.moneybags.account.service.HoldService;
 import com.moneybags.account.service.ProjectionService;
@@ -25,6 +29,7 @@ public class InternalAccountController {
     private final AccountQueryService queryService;
     private final HoldService holdService;
     private final ProjectionService projectionService;
+    private final AccountProductOwnershipService productOwnershipService;
 
     @Operation(summary = "Account state for transaction pre-flight checks")
     @GetMapping("/internal/v1/accounts/{accountId}/transaction-context")
@@ -74,6 +79,18 @@ public class InternalAccountController {
     public void project(@RequestHeader("Idempotency-Key") String idempotencyKey,
                         @Valid @RequestBody ProjectionInstruction instruction) {
         projectionService.apply(idempotencyKey, instruction);
+    }
+
+    @Operation(summary = "Apply an idempotent purchased-product ownership projection")
+    @PostMapping("/internal/v1/account-product-ownerships")
+    public OwnedProductView projectOwnedProduct(
+            @RequestHeader("X-Service-Name") String serviceName,
+            @Valid @RequestBody OwnedProductProjectionRequest request) {
+        if (!"transaction-service".equals(serviceName)) {
+            throw ApiException.forbidden("SERVICE_AUTH_DENIED",
+                    "Only transaction-service may project purchased products");
+        }
+        return productOwnershipService.projectPurchase(request);
     }
 
     @Operation(summary = "Account metadata for statement generation")

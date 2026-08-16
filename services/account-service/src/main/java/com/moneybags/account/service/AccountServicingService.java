@@ -30,6 +30,7 @@ public class AccountServicingService {
     private final AccountStatusHistoryRepository statusHistory;
     private final AccountLimitsRepository limits;
     private final AccountEventPublisher eventPublisher;
+    private final AccountProductOwnershipService productOwnerships;
 
     // --- Queries -----------------------------------------------------------
 
@@ -155,6 +156,7 @@ public class AccountServicingService {
 
         account.setStatus(target);
         accounts.saveAndFlush(account);
+        productOwnerships.syncPrimaryStatus(account);
         eventPublisher.enqueueAccountEvent(account, "ACCOUNT_" + target.name());
         return toDetail(account);
     }

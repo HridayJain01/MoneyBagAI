@@ -22,6 +22,7 @@ import java.util.List;
 public class OutboxPublisher {
     private final OutboxEventRepository events; private final TransactionRepository transactions; private final FundsHoldRepository holds;
     private final ClearingInstructionRepository clearing; private final AccountClient accounts; private final LedgerClient ledger; private final StatementClient statements;
+    private final ProductPurchaseRepository productPurchases;
     private final ObjectMapper mapper; private final TransactionProperties properties; private final TransactionStateMachine states; private final OutboxService outbox;
 
     @Scheduled(fixedDelayString="${moneybags.transaction.outbox.fixed-delay-ms:5000}")
@@ -41,9 +42,12 @@ public class OutboxPublisher {
         for(Transaction tx:transactions.findByStatusIn(readyStatuses,PageRequest.of(0,50)).getContent()){
             List<OutboxEvent> aggregate=events.findByAggregateId(tx.getId());
             if(aggregate.isEmpty()||aggregate.stream().anyMatch(e->e.getStatus()!=OutboxStatus.PUBLISHED))continue;
-            if(aggregate.stream().anyMatch(e->OutboxService.LEDGER_POST.equals(e.getEventType())))continue;
             boolean awaitingSettlement=tx.getType().externallyCleared()&&clearing.findByTransactionId(tx.getId()).map(c->c.getStatus()!=ClearingStatus.SETTLED).orElse(false);
-            if(!awaitingSettlement)outbox.ledgerPostings(tx);
+            boolean hasLedger=aggregate.stream().anyMatch(e->OutboxService.LEDGER_POST.equals(e.getEventType()));
+            if(!awaitingSettlement&&!hasLedger)outbox.ledgerPostings(tx);
+            else if(!awaitingSettlement&&ownershipRequired(tx)
+                    &&aggregate.stream().noneMatch(e->OutboxService.OWNERSHIP_POST.equals(e.getEventType())))
+                enqueueOwnership(tx);
         }
     }
     private void deliver(OutboxEvent event){
@@ -51,6 +55,7 @@ public class OutboxPublisher {
             switch(event.getEventType()){
                 case OutboxService.LEDGER_POST -> deliverLedger(event);
                 case OutboxService.STATEMENT_POST -> deliverStatement(event);
+                case OutboxService.OWNERSHIP_POST -> deliverOwnership(event);
                 default -> deliverAccount(event);
             }
             event.setStatus(OutboxStatus.PUBLISHED);event.setPublishedAt(Instant.now());event.setAttempts(event.getAttempts()+1);event.setLastError(null);
@@ -84,6 +89,18 @@ public class OutboxPublisher {
         statements.push("transaction-service",payload);
     }
 
+    private void deliverOwnership(OutboxEvent event)throws Exception{
+        AccountClient.OwnedProductProjection payload=mapper.readValue(
+                event.getPayload(),AccountClient.OwnedProductProjection.class);
+        accounts.projectOwnedProduct("transaction-service",payload);
+        ProductPurchase purchase=productPurchases.findById(payload.ownershipId()).orElseThrow();
+        if("ACTIVATE".equals(payload.action()))purchase.setStatus(ProductPurchaseStatus.ACTIVE);
+        else if("REVERSE".equals(payload.action())){
+            purchase.setStatus(ProductPurchaseStatus.REVERSED);
+            purchase.setReversalTransactionId(payload.reversalTransactionId());
+        }
+    }
+
     private StatementAmounts statementAmounts(Transaction tx,LedgerClient.JournalLineResponse line){
         if(tx.getType()==TransactionType.REVERSAL)return new StatementAmounts(line.amount(),BigDecimal.ZERO);
         if("DEBIT".equals(line.side())&&line.customerAccountId().equals(tx.getSourceAccountId()))
@@ -98,6 +115,10 @@ public class OutboxPublisher {
         if(awaitingSettlement&&tx.getStatus()==TransactionStatus.PROJECTION_PENDING)states.transition(tx,TransactionStatus.PROCESSING,"outbox-publisher","SYSTEM","Initial account projection applied; awaiting settlement");
         else if(awaitingSettlement)return;
         else if(aggregate.stream().noneMatch(e->OutboxService.LEDGER_POST.equals(e.getEventType()))){outbox.ledgerPostings(tx);}
+        else if(ownershipRequired(tx)
+                &&aggregate.stream().noneMatch(e->OutboxService.OWNERSHIP_POST.equals(e.getEventType()))){
+            enqueueOwnership(tx);
+        }
         else if(states.canTransition(tx.getStatus(),TransactionStatus.COMPLETED)){
             states.transition(tx,TransactionStatus.COMPLETED,"outbox-publisher","SYSTEM","Account, ledger, and statement projections completed");
             if(tx.getType()==TransactionType.REVERSAL&&tx.getReversalOf()!=null&&tx.getReversalOf().getStatus()==TransactionStatus.REVERSAL_PENDING)states.transition(tx.getReversalOf(),TransactionStatus.REVERSED,"outbox-publisher","SYSTEM","Compensating transaction completed");
@@ -109,6 +130,23 @@ public class OutboxPublisher {
         String message=exception.getMessage()==null?exception.getClass().getSimpleName():exception.getMessage();event.setLastError(message.substring(0,Math.min(500,message.length())));
         if(attempts>=properties.getOutbox().getMaxAttempts())event.setStatus(OutboxStatus.FAILED);
         else{event.setStatus(OutboxStatus.PENDING);event.setNextAttemptAt(Instant.now().plusSeconds(Math.min(300,1L<<Math.min(8,attempts))));}
+    }
+
+    private boolean ownershipRequired(Transaction tx){
+        if(tx.getType()==TransactionType.PRODUCT_PURCHASE)return true;
+        return tx.getType()==TransactionType.REVERSAL&&tx.getReversalOf()!=null
+                &&tx.getReversalOf().getType()==TransactionType.PRODUCT_PURCHASE;
+    }
+
+    private void enqueueOwnership(Transaction tx){
+        if(tx.getType()==TransactionType.PRODUCT_PURCHASE){
+            ProductPurchase purchase=productPurchases.findByTransaction_Id(tx.getId()).orElseThrow();
+            outbox.productOwnership(tx,purchase,"ACTIVATE");
+        }else{
+            ProductPurchase purchase=productPurchases.findByTransaction_Id(
+                    tx.getReversalOf().getId()).orElseThrow();
+            outbox.productOwnership(tx,purchase,"REVERSE");
+        }
     }
 
     private record StatementAmounts(BigDecimal amount,BigDecimal fee){}

@@ -1,6 +1,7 @@
 package com.moneybags.transaction.service;
 
 import com.moneybags.transaction.api.TransactionModels.*;
+import com.moneybags.transaction.api.ProductPurchaseResponse;
 import com.moneybags.transaction.client.AccountClient;
 import com.moneybags.transaction.domain.*;
 import com.moneybags.transaction.entity.*;
@@ -22,6 +23,7 @@ public class TransactionQueryService {
     private final TransactionRepository transactions; private final TransactionLegRepository legs; private final FundsHoldRepository holds;
     private final JournalEntryRepository journals; private final ClearingInstructionRepository clearing; private final StatusHistoryRepository history; private final AccountClient accounts;
     private final TransactionRailDetailsRepository railDetails;
+    private final ProductPurchaseRepository productPurchases;
 
     @Transactional(readOnly=true)
     public Page<TransactionView> search(String account,String reference,TransactionStatus status,PaymentRail rail,TransactionType type,BigDecimal minAmount,BigDecimal maxAmount,Instant from,Instant to,String createdBy,Pageable pageable,RequestActor actor){
@@ -34,6 +36,11 @@ public class TransactionQueryService {
     }
     @Transactional(readOnly=true) public TransactionView byId(String id,RequestActor actor){Transaction tx=transactions.findById(id).orElseThrow(()->DomainException.notFound("TRANSACTION_NOT_FOUND","Transaction not found: "+id));authorize(tx,actor);return view(tx);}
     @Transactional(readOnly=true) public TransactionView byReference(String ref,RequestActor actor){Transaction tx=transactions.findByReference(ref).orElseThrow(()->DomainException.notFound("TRANSACTION_NOT_FOUND","Transaction not found: "+ref));authorize(tx,actor);return view(tx);}
+    @Transactional(readOnly=true) public ProductPurchaseResponse productPurchase(String id,RequestActor actor){
+        Transaction tx=transactions.findById(id).orElseThrow(()->DomainException.notFound("TRANSACTION_NOT_FOUND","Transaction not found: "+id));authorize(tx,actor);
+        ProductPurchase purchase=productPurchases.findByTransaction_Id(id).orElseThrow(()->DomainException.notFound("PRODUCT_PURCHASE_NOT_FOUND","Transaction is not a product purchase: "+id));
+        return new ProductPurchaseResponse(purchase.getPurchaseId(),tx.getId(),tx.getReference(),tx.getStatus(),purchase.getOwnerAccountId(),purchase.getProductCode(),purchase.getProductName(),purchase.getProductType(),purchase.getProductVersionId(),purchase.getProductVersionNumber(),purchase.getPrincipalAmount(),purchase.getCurrency(),purchase.getInterestRate(),purchase.getTenureMonths(),purchase.getPurchasedOn(),purchase.getMaturityDate(),purchase.getStatus(),purchase.getReversalTransactionId(),purchase.getCreatedAt(),purchase.getUpdatedAt());
+    }
     @Transactional(readOnly=true) public StatusView status(String id,RequestActor actor){Transaction tx=transactions.findById(id).orElseThrow(()->DomainException.notFound("TRANSACTION_NOT_FOUND","Transaction not found: "+id));authorize(tx,actor);return new StatusView(tx.getId(),tx.getReference(),tx.getStatus(),tx.getUpdatedAt());}
     @Transactional(readOnly=true) public Page<TransactionView> account(String accountId,Pageable page,RequestActor actor){requireQueryActor(actor);accounts.context(accountId);return transactions.findBySourceAccountIdOrDestinationAccountId(accountId,accountId,page).map(tx->{authorize(tx,actor);return view(tx);});}
     @Transactional(readOnly=true) public List<TransactionView> miniStatement(String accountId,int size,RequestActor actor){return account(accountId,PageRequest.of(0,Math.min(Math.max(size,1),100),Sort.by(Sort.Direction.DESC,"createdAt")),actor).getContent();}

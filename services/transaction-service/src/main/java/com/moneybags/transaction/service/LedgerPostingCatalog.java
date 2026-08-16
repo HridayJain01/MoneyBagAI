@@ -15,6 +15,7 @@ public class LedgerPostingCatalog {
     private static final Map<String, String> STATIC_LEDGER_NAMES = Map.of(
             "110100", "Cash and Settlement Asset",
             "210000", "Customer Deposit Control",
+            "210100", "Term Deposit Control",
             "220100", "Internal Payment Clearing",
             "220200", "External Clearing",
             "410100", "Payment Fee Income");
@@ -44,6 +45,7 @@ public class LedgerPostingCatalog {
         }
         if (transaction.getType() == TransactionType.DEPOSIT) return "DEPOSIT";
         if (transaction.getType() == TransactionType.WITHDRAWAL) return "WITHDRAWAL";
+        if (transaction.getType() == TransactionType.PRODUCT_PURCHASE) return "PRODUCT_PURCHASE";
         return "PAYMENT";
     }
 
@@ -51,6 +53,7 @@ public class LedgerPostingCatalog {
         return switch (postingType) {
             case "DEPOSIT" -> "Customer deposit journal";
             case "WITHDRAWAL" -> "Customer withdrawal journal";
+            case "PRODUCT_PURCHASE" -> "Term deposit purchase journal";
             case "PAYMENT" -> "Customer payment journal";
             case "SETTLEMENT" -> "Payment settlement journal";
             case "REVERSAL" -> "Transaction reversal journal";

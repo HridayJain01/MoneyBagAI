@@ -19,6 +19,7 @@ public class TransactionProperties {
     public static class Ledger {
         private String cashAsset = "110100";
         private String accountDepositControl = "210000";
+        private String termDepositControl = "210100";
         private String internalClearing = "220100";
         private String externalClearing = "220200";
         private String feeIncome = "410100";
