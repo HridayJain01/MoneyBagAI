@@ -1,6 +1,6 @@
 package com.moneybags.product.controller;
 
-import com.moneybags.product.api.ApiModels.*;
+import com.moneybags.product.dto.*;
 import com.moneybags.product.entity.ProductStatus;
 import com.moneybags.product.entity.ProductType;
 import com.moneybags.product.service.ProductService;
@@ -34,6 +34,27 @@ public class ProductController {
     @GetMapping("/api/v1/products/{productCode}")
     public ProductDetail detail(@PathVariable String productCode) {
         return productService.detail(productCode);
+    }
+
+    @Operation(summary = "List every immutable version of a product")
+    @GetMapping("/api/v1/products/{productCode}/versions")
+    public List<ProductVersionDetail> history(@PathVariable String productCode) {
+        return productService.history(productCode);
+    }
+
+    @Operation(summary = "Read one exact historical product version")
+    @GetMapping("/api/v1/products/{productCode}/versions/{versionNumber}")
+    public ProductVersionDetail version(@PathVariable String productCode,
+                                        @PathVariable Integer versionNumber) {
+        return productService.version(productCode, versionNumber);
+    }
+
+    @Operation(summary = "Resolve the product version effective on a business date")
+    @GetMapping("/api/v1/products/{productCode}/as-of")
+    public ProductVersionDetail asOf(
+            @PathVariable String productCode,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return productService.asOf(productCode, date);
     }
 
     @Operation(summary = "Create a product")

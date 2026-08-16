@@ -1,6 +1,6 @@
 package com.moneybags.product.support;
 
-import com.moneybags.product.api.ApiModels.ErrorResponse;
+import com.moneybags.product.dto.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

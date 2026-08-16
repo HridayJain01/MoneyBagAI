@@ -1,0 +1,409 @@
+{
+  "info": {
+    "_postman_id": "43bdc2b0-1c9c-4b11-85a4-product-service",
+    "name": "Product Service - Versioned Flexible Catalog",
+    "description": "Postman collection for testing the Product Service versioned flexible product catalog APIs.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8083/api/v1/products",
+      "type": "string"
+    },
+    {
+      "key": "productId",
+      "value": "9",
+      "type": "string"
+    },
+    {
+      "key": "productCode",
+      "value": "HL-STANDARD",
+      "type": "string"
+    },
+    {
+      "key": "productVersionId",
+      "value": "901",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": [
+                "{{baseUrl}}"
+              ]
+            },
+            "description": "Returns all products using each product's current active version."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Products by Category",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}?productCategory=LOAN",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "key": "productCategory",
+                  "value": "LOAN"
+                }
+              ]
+            },
+            "description": "Filters products by productCategory. Valid examples: DEPOSIT, LOAN, CARD, INSURANCE."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Products by Type",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}?productType=HOME_LOAN",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "key": "productType",
+                  "value": "HOME_LOAN"
+                }
+              ]
+            },
+            "description": "Filters products by productType. Valid examples: SAVINGS, CURRENT, FIXED_DEPOSIT, RECURRING_DEPOSIT, PERSONAL_LOAN, HOME_LOAN, DEBIT_CARD, CREDIT_CARD."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Products by Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}?status=ACTIVE",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "ACTIVE"
+                }
+              ]
+            },
+            "description": "Filters active-version responses by status. Valid values: ACTIVE, INACTIVE, DISCONTINUED."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Products by Category Type and Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}?productCategory=LOAN&productType=HOME_LOAN&status=ACTIVE",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "key": "productCategory",
+                  "value": "LOAN"
+                },
+                {
+                  "key": "productType",
+                  "value": "HOME_LOAN"
+                },
+                {
+                  "key": "status",
+                  "value": "ACTIVE"
+                }
+              ]
+            },
+            "description": "Combines productCategory, productType, and status filters."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product by Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/{{productId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{productId}}"
+              ]
+            },
+            "description": "Returns the active/current version for the product id."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product by Code",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/code/{{productCode}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "code",
+                "{{productCode}}"
+              ]
+            },
+            "description": "Returns the active/current version for the product code."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Versions",
+      "item": [
+        {
+          "name": "Get Product by Version Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/versions/{{productVersionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "versions",
+                "{{productVersionId}}"
+              ]
+            },
+            "description": "Returns the exact historical product version."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Versions for Product",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/{{productId}}/versions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{productId}}",
+                "versions"
+              ]
+            },
+            "description": "Returns all versions for one product, newest version first."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Mutations",
+      "item": [
+        {
+          "name": "Create New Product - Home Loan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productCode\": \"HL-TEST-001\",\n  \"name\": \"Test Home Loan\",\n  \"productCategory\": \"LOAN\",\n  \"productType\": \"HOME_LOAN\",\n  \"status\": \"ACTIVE\",\n  \"effectiveFrom\": \"2026-07-01T00:00:00\",\n  \"effectiveTo\": null,\n  \"terms\": {\n    \"INTEREST_RATE\": 8.25,\n    \"MIN_LOAN_AMOUNT\": 500000,\n    \"MAX_LOAN_AMOUNT\": 50000000,\n    \"MAX_TENURE_MONTHS\": 360,\n    \"PROCESSING_FEE_PERCENT\": 0.5\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": [
+                "{{baseUrl}}"
+              ]
+            },
+            "description": "Creates a new product family and version 1."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Second Version for Existing Product Code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productCode\": \"HL-TEST-001\",\n  \"name\": \"Test Home Loan\",\n  \"productCategory\": \"LOAN\",\n  \"productType\": \"HOME_LOAN\",\n  \"status\": \"ACTIVE\",\n  \"effectiveFrom\": \"2026-08-01T00:00:00\",\n  \"effectiveTo\": null,\n  \"terms\": {\n    \"INTEREST_RATE\": 8.5,\n    \"MIN_LOAN_AMOUNT\": 500000,\n    \"MAX_LOAN_AMOUNT\": 60000000,\n    \"MAX_TENURE_MONTHS\": 360,\n    \"PROCESSING_FEE_PERCENT\": 0.45\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": [
+                "{{baseUrl}}"
+              ]
+            },
+            "description": "Creates version 2 under the same productCode. Previous active version is marked INACTIVE."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Savings Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productCode\": \"SAV-TEST-001\",\n  \"name\": \"Test Savings Account\",\n  \"productCategory\": \"DEPOSIT\",\n  \"productType\": \"SAVINGS\",\n  \"status\": \"ACTIVE\",\n  \"effectiveFrom\": \"2026-07-01T00:00:00\",\n  \"effectiveTo\": null,\n  \"terms\": {\n    \"INTEREST_RATE\": 3.25,\n    \"MIN_BALANCE\": 1000,\n    \"OPENING_FEE\": 0\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": [
+                "{{baseUrl}}"
+              ]
+            },
+            "description": "Creates a CASA-style savings product with flexible terms."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Product - Create New Version",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Standard Home Loan\",\n  \"productCategory\": \"LOAN\",\n  \"productType\": \"HOME_LOAN\",\n  \"status\": \"ACTIVE\",\n  \"effectiveFrom\": \"2026-09-01T00:00:00\",\n  \"effectiveTo\": null,\n  \"terms\": {\n    \"INTEREST_RATE\": 8.35,\n    \"MIN_LOAN_AMOUNT\": 500000,\n    \"MAX_LOAN_AMOUNT\": 55000000,\n    \"MAX_TENURE_MONTHS\": 360,\n    \"PROCESSING_FEE_PERCENT\": 0.4\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/{{productId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{productId}}"
+              ]
+            },
+            "description": "Updates product identity fields if provided and creates a new version. Existing version terms are preserved."
+          },
+          "response": []
+        },
+        {
+          "name": "Patch Product Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"DISCONTINUED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/{{productId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{productId}}",
+                "status"
+              ]
+            },
+            "description": "Updates the status of the current active product version."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Validation Examples",
+      "item": [
+        {
+          "name": "Create Product - Unknown Attribute Should Fail",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productCode\": \"BAD-ATTR-001\",\n  \"name\": \"Bad Attribute Product\",\n  \"productCategory\": \"LOAN\",\n  \"productType\": \"HOME_LOAN\",\n  \"status\": \"ACTIVE\",\n  \"effectiveFrom\": \"2026-07-01T00:00:00\",\n  \"terms\": {\n    \"UNKNOWN_ATTRIBUTE\": 123\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": [
+                "{{baseUrl}}"
+              ]
+            },
+            "description": "Expected result: HTTP 400 because UNKNOWN_ATTRIBUTE is not in product_attribute_definitions."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Product - Invalid Date Range Should Fail",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productCode\": \"BAD-DATE-001\",\n  \"name\": \"Bad Date Product\",\n  \"productCategory\": \"DEPOSIT\",\n  \"productType\": \"SAVINGS\",\n  \"status\": \"ACTIVE\",\n  \"effectiveFrom\": \"2026-07-01T00:00:00\",\n  \"effectiveTo\": \"2026-07-01T00:00:00\",\n  \"terms\": {\n    \"INTEREST_RATE\": 3.0,\n    \"MIN_BALANCE\": 1000\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}",
+              "host": [
+                "{{baseUrl}}"
+              ]
+            },
+            "description": "Expected result: HTTP 400 because effectiveTo must be after effectiveFrom."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
