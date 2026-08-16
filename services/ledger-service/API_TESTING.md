@@ -31,17 +31,18 @@ GET /api/v1/ledger/accounts/110100/balance
 ## 4. Post a deposit journal
 
 ```http
-POST /api/v1/ledger/journals
+POST /internal/v1/ledger/journals
+X-Service-Name: transaction-service
 Content-Type: application/json
 ```
 
 ```json
 {
   "journalReference": "DEMO-1001-DEPOSIT",
-  "transactionId": 1001,
+  "transactionId": "tx-1001",
   "journalType": "DEPOSIT",
   "description": "Deposit 500 into account 10001",
-  "currencyCode": "USD",
+  "currencyCode": "INR",
   "createdBy": "swagger-test",
   "lines": [
     {
@@ -52,7 +53,7 @@ Content-Type: application/json
     },
     {
       "ledgerCode": "210000",
-      "customerAccountId": 10001,
+      "customerAccountId": "a0000000-0000-0000-0000-000000000101",
       "side": "CREDIT",
       "amount": 500.00,
       "description": "Increase customer deposit liability"
@@ -68,15 +69,15 @@ Save the returned `id`; it is the journal ID used by the ID and reversal endpoin
 ```json
 {
   "journalReference": "DEMO-1002-WITHDRAWAL",
-  "transactionId": 1002,
+  "transactionId": "tx-1002",
   "journalType": "WITHDRAWAL",
   "description": "Withdraw 40 and charge a 1 fee",
-  "currencyCode": "USD",
+  "currencyCode": "INR",
   "createdBy": "swagger-test",
   "lines": [
     {
       "ledgerCode": "210000",
-      "customerAccountId": 10001,
+      "customerAccountId": "a0000000-0000-0000-0000-000000000101",
       "side": "DEBIT",
       "amount": 41.00
     },
@@ -99,15 +100,15 @@ Save the returned `id`; it is the journal ID used by the ID and reversal endpoin
 ```json
 {
   "journalReference": "DEMO-1003-PAYER",
-  "transactionId": 1003,
+  "transactionId": "tx-1003",
   "journalType": "TRANSFER_PAYER",
   "description": "Transfer 250 from account 10001 with a 2 fee",
-  "currencyCode": "USD",
+  "currencyCode": "INR",
   "createdBy": "swagger-test",
   "lines": [
     {
       "ledgerCode": "210000",
-      "customerAccountId": 10001,
+      "customerAccountId": "a0000000-0000-0000-0000-000000000101",
       "side": "DEBIT",
       "amount": 252.00
     },
@@ -130,10 +131,10 @@ Save the returned `id`; it is the journal ID used by the ID and reversal endpoin
 ```json
 {
   "journalReference": "DEMO-1003-CLEAR",
-  "transactionId": 1003,
+  "transactionId": "tx-1003",
   "journalType": "TRANSFER_SETTLEMENT",
   "description": "Settle 250 to account 20001",
-  "currencyCode": "USD",
+  "currencyCode": "INR",
   "createdBy": "swagger-test",
   "lines": [
     {
@@ -143,7 +144,7 @@ Save the returned `id`; it is the journal ID used by the ID and reversal endpoin
     },
     {
       "ledgerCode": "210000",
-      "customerAccountId": 20001,
+      "customerAccountId": "a0000000-0000-0000-0000-000000000102",
       "side": "CREDIT",
       "amount": 250.00
     }
@@ -158,15 +159,15 @@ After steps 6 and 7, `GET /api/v1/ledger/accounts/220100/balance` should show th
 ```json
 {
   "journalReference": "DEMO-1004-EXTERNAL",
-  "transactionId": 1004,
+  "transactionId": "tx-1004",
   "journalType": "EXTERNAL_TRANSFER",
   "description": "Move 75 into external clearing",
-  "currencyCode": "USD",
+  "currencyCode": "INR",
   "createdBy": "swagger-test",
   "lines": [
     {
       "ledgerCode": "210000",
-      "customerAccountId": 10001,
+      "customerAccountId": "a0000000-0000-0000-0000-000000000101",
       "side": "DEBIT",
       "amount": 75.00
     },
@@ -204,9 +205,9 @@ The reversal response has `reversalOfJournalId` equal to the original ID. Revers
 GET /api/v1/ledger/journals/{id}
 GET /api/v1/ledger/journals/reference/DEMO-1001-DEPOSIT
 GET /api/v1/ledger/journals
-GET /api/v1/ledger/journals?transactionId=1003
+GET /api/v1/ledger/journals?transactionId=tx-1003
 GET /api/v1/ledger/journals?customerAccountId=10001
-GET /api/v1/ledger/customer-accounts/10001/entries
+GET /api/v1/ledger/customer-accounts/a0000000-0000-0000-0000-000000000101/entries
 ```
 
 The customer-account entries endpoint is an audit association. It does not represent the customer's spendable balance.
@@ -216,7 +217,7 @@ The customer-account entries endpoint is an audit association. It does not repre
 ```json
 {
   "journalReference": "DEMO-INVALID-UNBALANCED",
-  "currencyCode": "USD",
+  "currencyCode": "INR",
   "lines": [
     {"ledgerCode": "110100", "side": "DEBIT", "amount": 100.00},
     {"ledgerCode": "210000", "side": "CREDIT", "amount": 90.00}

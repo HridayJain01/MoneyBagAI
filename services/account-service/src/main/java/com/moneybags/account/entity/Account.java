@@ -125,7 +125,6 @@ public class Account {
     public BigDecimal availableBalance() {
         return ledgerBalance
                 .subtract(heldAmount)
-                .subtract(minBalance)
                 .add(overdraftLimit);
     }
 }

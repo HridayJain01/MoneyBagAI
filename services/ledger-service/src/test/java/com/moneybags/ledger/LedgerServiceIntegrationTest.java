@@ -1,6 +1,7 @@
 package com.moneybags.ledger;
 
 import com.moneybags.ledger.dto.*;
+import com.moneybags.ledger.client.AccountClient;
 import com.moneybags.ledger.enums.*;
 import com.moneybags.ledger.exception.*;
 import com.moneybags.ledger.repository.*;
@@ -9,12 +10,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class LedgerServiceIntegrationTest {
@@ -24,12 +28,19 @@ class LedgerServiceIntegrationTest {
     @Autowired LedgerAccountRepository accountRepository;
     @Autowired JournalEntryRepository journalRepository;
     @Autowired JdbcTemplate jdbc;
+    @MockBean AccountClient accountClient;
 
     @BeforeEach
     void resetLedger() {
         jdbc.update("DELETE FROM journal_lines");
         jdbc.update("DELETE FROM journal_entries");
         jdbc.update("UPDATE ledger_accounts SET balance = 0, version = 0, active = TRUE");
+        when(accountClient.context(anyString())).thenAnswer(invocation -> {
+            String id = invocation.getArgument(0);
+            if ("missing-account".equals(id)) throw new IllegalArgumentException("not found");
+            return new AccountClient.AccountContext(id, "customer-1", "ACTIVE", "INR",
+                    new BigDecimal("1000"), new BigDecimal("1000"), 1);
+        });
     }
 
     @Test
@@ -51,17 +62,19 @@ class LedgerServiceIntegrationTest {
         assertThat(journal.status()).isEqualTo(JournalStatus.POSTED);
         assertThat(journal.totalDebit()).isEqualByComparingTo("500.00");
         assertThat(journal.totalCredit()).isEqualByComparingTo("500.00");
+        assertThat(journal.lines()).extracting(JournalLineResponse::description)
+                .containsExactly("Cash and Settlement Asset", "Customer Deposit Control");
         assertBalance("110100", "500.00");
         assertBalance("210000", "500.00");
-        assertThat(queryService.customerEntries(10001L)).hasSize(1);
+        assertThat(queryService.customerEntries("account-10001")).hasSize(1);
     }
 
     @Test
     void postsWithdrawalUsingNormalSideRules() {
         JournalResponse journal = postingService.post(new JournalPostRequest(
-                "JE-502-WITHDRAWAL", 502L, "WITHDRAWAL", "Cash withdrawal", "USD", "transaction-service",
+                "JE-502-WITHDRAWAL", "tx-502", "WITHDRAWAL", "Cash withdrawal", "INR", "transaction-service",
                 List.of(
-                        line("210000", 10001L, EntrySide.DEBIT, "41.00"),
+                        line("210000", "account-10001", EntrySide.DEBIT, "41.00"),
                         line("110100", null, EntrySide.CREDIT, "40.00"),
                         line("410100", null, EntrySide.CREDIT, "1.00")
                 )));
@@ -74,31 +87,31 @@ class LedgerServiceIntegrationTest {
 
     @Test
     void internalClearingReturnsToItsOriginalBalanceAfterSettlement() {
-        postingService.post(new JournalPostRequest("JE-503-PAYER", 503L, "TRANSFER_PAYER", null, "USD", null,
+        postingService.post(new JournalPostRequest("JE-503-PAYER", "tx-503", "TRANSFER_PAYER", null, "INR", null,
                 List.of(
-                        line("210000", 10001L, EntrySide.DEBIT, "252.00"),
+                        line("210000", "account-10001", EntrySide.DEBIT, "252.00"),
                         line("220100", null, EntrySide.CREDIT, "250.00"),
                         line("410100", null, EntrySide.CREDIT, "2.00")
                 )));
         assertBalance("220100", "250.00");
 
-        postingService.post(new JournalPostRequest("JE-503-CLEAR", 503L, "TRANSFER_SETTLEMENT", null, "USD", null,
+        postingService.post(new JournalPostRequest("JE-503-CLEAR", "tx-503", "TRANSFER_SETTLEMENT", null, "INR", null,
                 List.of(
                         line("220100", null, EntrySide.DEBIT, "250.00"),
-                        line("210000", 20001L, EntrySide.CREDIT, "250.00")
+                        line("210000", "account-20001", EntrySide.CREDIT, "250.00")
                 )));
 
         assertBalance("220100", "0.00");
         assertBalance("210000", "-2.00");
         assertBalance("410100", "2.00");
-        assertThat(queryService.search(503L, null)).hasSize(2);
+        assertThat(queryService.search("tx-503", null)).hasSize(2);
     }
 
     @Test
     void rejectsUnbalancedJournalAtomically() {
-        JournalPostRequest request = new JournalPostRequest("JE-BAD", 900L, null, null, "USD", null,
+        JournalPostRequest request = new JournalPostRequest("JE-BAD", "tx-900", null, null, "INR", null,
                 List.of(
-                        line("210000", 10001L, EntrySide.DEBIT, "100.00"),
+                        line("210000", "account-10001", EntrySide.DEBIT, "100.00"),
                         line("220100", null, EntrySide.CREDIT, "90.00")
                 ));
 
@@ -118,9 +131,9 @@ class LedgerServiceIntegrationTest {
         assertThat(retry.id()).isEqualTo(first.id());
         assertThat(journalRepository.count()).isEqualTo(1);
         assertBalance("110100", "500.00");
-        JournalPostRequest changed = new JournalPostRequest("JE-IDEMPOTENT", 501L, "DEPOSIT", null, "USD", null,
+        JournalPostRequest changed = new JournalPostRequest("JE-IDEMPOTENT", "tx-501", "DEPOSIT", null, "INR", null,
                 List.of(line("110100", null, EntrySide.DEBIT, "600.00"),
-                        line("210000", 10001L, EntrySide.CREDIT, "600.00")));
+                        line("210000", "account-10001", EntrySide.CREDIT, "600.00")));
         assertThatThrownBy(() -> postingService.post(changed)).isInstanceOf(DuplicateJournalException.class);
     }
 
@@ -146,7 +159,7 @@ class LedgerServiceIntegrationTest {
 
     @Test
     void rejectsUnknownCodesCurrenciesAccountsAndInvalidAmounts() {
-        assertThatThrownBy(() -> postingService.post(new JournalPostRequest("JE-UNKNOWN", null, null, null, "USD", null,
+        assertThatThrownBy(() -> postingService.post(new JournalPostRequest("JE-UNKNOWN", null, null, null, "INR", null,
                 List.of(line("999999", null, EntrySide.DEBIT, "1.00"),
                         line("110100", null, EntrySide.CREDIT, "1.00")))))
                 .isInstanceOf(LedgerAccountNotFoundException.class);
@@ -156,18 +169,18 @@ class LedgerServiceIntegrationTest {
                         line("210000", null, EntrySide.CREDIT, "1.00")))))
                 .isInstanceOf(CurrencyMismatchException.class);
 
-        assertThatThrownBy(() -> postingService.post(new JournalPostRequest("JE-NO-ACCOUNT", null, null, null, "USD", null,
+        assertThatThrownBy(() -> postingService.post(new JournalPostRequest("JE-NO-ACCOUNT", null, null, null, "INR", null,
                 List.of(line("110100", null, EntrySide.DEBIT, "1.00"),
-                        line("210000", 99999L, EntrySide.CREDIT, "1.00")))))
+                        line("210000", "missing-account", EntrySide.CREDIT, "1.00")))))
                 .isInstanceOf(AccountLookupException.class);
 
-        assertThatThrownBy(() -> postingService.post(new JournalPostRequest("JE-ZERO", null, null, null, "USD", null,
+        assertThatThrownBy(() -> postingService.post(new JournalPostRequest("JE-ZERO", null, null, null, "INR", null,
                 List.of(line("110100", null, EntrySide.DEBIT, "0.00"),
                         line("210000", null, EntrySide.CREDIT, "0.00")))))
                 .isInstanceOf(InvalidJournalException.class);
 
         jdbc.update("UPDATE ledger_accounts SET active = FALSE WHERE code = '220200'");
-        assertThatThrownBy(() -> postingService.post(new JournalPostRequest("JE-INACTIVE", null, null, null, "USD", null,
+        assertThatThrownBy(() -> postingService.post(new JournalPostRequest("JE-INACTIVE", null, null, null, "INR", null,
                 List.of(line("110100", null, EntrySide.DEBIT, "1.00"),
                         line("220200", null, EntrySide.CREDIT, "1.00")))))
                 .isInstanceOf(InvalidJournalException.class)
@@ -176,14 +189,14 @@ class LedgerServiceIntegrationTest {
     }
 
     private JournalPostRequest deposit(String reference) {
-        return new JournalPostRequest(reference, 501L, "DEPOSIT", "Customer cash deposit", "USD", "transaction-service",
+        return new JournalPostRequest(reference, "tx-501", "DEPOSIT", "Customer cash deposit", "INR", "transaction-service",
                 List.of(
                         line("110100", null, EntrySide.DEBIT, "500.00"),
-                        line("210000", 10001L, EntrySide.CREDIT, "500.00")
+                        line("210000", "account-10001", EntrySide.CREDIT, "500.00")
                 ));
     }
 
-    private JournalLineRequest line(String code, Long accountId, EntrySide side, String amount) {
+    private JournalLineRequest line(String code, String accountId, EntrySide side, String amount) {
         return new JournalLineRequest(code, accountId, side, new BigDecimal(amount), null);
     }
 

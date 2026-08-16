@@ -34,6 +34,8 @@ REQUEST [sync]
  -> OUTBOX [same transaction]
  -> ACCOUNT SERVICE PROJECTION [async/retried/idempotent]
  -> HOLD CONSUMPTION, when applicable [async/idempotent]
+ -> LEDGER SERVICE JOURNAL [async/retried/idempotent]
+ -> STATEMENT TRANSACTION PROJECTION [after ledger acceptance]
  -> COMPLETED
 ```
 
@@ -49,12 +51,16 @@ REQUEST [sync]
  -> INITIAL ACCOUNT PROJECTION / HOLD CONSUMPTION [async]
  -> RAIL SETTLEMENT CALLBACK [async, provider-event idempotency]
  -> SETTLEMENT JOURNAL [callback transaction]
+ -> LEDGER SERVICE PAYMENT + SETTLEMENT JOURNALS [async/retried/idempotent]
+ -> STATEMENT TRANSACTION PROJECTION [after ledger acceptance]
  -> COMPLETED
 ```
 
 Cheque submission creates the transaction, destination leg, and clearing instruction only. Its account credit journal and outbox event are created after a successful cheque-clearing callback.
 
 Reversal preserves the original rows, moves the original to `REVERSAL_PENDING`, creates a linked transaction with opposite legs/journal lines/outbox instructions, and marks the original `REVERSED` only after compensating projections finish.
+
+The four normal authoritative posting types are `DEPOSIT`, `WITHDRAWAL`, `PAYMENT`, and `SETTLEMENT`; `REVERSAL` is the compensating exception. All postings use the static GL master codes and names owned by Ledger Service. A transaction cannot become `COMPLETED` while its ledger or statement outbox stage is still pending or failed.
 
 ## Security contract
 

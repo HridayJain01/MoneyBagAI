@@ -14,6 +14,12 @@ import java.util.*;
 
 @Service @RequiredArgsConstructor
 public class JournalService {
+    private static final String CASH_ASSET = "Cash and Settlement Asset";
+    private static final String CUSTOMER_DEPOSIT_CONTROL = "Customer Deposit Control";
+    private static final String INTERNAL_CLEARING = "Internal Payment Clearing";
+    private static final String EXTERNAL_CLEARING = "External Clearing";
+    private static final String FEE_INCOME = "Payment Fee Income";
+
     private final TransactionLegRepository legs;
     private final JournalEntryRepository journals;
     private final TransactionProperties properties;
@@ -21,23 +27,23 @@ public class JournalService {
     public void createInitialFinancialFacts(Transaction tx){
         createLegs(tx);
         switch(tx.getType()){
-            case DEPOSIT -> save(tx,"POSTING",List.of(dr(properties.getLedger().getCashAsset(),null,tx.getAmount(),"Cash/settlement asset received"),cr(properties.getLedger().getAccountDepositControl(),tx.getDestinationAccountId(),tx.getAmount(),"Account deposit credited")));
-            case WITHDRAWAL -> save(tx,"POSTING",debitWithFee(tx,properties.getLedger().getCashAsset(),"Cash disbursed"));
-            case INTERNAL_TRANSFER -> save(tx,"PAYMENT",debitWithFee(tx,properties.getLedger().getInternalClearing(),"Internal payment clearing credited"));
-            case NEFT,RTGS,IMPS,UPI,CARD_PAYMENT -> save(tx,"PAYMENT",debitWithFee(tx,properties.getLedger().getExternalClearing(),"External payment clearing credited"));
+            case DEPOSIT -> save(tx,"POSTING",List.of(dr(properties.getLedger().getCashAsset(),null,tx.getAmount(),CASH_ASSET),cr(properties.getLedger().getAccountDepositControl(),tx.getDestinationAccountId(),tx.getAmount(),CUSTOMER_DEPOSIT_CONTROL)));
+            case WITHDRAWAL -> save(tx,"POSTING",debitWithFee(tx,properties.getLedger().getCashAsset(),CASH_ASSET));
+            case INTERNAL_TRANSFER -> save(tx,"PAYMENT",debitWithFee(tx,properties.getLedger().getInternalClearing(),INTERNAL_CLEARING));
+            case NEFT,RTGS,IMPS,UPI,CARD_PAYMENT -> save(tx,"PAYMENT",debitWithFee(tx,properties.getLedger().getExternalClearing(),EXTERNAL_CLEARING));
             case CHEQUE -> { }
             case REVERSAL -> throw new IllegalArgumentException("Reversal journals are created from the original transaction");
         }
     }
     public void createSettlementJournal(Transaction tx){
         if(tx.getType()==TransactionType.INTERNAL_TRANSFER){
-            save(tx,"SETTLEMENT",List.of(dr(properties.getLedger().getInternalClearing(),null,tx.getAmount(),"Internal clearing settled"),cr(properties.getLedger().getAccountDepositControl(),tx.getDestinationAccountId(),tx.getAmount(),"Destination account credited")));
+            save(tx,"SETTLEMENT",List.of(dr(properties.getLedger().getInternalClearing(),null,tx.getAmount(),INTERNAL_CLEARING),cr(properties.getLedger().getAccountDepositControl(),tx.getDestinationAccountId(),tx.getAmount(),CUSTOMER_DEPOSIT_CONTROL)));
         } else if(tx.getType().externallyCleared()) {
-            save(tx,"SETTLEMENT",List.of(dr(properties.getLedger().getExternalClearing(),null,tx.getAmount(),"External clearing settled"),cr(properties.getLedger().getCashAsset(),null,tx.getAmount(),"Settlement asset released")));
+            save(tx,"SETTLEMENT",List.of(dr(properties.getLedger().getExternalClearing(),null,tx.getAmount(),EXTERNAL_CLEARING),cr(properties.getLedger().getCashAsset(),null,tx.getAmount(),CASH_ASSET)));
         }
     }
     public void createChequeSettlementJournal(Transaction tx){
-        save(tx,"CHEQUE_SETTLEMENT",List.of(dr(properties.getLedger().getCashAsset(),null,tx.getAmount(),"Cheque settlement asset received"),cr(properties.getLedger().getAccountDepositControl(),tx.getDestinationAccountId(),tx.getAmount(),"Account credited after cheque clearing")));
+        save(tx,"CHEQUE_SETTLEMENT",List.of(dr(properties.getLedger().getCashAsset(),null,tx.getAmount(),CASH_ASSET),cr(properties.getLedger().getAccountDepositControl(),tx.getDestinationAccountId(),tx.getAmount(),CUSTOMER_DEPOSIT_CONTROL)));
     }
     public void createReversalLegs(Transaction reversal,Transaction original){
         List<TransactionLeg> source=legs.findByTransactionIdOrderBySequenceNo(original.getId());
@@ -63,8 +69,8 @@ public class JournalService {
         legs.saveAll(result);
     }
     private List<Line> debitWithFee(Transaction tx,String creditAccount,String description){
-        List<Line> lines=new ArrayList<>(); lines.add(dr(properties.getLedger().getAccountDepositControl(),tx.getSourceAccountId(),tx.totalDebit(),"Account debited"));
-        lines.add(cr(creditAccount,null,tx.getAmount(),description)); if(tx.getFeeAmount().signum()>0) lines.add(cr(properties.getLedger().getFeeIncome(),null,tx.getFeeAmount(),"Fee income recognized")); return lines;
+        List<Line> lines=new ArrayList<>(); lines.add(dr(properties.getLedger().getAccountDepositControl(),tx.getSourceAccountId(),tx.totalDebit(),CUSTOMER_DEPOSIT_CONTROL));
+        lines.add(cr(creditAccount,null,tx.getAmount(),description)); if(tx.getFeeAmount().signum()>0) lines.add(cr(properties.getLedger().getFeeIncome(),null,tx.getFeeAmount(),FEE_INCOME)); return lines;
     }
     private void save(Transaction tx,String type,List<Line> lines){
         BigDecimal debits=lines.stream().map(Line::debit).reduce(BigDecimal.ZERO,BigDecimal::add); BigDecimal credits=lines.stream().map(Line::credit).reduce(BigDecimal.ZERO,BigDecimal::add);

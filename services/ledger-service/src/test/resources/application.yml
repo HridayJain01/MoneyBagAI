@@ -18,16 +18,3 @@ springdoc:
     path: /api-docs
   swagger-ui:
     path: /swagger-ui.html
-moneybags:
-  ledger:
-    fake-accounts:
-      enabled: true
-      accounts:
-        10001:
-          customer-id: 101
-          currency-code: USD
-          status: ACTIVE
-        20001:
-          customer-id: 202
-          currency-code: USD
-          status: ACTIVE

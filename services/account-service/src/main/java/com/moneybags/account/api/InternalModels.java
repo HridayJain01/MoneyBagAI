@@ -10,9 +10,8 @@ import java.time.LocalDate;
 
 /**
  * Service-to-service contracts. These shapes are FROZEN by existing consumers --
- * transaction-service's {@code AccountClient} and {@code CardClient}, and
- * statement-reporting-service's {@code SourceFallbackClient}. Field names and types must
- * match those records exactly.
+ * transaction-service's {@code AccountClient} and {@code CardClient}. Field names and
+ * types must match those records exactly.
  *
  * <p>Note that transaction-service sends only an {@code Idempotency-Key} header on these
  * calls: it has no Feign RequestInterceptor, so no actor or correlation headers arrive.
@@ -77,9 +76,8 @@ public final class InternalModels {
     }
 
     /**
-     * Consumed by statement-reporting-service's SourceFallbackClient. It defaults every
-     * absent field silently, so {@code customerId} and {@code branchId} in particular
-     * must be real -- they drive its scope checks.
+     * Legacy direct statement context retained for compatibility. New statement reads
+     * use the Account Service outbox projection rather than a source fallback.
      */
     public record StatementContext(
             String accountId,

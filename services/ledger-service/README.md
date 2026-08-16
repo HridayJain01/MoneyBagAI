@@ -21,7 +21,7 @@ Account Service
 
 - Transaction Service orchestrates deposits, withdrawals, transfers, and other business workflows.
 - Ledger Service records their immutable double-entry accounting representation.
-- The future Account Service owns customer `ledgerBalance`, `availableBalance`, holds, and account status.
+- Account Service owns customer `ledgerBalance`, `availableBalance`, holds, and account status.
 
 The `balance` on `ledger_accounts` is a bank GL balance. It is not a customer's balance. `customerAccountId` on a journal line is an audit/sub-ledger association only.
 
@@ -58,7 +58,7 @@ Flyway creates and seeds these definitions. Their symbolic codes are also expose
 
 ## Account Service abstraction
 
-`AccountLookupPort` isolates the future Account Service dependency. Local configuration provides fake metadata for accounts `10001` and `20001`; it stores no customer balances. Replace `ConfigurableAccountLookupAdapter` with an HTTP/event-backed adapter when Account Service exists.
+`AccountLookupPort` validates every customer-account association against the live Account Service. Ledger Service stores only the UUID association on a journal line; it never stores or calculates the customer's spendable balance.
 
 ## Run locally
 
@@ -91,17 +91,18 @@ Direct service URL: `http://localhost:8085`. Gateway URL: `http://localhost:8090
 ## Post a deposit journal
 
 ```http
-POST /api/v1/ledger/journals
+POST /internal/v1/ledger/journals
+X-Service-Name: transaction-service
 Content-Type: application/json
 ```
 
 ```json
 {
-  "journalReference": "JE-501-DEPOSIT",
-  "transactionId": 501,
+  "journalReference": "JRN-TXN-501-DEPOSIT",
+  "transactionId": "0e73454e-9fa2-4e31-9d6e-f4678d083f7e",
   "journalType": "DEPOSIT",
   "description": "Customer cash deposit",
-  "currencyCode": "USD",
+  "currencyCode": "INR",
   "createdBy": "transaction-service",
   "lines": [
     {
@@ -112,7 +113,7 @@ Content-Type: application/json
     },
     {
       "ledgerCode": "210000",
-      "customerAccountId": 10001,
+      "customerAccountId": "a0000000-0000-0000-0000-000000000101",
       "side": "CREDIT",
       "amount": 500.00,
       "description": "Increase customer deposit liability"

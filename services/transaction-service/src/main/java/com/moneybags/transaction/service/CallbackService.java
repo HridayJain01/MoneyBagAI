@@ -37,7 +37,7 @@ public class CallbackService {
         else journals.createSettlementJournal(tx);
         states.transition(tx,TransactionStatus.SETTLED,"rail-adapter","CALLBACK","External settlement confirmed");
         if(tx.getType()==TransactionType.CHEQUE) states.transition(tx,TransactionStatus.PROJECTION_PENDING,"rail-adapter","CALLBACK","Cheque credit projection queued");
-        else if(allPublished(tx.getId())) states.transition(tx,TransactionStatus.COMPLETED,"rail-adapter","CALLBACK","Settlement and account projection completed");
+        else if(allPublished(tx.getId())) outbox.ledgerPostings(tx);
         record("SETTLE",request,tx); return tx;
     }
     @Transactional

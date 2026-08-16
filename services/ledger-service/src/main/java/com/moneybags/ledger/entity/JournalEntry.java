@@ -25,7 +25,7 @@ public class JournalEntry {
     private String journalReference;
 
     @Column(name = "transaction_id")
-    private Long transactionId;
+    private String transactionId;
 
     @Column(name = "journal_type", nullable = false, length = 40)
     private String journalType;
@@ -67,7 +67,7 @@ public class JournalEntry {
     @Getter(AccessLevel.NONE)
     private List<JournalLine> lines = new ArrayList<>();
 
-    public static JournalEntry posted(String reference, Long transactionId, String journalType,
+    public static JournalEntry posted(String reference, String transactionId, String journalType,
                                       String description, String currencyCode, BigDecimal totalDebit,
                                       BigDecimal totalCredit, Long reversalOfJournalId, String createdBy) {
         JournalEntry entry = new JournalEntry();

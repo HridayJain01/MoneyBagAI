@@ -15,16 +15,11 @@ public class OpenApiConfig {
     OpenAPI transactionServiceOpenApi() {
         return new OpenAPI().info(new Info()
                 .title("MoneyBags Transaction Service API")
-                .description("Employee-operated APIs for deposits, withdrawals, transfers, transaction queries, approvals, reversals, and reconciliation. Use Authorize to provide the employee ID, branch code, and comma-separated permissions.")
+                .description("Employee-operated APIs for deposits, withdrawals, transfers, transaction queries, approvals, reversals, and reconciliation. Authenticate Swagger requests with the session ID returned by /api/v1/auth/login.")
                 .version("v1"))
                 .components(new Components()
-                        .addSecuritySchemes("employeeId", header("X-Employee-Id", "Authenticated bank employee ID"))
-                        .addSecuritySchemes("branchCode", header("X-Branch-Code", "Employee branch code"))
-                        .addSecuritySchemes("permissions", header("X-Permissions", "Comma-separated employee permissions")))
-                .addSecurityItem(new SecurityRequirement()
-                        .addList("employeeId")
-                        .addList("branchCode")
-                        .addList("permissions"));
+                        .addSecuritySchemes("sessionId", header("X-Session-Id", "Raw sessionId returned by POST /api/v1/auth/login")))
+                .addSecurityItem(new SecurityRequirement().addList("sessionId"));
     }
 
     private SecurityScheme header(String name,String description) {

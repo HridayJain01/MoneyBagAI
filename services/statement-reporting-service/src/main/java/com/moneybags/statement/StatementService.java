@@ -17,11 +17,11 @@ import java.util.*;
 @Service @RequiredArgsConstructor
 class StatementService {
     private final AccountReadRepository accounts; private final TransactionReadRepository transactions; private final StatementRequestRepository requests;
-    private final GeneratedFileRepository files; private final DownloadHistoryRepository downloads; private final SourceFallbackClient fallback;
+    private final GeneratedFileRepository files; private final DownloadHistoryRepository downloads;
     private final FileStorageService storage; private final ExportService exporter; private final StatementProperties properties;
 
     @Transactional(readOnly=true) MiniStatementView mini(String accountId,int size,Actor actor){
-        actor.require("STATEMENT_VIEW");AccountReadModel a=account(accountId,actor);List<TransactionReadModel> tx=accounts.existsById(accountId)?transactions.findTop100ByAccountIdOrderByPostedAtDesc(accountId):fallback.transactions(accountId,LocalDate.now().minusYears(1),LocalDate.now(),actor);
+        actor.require("STATEMENT_VIEW");AccountReadModel a=account(accountId,actor);List<TransactionReadModel> tx=transactions.findTop100ByAccountIdOrderByPostedAtDesc(accountId);
         List<EntryView> entries=expand(tx.stream().limit(Math.min(Math.max(size,1),100)).sorted(Comparator.comparing(x->x.postedAt)).toList(),null,a.currency);Collections.reverse(entries);
         return new MiniStatementView(accountId,a.maskedAccountNumber,a.accountName,Money.of(a.currentBalance,a.currency),entries.stream().limit(size).toList());
     }
@@ -45,8 +45,8 @@ class StatementService {
         e.status=RequestStatus.GENERATING;e.sourceSnapshotAt=Instant.now();requests.saveAndFlush(e);
         try{Actor sourceActor=new Actor(e.requestedByUserId,e.requestedByCif,e.requesterBranchId==null?null:"scheduled-staff",e.requesterBranchId,Set.of("STATEMENT_VIEW"),UUID.randomUUID().toString());AccountReadModel a=account(e.accountId,sourceActor);
             Instant from=e.fromDate.atStartOfDay(ZoneOffset.UTC).toInstant(),end=e.toDate.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
-            List<TransactionReadModel> range;if(accounts.existsById(e.accountId))range=transactions.findByAccountIdAndPostedAtGreaterThanEqualAndPostedAtLessThanAndPostedAtLessThanEqualOrderByPostedAtAsc(e.accountId,from,end,e.sourceSnapshotAt);else range=fallback.transactions(e.accountId,e.fromDate,e.toDate,sourceActor);
-            List<TransactionReadModel> allSince=accounts.existsById(e.accountId)?transactions.findByAccountIdAndPostedAtGreaterThanEqualAndPostedAtLessThanAndPostedAtLessThanEqualOrderByPostedAtAsc(e.accountId,from,e.sourceSnapshotAt.plusMillis(1),e.sourceSnapshotAt):range;
+            List<TransactionReadModel> range=transactions.findByAccountIdAndPostedAtGreaterThanEqualAndPostedAtLessThanAndPostedAtLessThanEqualOrderByPostedAtAsc(e.accountId,from,end,e.sourceSnapshotAt);
+            List<TransactionReadModel> allSince=transactions.findByAccountIdAndPostedAtGreaterThanEqualAndPostedAtLessThanAndPostedAtLessThanEqualOrderByPostedAtAsc(e.accountId,from,e.sourceSnapshotAt.plusMillis(1),e.sourceSnapshotAt);
             BigDecimal opening=a.currentBalance.subtract(net(allSince));List<EntryView> entries=expand(range,opening,a.currency);BigDecimal closing=opening.add(net(range));
             if(!range.isEmpty()&&range.get(range.size()-1).balanceAfter!=null&&range.get(range.size()-1).balanceAfter.compareTo(closing)!=0)
                 throw ApiException.unavailable("SOURCE_BALANCE_MISMATCH","Calculated closing balance does not match the source balance-as-of");
@@ -62,7 +62,7 @@ class StatementService {
     @Transactional(readOnly=true) PageView<DownloadView> history(Pageable page,Actor actor){Page<DownloadHistoryEntity> p=downloads.findByDownloadedByUserId(actor.userId(),page);return page(p.map(d->new DownloadView(d.id,d.request.id,d.file.id,d.downloadedByUserId,d.outcome,d.reasonCode,d.downloadedAt)));}
     record DownloadPayload(byte[] bytes,String contentType,String fileName) {}
 
-    private AccountReadModel account(String id,Actor actor){AccountReadModel a=accounts.findById(id).orElseGet(()->fallback.account(id,actor));if(actor.cif()!=null&&!actor.cif().equals(a.customerId))throw ApiException.forbidden("ACCOUNT_SCOPE_DENIED","Account is outside customer scope");if(actor.staff()&&actor.branchId()!=null&&!actor.branchId().equals(a.branchId))throw ApiException.forbidden("BRANCH_SCOPE_DENIED","Account is outside branch scope");return a;}
+    private AccountReadModel account(String id,Actor actor){AccountReadModel a=accounts.findById(id).orElseThrow(()->ApiException.unavailable("ACCOUNT_PROJECTION_NOT_FOUND","Account projection is not available yet"));if(actor.cif()!=null&&!actor.cif().equals(a.customerId))throw ApiException.forbidden("ACCOUNT_SCOPE_DENIED","Account is outside customer scope");if(actor.staff()&&actor.branchId()!=null&&!actor.branchId().equals(a.branchId))throw ApiException.forbidden("BRANCH_SCOPE_DENIED","Account is outside branch scope");return a;}
     private StatementRequestEntity owned(String id,Actor a){StatementRequestEntity r=requests.findById(id).orElseThrow(()->ApiException.notFound("STATEMENT_NOT_FOUND","Statement request not found"));authorize(r,a);return r;}
     private void authorize(StatementRequestEntity r,Actor a){if(!r.requestedByUserId.equals(a.userId())&&!(a.staff()&&a.branchId()!=null&&a.branchId().equals(r.requesterBranchId)))throw ApiException.forbidden("STATEMENT_SCOPE_DENIED","Statement is outside caller scope");}
     private RequestView view(StatementRequestEntity e){GeneratedFileEntity f=files.findByRequestId(e.id).orElse(null);FileView fv=f==null?null:new FileView(f.id,f.fileName,f.contentType,f.fileSizeBytes,f.checksumSha256,f.expiresAt);return new RequestView(e.id,e.requestRef,e.accountId,e.fromDate,e.toDate,e.outputFormat,e.statementKind,e.status,e.sourceSnapshotAt,e.safeErrorCode,e.safeErrorMessage,fv,e.createdAt,e.updatedAt);}

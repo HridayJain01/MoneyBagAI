@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moneybags.account.api.InternalModels.AccountEvent;
 import com.moneybags.account.client.AuditClient;
 import com.moneybags.account.client.StatementClient;
+import com.moneybags.account.client.TransactionClient;
+import com.moneybags.account.client.TransactionClient.OpeningDepositCommand;
 import com.moneybags.account.config.AccountProperties;
 import com.moneybags.account.entity.AccountOutbox;
 import com.moneybags.account.entity.OutboxStatus;
@@ -37,6 +39,7 @@ public class AccountOutboxPublisher {
     private final AccountOutboxRepository outbox;
     private final StatementClient statementClient;
     private final AuditClient auditClient;
+    private final TransactionClient transactionClient;
     private final ObjectMapper objectMapper;
     private final AccountProperties properties;
 
@@ -55,13 +58,23 @@ public class AccountOutboxPublisher {
 
     private void deliver(AccountOutbox event) {
         try {
-            AccountEvent payload = objectMapper.readValue(event.getPayload(), AccountEvent.class);
             switch (event.getDestination()) {
-                case AccountEventPublisher.DESTINATION_STATEMENT ->
-                        statementClient.push(SERVICE_NAME, payload);
-                case AccountEventPublisher.DESTINATION_AUDIT ->
-                        auditClient.append(SERVICE_NAME, toAuditEvent(event, payload));
-                default -> log.warn("Unknown outbox destination {}", event.getDestination());
+                case AccountEventPublisher.DESTINATION_STATEMENT -> {
+                    AccountEvent payload = objectMapper.readValue(event.getPayload(), AccountEvent.class);
+                    statementClient.push(SERVICE_NAME, payload);
+                }
+                case AccountEventPublisher.DESTINATION_AUDIT -> {
+                    AccountEvent payload = objectMapper.readValue(event.getPayload(), AccountEvent.class);
+                    auditClient.append(SERVICE_NAME, toAuditEvent(event, payload));
+                }
+                case AccountEventPublisher.DESTINATION_TRANSACTION -> {
+                    OpeningDepositCommand command = objectMapper.readValue(
+                            event.getPayload(), OpeningDepositCommand.class);
+                    transactionClient.createOpeningDeposit(SERVICE_NAME,
+                            "opening-deposit:" + event.getAggregateId(), command);
+                }
+                default -> throw new IllegalStateException(
+                        "Unknown outbox destination " + event.getDestination());
             }
             event.setStatus(OutboxStatus.PUBLISHED);
             event.setPublishedAt(Instant.now());

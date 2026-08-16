@@ -1,10 +1,13 @@
 package com.moneybags.statement;
 
 import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,18 +19,19 @@ public class OpenApiConfig {
         return new OpenAPI().info(new Info()
                 .title("Moneybags Statement & Reporting Service")
                 .version("v1")
-                .description("Swagger test order: project an account, project transactions, then call statements and reports."));
+                .description("Statements and reports projected from Account, Transaction, and Ledger services. Authenticate Swagger requests with the session ID returned by /api/v1/auth/login."))
+                .components(new Components().addSecuritySchemes("sessionId", new SecurityScheme()
+                        .type(SecurityScheme.Type.APIKEY)
+                        .in(SecurityScheme.In.HEADER)
+                        .name("X-Session-Id")
+                        .description("Raw sessionId returned by POST /api/v1/auth/login")))
+                .addSecurityItem(new SecurityRequirement().addList("sessionId"));
     }
 
     @Bean
-    OperationCustomizer swaggerIdentityHeaders() {
+    OperationCustomizer swaggerRequestHeaders() {
         return (operation, method) -> {
             if (method.getBeanType() == ProjectionController.class) return operation;
-            header(operation,"X-User-Id",true,"Authenticated user ID","user-001");
-            header(operation,"X-Customer-Id",false,"Customer CIF. Use for customer tests.","cif-001");
-            header(operation,"X-Employee-Id",false,"Staff ID. Leave empty for customer tests.","employee-001");
-            header(operation,"X-Branch-Id",false,"Staff branch. Leave empty for customer tests.","branch-001");
-            header(operation,"X-Permissions",true,"Comma-separated permissions","STATEMENT_VIEW,REPORT_VIEW");
             header(operation,"X-Correlation-Id",false,"Request trace ID","swagger-test-001");
             return operation;
         };

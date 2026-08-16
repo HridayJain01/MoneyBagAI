@@ -1,11 +1,13 @@
 package com.moneybags.ledger;
 
+import com.moneybags.ledger.client.AccountClient;
 import com.moneybags.ledger.repository.JournalEntryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
@@ -13,6 +15,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -20,12 +24,18 @@ class LedgerApiIntegrationTest {
     @Autowired MockMvc mockMvc;
     @Autowired JdbcTemplate jdbc;
     @Autowired JournalEntryRepository journals;
+    @MockBean AccountClient accountClient;
 
     @BeforeEach
     void resetLedger() {
         jdbc.update("DELETE FROM journal_lines");
         jdbc.update("DELETE FROM journal_entries");
         jdbc.update("UPDATE ledger_accounts SET balance = 0, version = 0, active = TRUE");
+        when(accountClient.context(anyString())).thenAnswer(invocation -> {
+            String id = invocation.getArgument(0);
+            return new AccountClient.AccountContext(id, "customer-1", "ACTIVE", "INR",
+                    java.math.BigDecimal.ZERO, java.math.BigDecimal.ZERO, 1);
+        });
     }
 
     @Test
@@ -33,11 +43,11 @@ class LedgerApiIntegrationTest {
         String body = """
                 {
                   "journalReference":"API-DEPOSIT-1",
-                  "transactionId":701,
-                  "currencyCode":"USD",
+                  "transactionId":"tx-701",
+                  "currencyCode":"INR",
                   "lines":[
                     {"ledgerCode":"110100","side":"DEBIT","amount":500.00},
-                    {"ledgerCode":"210000","customerAccountId":10001,"side":"CREDIT","amount":500.00}
+                    {"ledgerCode":"210000","customerAccountId":"account-10001","side":"CREDIT","amount":500.00}
                   ]
                 }
                 """;
@@ -51,13 +61,29 @@ class LedgerApiIntegrationTest {
         mockMvc.perform(get("/api/v1/ledger/journals/reference/API-DEPOSIT-1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.lines.length()").value(2));
-        mockMvc.perform(get("/api/v1/ledger/customer-accounts/10001/entries"))
+        mockMvc.perform(get("/api/v1/ledger/customer-accounts/account-10001/entries"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].ledgerCode").value("210000"));
         mockMvc.perform(get("/api/v1/ledger/accounts/110100/balance"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.balance").value(500.0));
         assertThat(journals.count()).isEqualTo(1);
+    }
+
+    @Test
+    void internalPostingRequiresTransactionServiceIdentity() throws Exception {
+        String body = """
+                {"journalReference":"INTERNAL-1","transactionId":"tx-1","currencyCode":"INR","lines":[
+                  {"ledgerCode":"110100","side":"DEBIT","amount":1.00},
+                  {"ledgerCode":"210000","customerAccountId":"account-1","side":"CREDIT","amount":1.00}
+                ]}
+                """;
+        mockMvc.perform(post("/internal/v1/ledger/journals").header("X-Service-Name", "transaction-service")
+                        .contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isOk());
+        mockMvc.perform(post("/internal/v1/ledger/journals").header("X-Service-Name", "other-service")
+                        .contentType(MediaType.APPLICATION_JSON).content(body.replace("INTERNAL-1", "INTERNAL-2")))
+                .andExpect(status().isForbidden());
     }
 
     @Test

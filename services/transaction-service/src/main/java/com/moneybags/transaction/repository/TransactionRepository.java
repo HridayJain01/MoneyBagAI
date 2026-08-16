@@ -13,6 +13,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
     boolean existsByReversalOfId(String transactionId);
     Page<Transaction> findBySourceAccountIdOrDestinationAccountId(String source, String destination, Pageable pageable);
     List<Transaction> findByStatusIn(Collection<TransactionStatus> statuses);
+    Page<Transaction> findByStatusIn(Collection<TransactionStatus> statuses, Pageable pageable);
     @Query("select coalesce(sum(t.amount+t.feeAmount),0) from Transaction t where (t.sourceAccountId=:accountId or t.destinationAccountId=:accountId) and t.createdAt>=:from and t.createdAt<:to and t.status not in (com.moneybags.transaction.domain.TransactionStatus.FAILED,com.moneybags.transaction.domain.TransactionStatus.REJECTED,com.moneybags.transaction.domain.TransactionStatus.CANCELLED)")
     BigDecimal sumDailyUsage(String accountId, Instant from, Instant to);
 }

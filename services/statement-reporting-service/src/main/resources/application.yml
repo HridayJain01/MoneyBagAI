@@ -24,7 +24,3 @@ moneybags.statement:
   download-link-minutes: 10
   file-retention-days: 30
   worker-delay-ms: 2000
-  account-service-url: ${ACCOUNT_SERVICE_URL:http://localhost:8083}
-  transaction-service-url: ${TRANSACTION_SERVICE_URL:http://localhost:8084}
-  source-connect-timeout-ms: 1000
-  source-read-timeout-ms: 3000

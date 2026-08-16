@@ -4,8 +4,9 @@ Standalone read-heavy service for statements, certificates and operational repor
 
 ## Source integration
 
-- Normal path: Account and Transaction/Ledger services deliver idempotent events to `/internal/v1/statement-read-model/accounts` and `/internal/v1/statement-read-model/transactions` after their local commits.
-- Fallback: when an account projection is absent, the service calls Account Service's `/internal/v1/accounts/{id}/statement-context` and Transaction Service's existing `/api/v1/accounts/{id}/transactions` endpoint using strict timeouts.
+- Account Service delivers idempotent account and balance events to `/internal/v1/statement-read-model/accounts`.
+- Transaction Service delivers transaction entries to `/internal/v1/statement-read-model/transactions` only after the corresponding journal has been accepted by Ledger Service.
+- There is no source fallback or mock-account path. A statement remains unavailable until its real account projection has arrived.
 - Internal event endpoints require a trusted `X-Service-Name`; production ingress should additionally enforce mTLS/workload identity.
 
 ## Public scope

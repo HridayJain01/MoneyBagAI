@@ -92,8 +92,14 @@ public class ProjectionService {
         account.setLedgerBalance(ledgerAfter);
         account.setLastActivityAt(Instant.now());
 
-        // A credit wakes a dormant account; the spec requires dormancy to end on activity.
-        if (account.getStatus() == AccountStatus.DORMANT && direction == Direction.CREDIT) {
+        // The automatic opening deposit activates products that require funding. A
+        // normal incoming credit also wakes a dormant account.
+        if (account.getStatus() == AccountStatus.PENDING_ACTIVATION
+                && direction == Direction.CREDIT
+                && "OPENING_DEPOSIT_POSTED".equals(instruction.eventType())) {
+            recordStatusChange(account, AccountStatus.ACTIVE, "Activated by opening deposit");
+            account.setStatus(AccountStatus.ACTIVE);
+        } else if (account.getStatus() == AccountStatus.DORMANT && direction == Direction.CREDIT) {
             recordStatusChange(account, AccountStatus.ACTIVE, "Reactivated by incoming credit");
             account.setStatus(AccountStatus.ACTIVE);
             account.setDormantSince(null);

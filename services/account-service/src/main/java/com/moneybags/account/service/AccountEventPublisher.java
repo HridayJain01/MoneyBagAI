@@ -3,10 +3,13 @@ package com.moneybags.account.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moneybags.account.api.InternalModels.AccountEvent;
+import com.moneybags.account.client.TransactionClient.OpeningDepositCommand;
 import com.moneybags.account.entity.Account;
+import com.moneybags.account.entity.AccountApplication;
 import com.moneybags.account.entity.AccountOutbox;
 import com.moneybags.account.entity.OutboxStatus;
 import com.moneybags.account.repository.AccountOutboxRepository;
+import com.moneybags.account.security.RequestActor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,6 +28,7 @@ public class AccountEventPublisher {
 
     public static final String DESTINATION_STATEMENT = "STATEMENT";
     public static final String DESTINATION_AUDIT = "AUDIT";
+    public static final String DESTINATION_TRANSACTION = "TRANSACTION";
 
     private final AccountOutboxRepository outbox;
     private final ObjectMapper objectMapper;
@@ -32,6 +36,20 @@ public class AccountEventPublisher {
     public void enqueueAccountEvent(Account account, String eventType) {
         enqueue(account, eventType, DESTINATION_STATEMENT);
         enqueue(account, eventType, DESTINATION_AUDIT);
+    }
+
+    public void enqueueOpeningDeposit(Account account, AccountApplication application,
+                                      RequestActor approver) {
+        if (application.getRequestedInitialDeposit() == null
+                || application.getRequestedInitialDeposit().signum() <= 0) {
+            return;
+        }
+        OpeningDepositCommand command = new OpeningDepositCommand(
+                account.getAccountId(), application.getRequestedInitialDeposit(),
+                account.getCurrency(), application.getApplicationReference(),
+                approver.employeeId(), account.getBranchCode(), approver.correlationId());
+        save(UUID.randomUUID().toString(), account.getAccountId(),
+                "OPENING_DEPOSIT_REQUESTED", DESTINATION_TRANSACTION, command, true);
     }
 
     private void enqueue(Account account, String eventType, String destination) {
@@ -51,24 +69,33 @@ public class AccountEventPublisher {
                 // it already holds, so this value has to advance with the actual write.
                 account.getUpdatedAt());
 
+        save(event.sourceEventId(), account.getAccountId(),
+                eventType == null ? "ACCOUNT_UPDATED" : eventType,
+                destination, event, false);
+    }
+
+    private void save(String eventId, String accountId, String eventType, String destination,
+                      Object payload, boolean financialCommand) {
         try {
             outbox.save(AccountOutbox.builder()
-                    .eventId(event.sourceEventId())
+                    .eventId(eventId)
                     .aggregateType("ACCOUNT")
-                    .aggregateId(account.getAccountId())
-                    .eventType(eventType == null ? "ACCOUNT_UPDATED" : eventType)
+                    .aggregateId(accountId)
+                    .eventType(eventType)
                     .destination(destination)
-                    .payload(objectMapper.writeValueAsString(event))
+                    .payload(objectMapper.writeValueAsString(payload))
                     .status(OutboxStatus.PENDING)
                     .attempts(0)
                     .nextAttemptAt(Instant.now())
                     .createdAt(Instant.now())
                     .build());
         } catch (JsonProcessingException ex) {
+            if (financialCommand) {
+                throw new IllegalStateException("Could not serialise opening deposit command", ex);
+            }
             // Never fail the business transaction for a serialisation problem in a
             // downstream projection; the account change itself is what matters.
-            log.error("Could not serialise account event for {}: {}",
-                    account.getAccountId(), ex.getMessage());
+            log.error("Could not serialise account event for {}: {}", accountId, ex.getMessage());
         }
     }
 }

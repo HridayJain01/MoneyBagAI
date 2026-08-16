@@ -145,13 +145,13 @@ public class JournalPostingService {
             LedgerAccount account = accounts.get(line.ledgerCode());
             account.apply(line.side(), line.amount());
             entry.addLine(JournalLine.of(entry, lineNumber++, account, line.customerAccountId(),
-                    line.side(), line.amount(), line.description()));
+                    line.side(), line.amount(), account.getName()));
         }
         accountRepository.saveAll(accounts.values());
         return journalRepository.saveAndFlush(entry);
     }
 
-    private void validateAccount(LedgerAccount account, String journalCurrency, Long customerAccountId,
+    private void validateAccount(LedgerAccount account, String journalCurrency, String customerAccountId,
                                  boolean validateCustomerAccount) {
         if (!account.isActive()) {
             throw new InvalidJournalException("Ledger account is inactive: " + account.getCode());
@@ -224,9 +224,9 @@ public class JournalPostingService {
         return value != null && !value.isBlank();
     }
 
-    private record NormalizedJournal(String reference, Long transactionId, String journalType,
+    private record NormalizedJournal(String reference, String transactionId, String journalType,
                                      String description, String currencyCode, String createdBy,
                                      List<NormalizedLine> lines) {}
-    private record NormalizedLine(String ledgerCode, Long customerAccountId, EntrySide side,
+    private record NormalizedLine(String ledgerCode, String customerAccountId, EntrySide side,
                                   BigDecimal amount, String description) {}
 }

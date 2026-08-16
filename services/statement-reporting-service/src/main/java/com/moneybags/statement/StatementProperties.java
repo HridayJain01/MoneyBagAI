@@ -12,8 +12,4 @@ public class StatementProperties {
     private long fileRetentionDays = 30;
     private long workerDelayMs = 2000;
     private boolean workerEnabled = true;
-    private String accountServiceUrl = "http://localhost:8083";
-    private String transactionServiceUrl = "http://localhost:8084";
-    private int sourceConnectTimeoutMs = 1000;
-    private int sourceReadTimeoutMs = 3000;
 }

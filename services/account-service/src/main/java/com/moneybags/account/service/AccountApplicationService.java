@@ -225,7 +225,9 @@ public class AccountApplicationService {
                 .openedOn(LocalDate.now(ZoneOffset.UTC))
                 .applicationId(application.getApplicationId())
                 .build();
-        accounts.saveAndFlush(account);
+        // UUID identifiers make Spring Data use merge(); the returned instance is the
+        // managed one on which @PrePersist populated createdAt/updatedAt.
+        account = accounts.saveAndFlush(account);
 
         holders.save(AccountHolder.builder()
                 .holderId(UUID.randomUUID().toString())
@@ -248,6 +250,7 @@ public class AccountApplicationService {
                 .build());
 
         eventPublisher.enqueueAccountEvent(account, "ACCOUNT_OPENED");
+        eventPublisher.enqueueOpeningDeposit(account, application, actor);
         return account;
     }
 

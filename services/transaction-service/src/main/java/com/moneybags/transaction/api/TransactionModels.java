@@ -25,6 +25,14 @@ public final class TransactionModels {
 
     public record ActionRequest(String reason) {}
     public record CallbackRequest(@NotBlank String providerEventId,String externalReference,LocalDate settlementDate,String outcome,String reason) {}
+    public record OpeningDepositRequest(
+            @NotBlank String accountId,
+            @NotNull @DecimalMin(value="0.0001") BigDecimal amount,
+            @NotBlank @Pattern(regexp="[A-Z]{3}") String currency,
+            @NotBlank String applicationReference,
+            @NotBlank String initiatedByEmployeeId,
+            @NotBlank String branchCode,
+            String correlationId) {}
     public record ReversalRequest(@NotBlank String reason) {}
     public record AssignRequest(@NotBlank String investigatorId) {}
     public record ResolveRequest(@NotBlank String resolution,@NotBlank String notes) {}

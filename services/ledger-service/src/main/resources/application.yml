@@ -47,14 +47,3 @@ moneybags:
       internal-clearing: "220100"
       external-clearing: "220200"
       fee-income: "410100"
-    fake-accounts:
-      enabled: true
-      accounts:
-        10001:
-          customer-id: 101
-          currency-code: USD
-          status: ACTIVE
-        20001:
-          customer-id: 202
-          currency-code: USD
-          status: ACTIVE

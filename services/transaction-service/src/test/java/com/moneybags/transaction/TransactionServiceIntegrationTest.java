@@ -15,12 +15,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
+import org.mockito.ArgumentCaptor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.Instant;
 import java.util.Set;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicLong;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -34,19 +37,54 @@ class TransactionServiceIntegrationTest {
     @Autowired TransactionRepository transactions; @Autowired TransactionLegRepository legs; @Autowired FundsHoldRepository holds; @Autowired JournalEntryRepository journals;
     @Autowired ClearingInstructionRepository clearing; @Autowired OutboxEventRepository outbox;
     @Autowired MockMvc mockMvc;
-    @MockBean AccountClient accountClient; @MockBean CardClient cardClient;
+    @MockBean AccountClient accountClient; @MockBean CardClient cardClient; @MockBean LedgerClient ledgerClient; @MockBean StatementClient statementClient;
     RequestActor maker;
 
     @BeforeEach void setup(){
         maker=new RequestActor("EMP-100","MB001",Set.of("TRANSACTION_CREATE","TRANSACTION_VIEW","TRANSACTION_APPROVE","TRANSACTION_CANCEL","TRANSACTION_REVERSE","RECONCILIATION_MANAGE"),"corr-1");
         when(accountClient.context(anyString())).thenAnswer(i->new AccountClient.AccountContext(i.getArgument(0),"AH-1","ACTIVE","INR",new BigDecimal("5000000"),new BigDecimal("5000000"),1));
         when(accountClient.reserve(anyString(),anyString(),any())).thenAnswer(i->{AccountClient.HoldRequest r=i.getArgument(2);return new AccountClient.HoldResponse("H-"+r.transactionId(),"FUNDS_HELD",r.amount());});
+        AtomicLong ids=new AtomicLong(1);
+        when(ledgerClient.post(eq("transaction-service"),any())).thenAnswer(i->{LedgerClient.JournalPostRequest r=i.getArgument(1);List<LedgerClient.JournalLineResponse> lines=r.lines().stream().map(l->new LedgerClient.JournalLineResponse(ids.getAndIncrement(),1,l.ledgerCode(),l.description(),l.customerAccountId(),l.side(),l.amount(),l.description(),Instant.now())).toList();return new LedgerClient.JournalResponse(ids.getAndIncrement(),r.journalReference(),r.transactionId(),r.journalType(),r.description(),"POSTED",r.currencyCode(),r.lines().stream().filter(l->"DEBIT".equals(l.side())).map(LedgerClient.JournalLineRequest::amount).reduce(BigDecimal.ZERO,BigDecimal::add),r.lines().stream().filter(l->"CREDIT".equals(l.side())).map(LedgerClient.JournalLineRequest::amount).reduce(BigDecimal.ZERO,BigDecimal::add),null,Instant.now(),Instant.now(),"transaction-service",lines);});
+        when(statementClient.push(eq("transaction-service"),any())).thenAnswer(i->{StatementClient.TransactionEvent e=i.getArgument(1);return new StatementClient.IngestResult(e.sourceEventId(),"APPLIED");});
     }
     @AfterEach void resetOutbox(){properties.getOutbox().setEnabled(false);}
 
     @Test void depositCreatesLegBalancedJournalAndOutbox(){
         Transaction tx=orchestrator.create(TransactionType.DEPOSIT,PaymentRail.CASH,deposit(),"dep-1",maker);
         assertThat(tx.getStatus()).isEqualTo(TransactionStatus.PROJECTION_PENDING);assertThat(legs.findByTransactionIdOrderBySequenceNo(tx.getId())).hasSize(1);assertThat(journals.findByTransactionIdOrderByCreatedAt(tx.getId())).hasSize(1);assertThat(outbox.findByAggregateId(tx.getId())).hasSize(1);assertThat(holds.findByTransactionId(tx.getId())).isEmpty();
+    }
+    @Test void accountServiceOpeningDepositIsIdempotentAndCompletesAllProjections(){
+        when(accountClient.context("OPEN-A1")).thenReturn(new AccountClient.AccountContext(
+                "OPEN-A1","CIF-1","PENDING_ACTIVATION","INR",BigDecimal.ZERO,BigDecimal.ZERO,0));
+        OpeningDepositRequest request=new OpeningDepositRequest("OPEN-A1",new BigDecimal("5000"),"INR",
+                "APP-OPEN-001","EMP-200","BR001","opening-correlation");
+        long before=transactions.count();
+        Transaction first=orchestrator.createOpeningDeposit(request,"opening-deposit:OPEN-A1");
+        Transaction replay=orchestrator.createOpeningDeposit(request,"opening-deposit:OPEN-A1");
+        assertThat(replay.getId()).isEqualTo(first.getId());
+        assertThat(transactions.count()-before).isEqualTo(1);
+        assertThat(first.getReference()).isEqualTo("TXN-OPEN-APP-OPEN-001");
+        properties.getOutbox().setEnabled(true);publisher.publish();
+        assertThat(transactions.findById(first.getId()).orElseThrow().getStatus()).isEqualTo(TransactionStatus.COMPLETED);
+        ArgumentCaptor<AccountClient.ProjectionInstruction> projection=ArgumentCaptor.forClass(AccountClient.ProjectionInstruction.class);
+        verify(accountClient,atLeastOnce()).project(anyString(),projection.capture());
+        List<AccountClient.ProjectionInstruction> openingProjections=projection.getAllValues().stream()
+                .filter(value->value.transactionId().equals(first.getId())).toList();
+        assertThat(openingProjections).hasSize(1);
+        AccountClient.ProjectionInstruction openingProjection=openingProjections.get(0);
+        assertThat(openingProjection.eventType()).isEqualTo("OPENING_DEPOSIT_POSTED");
+        assertThat(openingProjection.amount()).isEqualByComparingTo("5000");
+        ArgumentCaptor<LedgerClient.JournalPostRequest> journal=ArgumentCaptor.forClass(LedgerClient.JournalPostRequest.class);
+        verify(ledgerClient,atLeastOnce()).post(eq("transaction-service"),journal.capture());
+        List<LedgerClient.JournalPostRequest> openingJournals=journal.getAllValues().stream()
+                .filter(value->value.transactionId().equals(first.getId())).toList();
+        assertThat(openingJournals).hasSize(1);
+        LedgerClient.JournalPostRequest openingJournal=openingJournals.get(0);
+        assertThat(openingJournal.journalType()).isEqualTo("DEPOSIT");
+        verify(statementClient).push(eq("transaction-service"),argThat(e->
+                e.transactionId().equals(first.getId())&&e.transactionType().equals("DEPOSIT")
+                        &&e.amount().compareTo(new BigDecimal("5000"))==0));
     }
     @Test void duplicateCreateReturnsOriginalWithoutDuplicateHoldOrFacts(){
         Transaction first=orchestrator.create(TransactionType.WITHDRAWAL,PaymentRail.CASH,withdrawal(),"wd-dup",maker);Transaction second=orchestrator.create(TransactionType.WITHDRAWAL,PaymentRail.CASH,withdrawal(),"wd-dup",maker);
@@ -68,17 +106,22 @@ class TransactionServiceIntegrationTest {
     }
     @Test void outboxDeliveryConsumesHoldAndCompletesWithdrawalOnce(){
         Transaction tx=orchestrator.create(TransactionType.WITHDRAWAL,PaymentRail.CASH,withdrawal(),"wd-publish",maker);properties.getOutbox().setEnabled(true);publisher.publish();
-        assertThat(transactions.findById(tx.getId()).orElseThrow().getStatus()).isEqualTo(TransactionStatus.COMPLETED);assertThat(holds.findByTransactionId(tx.getId()).orElseThrow().getStatus().name()).isEqualTo("CONSUMED");verify(accountClient).project(anyString(),any());verify(accountClient).consume(eq("A1"),anyString(),anyString());
+        assertThat(transactions.findById(tx.getId()).orElseThrow().getStatus()).isEqualTo(TransactionStatus.COMPLETED);assertThat(holds.findByTransactionId(tx.getId()).orElseThrow().getStatus().name()).isEqualTo("CONSUMED");verify(accountClient).project(anyString(),any());verify(accountClient).consume(eq("A1"),anyString(),anyString());verify(ledgerClient).post(eq("transaction-service"),any());verify(statementClient).push(eq("transaction-service"),any());
     }
     @Test void duplicateSettlementCallbackCreatesOneSettlementEffect(){
         Transaction tx=orchestrator.create(TransactionType.NEFT,PaymentRail.NEFT,external(new BigDecimal("500")),"neft-settle",maker);properties.getOutbox().setEnabled(true);publisher.publish();
-        CallbackRequest cb=new CallbackRequest("rail-event-1","NEFT-EXT-1",LocalDate.now(),"SETTLED",null);callbacks.settle(tx.getId(),cb);callbacks.settle(tx.getId(),cb);
+        CallbackRequest cb=new CallbackRequest("rail-event-1","NEFT-EXT-1",LocalDate.now(),"SETTLED",null);callbacks.settle(tx.getId(),cb);publisher.publish();callbacks.settle(tx.getId(),cb);
         assertThat(transactions.findById(tx.getId()).orElseThrow().getStatus()).isEqualTo(TransactionStatus.COMPLETED);assertThat(journals.findByTransactionIdOrderByCreatedAt(tx.getId())).hasSize(2);
     }
     @Test void completedWithdrawalReversalIsLinkedAndCompensating(){
         Transaction original=orchestrator.create(TransactionType.WITHDRAWAL,PaymentRail.CASH,withdrawal(),"reverse-source",maker);properties.getOutbox().setEnabled(true);publisher.publish();
+        clearInvocations(accountClient,ledgerClient,statementClient);
         Transaction reversal=orchestrator.reverse(original.getId(),"Erroneous withdrawal","reverse-action",maker);assertThat(reversal.getReversalOf().getId()).isEqualTo(original.getId());assertThat(journals.findByTransactionIdOrderByCreatedAt(reversal.getId())).isNotEmpty();publisher.publish();
         assertThat(transactions.findById(reversal.getId()).orElseThrow().getStatus()).isEqualTo(TransactionStatus.COMPLETED);assertThat(transactions.findById(original.getId()).orElseThrow().getStatus()).isEqualTo(TransactionStatus.REVERSED);
+        verify(ledgerClient).post(eq("transaction-service"),argThat(j->"REVERSAL".equals(j.journalType())));
+        verify(statementClient).push(eq("transaction-service"),argThat(e->
+                e.transactionId().equals(reversal.getId())&&e.transactionType().equals("REVERSAL")
+                        &&"CREDIT".equals(e.direction())));
     }
     @Test void twoWithdrawalsRacingForSameAvailableFundsCannotDoubleSpend() throws Exception {
         when(accountClient.context(anyString())).thenAnswer(i->new AccountClient.AccountContext(i.getArgument(0),"AH-1","ACTIVE","INR",new BigDecimal("50"),new BigDecimal("50"),1));
@@ -97,6 +140,40 @@ class TransactionServiceIntegrationTest {
         Transaction tx=orchestrator.create(TransactionType.CHEQUE,PaymentRail.CHEQUE,cheque,"cheque-create",maker);assertThat(journals.findByTransactionIdOrderByCreatedAt(tx.getId())).isEmpty();assertThat(outbox.findByAggregateId(tx.getId())).isEmpty();
         callbacks.cheque(tx.getId(),new CallbackRequest("cheque-event-1","CLR-CHQ-1",LocalDate.now(),"SETTLED",null));assertThat(journals.findByTransactionIdOrderByCreatedAt(tx.getId())).hasSize(1);assertThat(outbox.findByAggregateId(tx.getId())).hasSize(1);properties.getOutbox().setEnabled(true);publisher.publish();assertThat(transactions.findById(tx.getId()).orElseThrow().getStatus()).isEqualTo(TransactionStatus.COMPLETED);
     }
+    @Test void internalTransferUsesStaticPaymentAndSettlementLedgerMappings(){
+        CreateRequest transfer=new CreateRequest("A1","A2",null,new BigDecimal("300"),BigDecimal.ZERO,"INR",PaymentChannel.BRANCH,PaymentMethod.ACCOUNT,null,null,"Internal transfer", "TXN-TRF-001");
+        Transaction tx=orchestrator.create(TransactionType.INTERNAL_TRANSFER,PaymentRail.INTERNAL,transfer,"transfer-ledger",maker);properties.getOutbox().setEnabled(true);publisher.publish();
+        ArgumentCaptor<LedgerClient.JournalPostRequest> captor=ArgumentCaptor.forClass(LedgerClient.JournalPostRequest.class);verify(ledgerClient,times(2)).post(eq("transaction-service"),captor.capture());
+        LedgerClient.JournalPostRequest payment=captor.getAllValues().stream().filter(x->"PAYMENT".equals(x.journalType())).findFirst().orElseThrow();
+        assertThat(payment.journalReference()).isEqualTo("JRN-TXN-TRF-001-PAYMENT");
+        assertThat(payment.lines()).extracting(LedgerClient.JournalLineRequest::ledgerCode,LedgerClient.JournalLineRequest::side,LedgerClient.JournalLineRequest::description)
+                .containsExactly(tuple("210000","DEBIT","Customer Deposit Control"),tuple("220100","CREDIT","Internal Payment Clearing"));
+        assertThat(transactions.findById(tx.getId()).orElseThrow().getStatus()).isEqualTo(TransactionStatus.COMPLETED);
+    }
+    @Test void completedInternalTransferReversalRestoresBothAccountsLedgerAndStatements(){
+        CreateRequest transfer=new CreateRequest("A1","A2",null,new BigDecimal("300"),BigDecimal.ZERO,"INR",PaymentChannel.BRANCH,PaymentMethod.ACCOUNT,null,null,"Internal transfer to reverse",null);
+        Transaction original=orchestrator.create(TransactionType.INTERNAL_TRANSFER,PaymentRail.INTERNAL,transfer,"transfer-to-reverse",maker);properties.getOutbox().setEnabled(true);publisher.publish();
+        clearInvocations(accountClient,ledgerClient,statementClient);
+        Transaction reversal=orchestrator.reverse(original.getId(),"Transfer entered in error","reverse-transfer",maker);publisher.publish();
+        assertThat(transactions.findById(reversal.getId()).orElseThrow().getStatus()).isEqualTo(TransactionStatus.COMPLETED);
+        assertThat(transactions.findById(original.getId()).orElseThrow().getStatus()).isEqualTo(TransactionStatus.REVERSED);
+        ArgumentCaptor<AccountClient.ProjectionInstruction> projections=ArgumentCaptor.forClass(AccountClient.ProjectionInstruction.class);
+        verify(accountClient,times(2)).project(anyString(),projections.capture());
+        assertThat(projections.getAllValues()).anySatisfy(p->{assertThat(p.accountId()).isEqualTo("A1");assertThat(p.direction()).isEqualTo("CREDIT");assertThat(p.amount()).isEqualByComparingTo("300");});
+        assertThat(projections.getAllValues()).anySatisfy(p->{assertThat(p.accountId()).isEqualTo("A2");assertThat(p.direction()).isEqualTo("DEBIT");assertThat(p.amount()).isEqualByComparingTo("300");});
+        verify(ledgerClient,times(2)).post(eq("transaction-service"),argThat(j->"REVERSAL".equals(j.journalType())));
+        ArgumentCaptor<StatementClient.TransactionEvent> statements=ArgumentCaptor.forClass(StatementClient.TransactionEvent.class);
+        verify(statementClient,times(2)).push(eq("transaction-service"),statements.capture());
+        assertThat(statements.getAllValues()).allMatch(e->e.transactionId().equals(reversal.getId())&&e.transactionType().equals("REVERSAL"));
+        assertThat(statements.getAllValues()).extracting(StatementClient.TransactionEvent::direction).containsExactlyInAnyOrder("CREDIT","DEBIT");
+    }
+    @Test void ledgerFailurePreventsCompletionAndStatementProjection(){
+        doThrow(new IllegalStateException("ledger unavailable")).when(ledgerClient).post(eq("transaction-service"),any());
+        Transaction tx=orchestrator.create(TransactionType.DEPOSIT,PaymentRail.CASH,deposit(),"ledger-failure",maker);properties.getOutbox().setEnabled(true);publisher.publish();
+        assertThat(transactions.findById(tx.getId()).orElseThrow().getStatus()).isEqualTo(TransactionStatus.PROJECTION_PENDING);
+        assertThat(outbox.findByAggregateId(tx.getId())).anyMatch(e->OutboxService.LEDGER_POST.equals(e.getEventType())&&e.getStatus().name().equals("PENDING"));
+        assertThat(outbox.findByAggregateId(tx.getId())).noneMatch(e->OutboxService.STATEMENT_POST.equals(e.getEventType()));
+    }
     @Test void swaggerUiAndOpenApiDocumentAreAvailable() throws Exception {
         mockMvc.perform(get("/"))
                 .andExpect(status().is3xxRedirection())
@@ -114,8 +191,9 @@ class TransactionServiceIntegrationTest {
                 .andExpect(jsonPath("$.components.schemas.CreateRequest.properties.beneficiaryId").doesNotExist())
                 .andExpect(jsonPath("$.components.schemas.TransactionView.properties.accountHolderId").exists())
                 .andExpect(jsonPath("$.components.schemas.TransactionView.properties.makerEmployeeId").exists())
-                .andExpect(jsonPath("$.components.securitySchemes.employeeId.name").value("X-Employee-Id"))
-                .andExpect(jsonPath("$.components.securitySchemes.branchCode.name").value("X-Branch-Code"))
+                .andExpect(jsonPath("$.components.securitySchemes.sessionId.name").value("X-Session-Id"))
+                .andExpect(jsonPath("$.components.securitySchemes.employeeId").doesNotExist())
+                .andExpect(jsonPath("$.components.securitySchemes.branchCode").doesNotExist())
                 .andExpect(jsonPath("$.components.schemas.TransactionView.properties.beneficiaryId").doesNotExist());
     }
     private boolean attemptWithdrawal(String key){try{orchestrator.create(TransactionType.WITHDRAWAL,PaymentRail.CASH,withdrawal(),key,maker);return true;}catch(Exception expected){return false;}}
