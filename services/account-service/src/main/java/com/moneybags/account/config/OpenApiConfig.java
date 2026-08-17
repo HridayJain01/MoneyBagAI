@@ -16,17 +16,17 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("MoneyBags Account Service API")
-                        .description("Account applications, approvals, balances, holds, and lifecycle operations. Authenticate Swagger requests with the session ID returned by /api/v1/auth/login.")
+                        .description("Account applications, approvals, balances, holds, and lifecycle operations. Use the Bearer JWT returned by /api/v1/auth/login.")
                         .version("v1"))
-                .components(new Components().addSecuritySchemes("sessionId", sessionIdScheme()))
-                .addSecurityItem(new SecurityRequirement().addList("sessionId"));
+                .components(new Components().addSecuritySchemes("bearerAuth", bearerScheme()))
+                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
     }
 
-    private SecurityScheme sessionIdScheme() {
+    private SecurityScheme bearerScheme() {
         return new SecurityScheme()
-                .type(SecurityScheme.Type.APIKEY)
-                .in(SecurityScheme.In.HEADER)
-                .name("X-Session-Id")
-                .description("Raw sessionId returned by POST /api/v1/auth/login");
+                .type(SecurityScheme.Type.HTTP)
+                .scheme("bearer")
+                .bearerFormat("JWT")
+                .description("JWT accessToken returned by POST /api/v1/auth/login");
     }
 }

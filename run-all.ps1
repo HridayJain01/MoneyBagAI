@@ -119,6 +119,13 @@ $javaExecutable = if ($env:JAVA_HOME -and (Test-Path (Join-Path $env:JAVA_HOME '
     (Get-Command java.exe -ErrorAction Stop).Source
 }
 
+function Get-EnvironmentPortWithFallback {
+    param([string]$Name, [string]$FallbackName, [int]$Default)
+    $value = [Environment]::GetEnvironmentVariable($Name, 'Process')
+    if ($value) { return [int]$value }
+    return Get-EnvironmentPort $FallbackName $Default
+}
+
 New-Item -ItemType Directory -Path $logDirectory -Force | Out-Null
 New-Item -ItemType Directory -Path $pidDirectory -Force | Out-Null
 
@@ -129,7 +136,7 @@ $waves = @(
     @{ Name = 'Registry';    Services = @(
         @{ Name = 'eureka-server'; Port = $eurekaServerPort }) },
     @{ Name = 'Foundation';  Services = @(
-        @{ Name = 'identity-service';      Port = Get-EnvironmentPort 'IDENTITY_SERVICE_PORT' 8087 },
+        @{ Name = 'identity-service';      Port = Get-EnvironmentPortWithFallback 'AUTH_SERVICE_PORT' 'IDENTITY_SERVICE_PORT' 8087 },
         @{ Name = 'product-service';       Port = Get-EnvironmentPort 'PRODUCT_SERVICE_PORT' 8088 },
         @{ Name = 'branch-employee-service'; Port = Get-EnvironmentPort 'BRANCH_SERVICE_PORT' 8081 },
         @{ Name = 'configuration-service'; Port = Get-EnvironmentPort 'CONFIG_SERVICE_PORT' 8092 },
@@ -463,6 +470,7 @@ Write-Host ''
 Write-Host "  Sign in:  POST http://localhost:$apiGatewayPort/api/v1/auth/login"
 Write-Host '            {"username":"teller1","password":"Password@123"}'
 Write-Host '            then send  Authorization: Bearer <accessToken>'
+Write-Host "  Register: POST http://localhost:$apiGatewayPort/api/v1/auth/register"
 
 # ---------------------------------------------------------------- Phase 4
 if ($Smoke) {

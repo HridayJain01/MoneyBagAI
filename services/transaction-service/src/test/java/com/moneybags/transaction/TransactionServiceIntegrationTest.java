@@ -237,7 +237,7 @@ class TransactionServiceIntegrationTest {
                 .andExpect(jsonPath("$.components.schemas.CreateRequest.properties.beneficiaryId").doesNotExist())
                 .andExpect(jsonPath("$.components.schemas.TransactionView.properties.accountHolderId").exists())
                 .andExpect(jsonPath("$.components.schemas.TransactionView.properties.makerEmployeeId").exists())
-                .andExpect(jsonPath("$.components.securitySchemes.sessionId.name").value("X-Session-Id"))
+                .andExpect(jsonPath("$.components.securitySchemes.bearerAuth.scheme").value("bearer"))
                 .andExpect(jsonPath("$.components.securitySchemes.employeeId").doesNotExist())
                 .andExpect(jsonPath("$.components.securitySchemes.branchCode").doesNotExist())
                 .andExpect(jsonPath("$.components.schemas.TransactionView.properties.beneficiaryId").doesNotExist());

@@ -56,10 +56,11 @@ public class JwtAuthenticationGlobalFilter implements GlobalFilter, Ordered {
                     .build());
         }
 
-        String token = extractBearerToken(request);
+        String token = extractAccessToken(request);
         if (token == null) {
             return reject(exchange, HttpStatus.UNAUTHORIZED, "JWT_REQUIRED",
-                    "Provide a JWT as 'Authorization: Bearer <token>'", correlationId);
+                    "Provide a JWT as 'Authorization: Bearer <token>' or in the access-token cookie",
+                    correlationId);
         }
 
         final JwtPrincipal principal;
@@ -96,13 +97,16 @@ public class JwtAuthenticationGlobalFilter implements GlobalFilter, Ordered {
         return properties.getPublicPaths().stream().anyMatch(path::startsWith);
     }
 
-    private String extractBearerToken(ServerHttpRequest request) {
+    private String extractAccessToken(ServerHttpRequest request) {
         String authorization = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-        if (authorization == null || !authorization.regionMatches(true, 0, "Bearer ", 0, 7)) {
-            return null;
+        if (authorization != null && authorization.regionMatches(true, 0, "Bearer ", 0, 7)) {
+            String token = authorization.substring(7).trim();
+            if (!token.isEmpty()) {
+                return token;
+            }
         }
-        String token = authorization.substring(7).trim();
-        return token.isEmpty() ? null : token;
+        var cookie = request.getCookies().getFirst(properties.getAccessTokenCookieName());
+        return cookie == null || cookie.getValue().isBlank() ? null : cookie.getValue();
     }
 
     private String resolveCorrelationId(ServerHttpRequest request) {

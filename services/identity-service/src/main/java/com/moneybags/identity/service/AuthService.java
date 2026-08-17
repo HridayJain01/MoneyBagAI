@@ -2,12 +2,16 @@ package com.moneybags.identity.service;
 
 import com.moneybags.identity.api.ApiModels.LoginRequest;
 import com.moneybags.identity.api.ApiModels.LoginResponse;
+import com.moneybags.identity.api.ApiModels.RegisterRequest;
+import com.moneybags.identity.api.ApiModels.RegistrationResponse;
+import com.moneybags.identity.api.ApiModels.UserProfile;
 import com.moneybags.identity.config.IdentityConfig.IdentityProperties;
 import com.moneybags.identity.entity.LoginAudit;
 import com.moneybags.identity.entity.Role;
 import com.moneybags.identity.entity.User;
 import com.moneybags.identity.entity.UserStatus;
 import com.moneybags.identity.repository.LoginAuditRepository;
+import com.moneybags.identity.repository.RoleRepository;
 import com.moneybags.identity.repository.UserRepository;
 import com.moneybags.identity.support.ApiException;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Locale;
 
 @Slf4j
 @Service
@@ -26,6 +31,7 @@ import java.util.List;
 public class AuthService {
 
     private final UserRepository users;
+    private final RoleRepository roles;
     private final LoginAuditRepository audits;
     private final PasswordEncoder passwordEncoder;
     private final IdentityProperties properties;
@@ -33,7 +39,10 @@ public class AuthService {
 
     @Transactional
     public LoginResponse login(LoginRequest request, String ip, String userAgent) {
-        User user = users.findByUsername(request.username()).orElse(null);
+        String login = request.username().trim();
+        User user = users.findByUsernameIgnoreCase(login)
+                .or(() -> users.findByEmailIgnoreCase(login))
+                .orElse(null);
 
         if (user == null) {
             audit(null, request.username(), "LOGIN_FAILED", ip, userAgent, "UNKNOWN_USER", "FAILURE");
@@ -68,6 +77,51 @@ public class AuthService {
         return new LoginResponse(
                 issued.value(), "Bearer", issued.expiresAt(), user.getUserId(), user.getUsername(),
                 user.getFullName(), user.getEmployeeId(), user.getBranchCode(), roles, permissions);
+    }
+
+    @Transactional
+    public RegistrationResponse register(RegisterRequest request) {
+        if (!properties.isRegistrationEnabled()) {
+            throw ApiException.forbidden("REGISTRATION_DISABLED", "Self-registration is disabled");
+        }
+
+        String email = request.email().trim().toLowerCase(Locale.ROOT);
+        if (users.existsByEmail(email)) {
+            throw ApiException.conflict("EMAIL_TAKEN", "Email already exists");
+        }
+        if (users.existsByUsername(email)) {
+            throw ApiException.conflict("USERNAME_TAKEN", "A user already uses this email as a username");
+        }
+
+        Role defaultRole = roles.findByRoleName(properties.getDefaultRegistrationRole())
+                .orElseThrow(() -> new IllegalStateException(
+                        "Default registration role does not exist: " + properties.getDefaultRegistrationRole()));
+        String firstName = request.firstName().trim();
+        String lastName = request.lastName().trim();
+        User user = User.builder()
+                .username(email)
+                .email(email)
+                .passwordHash(passwordEncoder.encode(request.password()))
+                .firstName(firstName)
+                .lastName(lastName)
+                .fullName(firstName + " " + lastName)
+                .dateOfBirth(request.dob())
+                .gender(request.gender())
+                .mobile(request.mobile())
+                .status(UserStatus.ACTIVE)
+                .failedAttempts(0)
+                .passwordChangedAt(Instant.now())
+                .roles(new java.util.LinkedHashSet<>(List.of(defaultRole)))
+                .build();
+        User saved = users.save(user);
+        return new RegistrationResponse("Registered successfully", toProfile(saved));
+    }
+
+    @Transactional(readOnly = true)
+    public UserProfile currentUser(Long userId) {
+        User user = users.findById(userId)
+                .orElseThrow(() -> ApiException.notFound("USER_NOT_FOUND", "No user with id " + userId));
+        return toProfile(user);
     }
 
     @Transactional
@@ -110,5 +164,14 @@ public class AuthService {
             return null;
         }
         return value.length() <= 255 ? value : value.substring(0, 255);
+    }
+
+    private UserProfile toProfile(User user) {
+        return new UserProfile(
+                user.getUserId(), user.getUsername(), user.getFirstName(), user.getLastName(),
+                user.getFullName(), user.getEmail(), user.getDateOfBirth(), user.getGender(),
+                user.getMobile(), user.getStatus().name(),
+                user.getRoles().stream().map(Role::getRoleName).sorted().toList(),
+                user.permissionCodes().stream().sorted().toList(), user.getCreatedAt());
     }
 }
