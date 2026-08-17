@@ -1,0 +1,1639 @@
+{
+  "info": {
+    "_postman_id": "425b4e13-0000-4000-8000-425b4e13425b",
+    "name": "Moneybags - Transaction Service",
+    "description": "Generated from the current Spring controller source for services/transaction-service. Requests default to direct service access on port 8084. Set baseUrl to http://localhost:8090 to exercise public routes through the API gateway. Internal /internal routes are intentionally called directly.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{sessionId}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.collectionVariables.get(\"idempotencyKey\")) {",
+          "  pm.collectionVariables.set(\"idempotencyKey\", pm.variables.replaceIn(\"{{$guid}}\"));",
+          "}",
+          "pm.collectionVariables.set(\"correlationId\", pm.variables.replaceIn(\"{{$guid}}\"));"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8084",
+      "type": "string"
+    },
+    {
+      "key": "sessionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "employeeId",
+      "value": "1004",
+      "type": "string"
+    },
+    {
+      "key": "branchCode",
+      "value": "BR001",
+      "type": "string"
+    },
+    {
+      "key": "permissions",
+      "value": "TRANSACTION_CREATE,TRANSACTION_APPROVE,TRANSACTION_CANCEL,TRANSACTION_CANCEL_ANY,TRANSACTION_REVERSE,TRANSACTION_VIEW,TRANSACTION_VIEW_ALL_BRANCHES,RECONCILIATION_MANAGE,STATEMENT_VIEW,REPORT_VIEW,REPORT_ADMIN,ACCOUNT_VIEW,ACCOUNT_VIEW_ALL_BRANCHES,ACCOUNT_OPEN,ACCOUNT_APPROVE,ACCOUNT_STATUS_MANAGE,CUSTOMER_READ,CUSTOMER_UPDATE,KYC_VERIFY,PRODUCT_READ,PRODUCT_MANAGE,USER_MANAGE,ROLE_PERMISSION_MANAGE,BRANCH_MANAGE,EMPLOYEE_MANAGE,CONFIG_MANAGE,NOTIFICATION_MANAGE,AUDIT_VIEW",
+      "type": "string"
+    },
+    {
+      "key": "serviceName",
+      "value": "account-service",
+      "type": "string"
+    },
+    {
+      "key": "idempotencyKey",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "correlationId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "account",
+      "value": "a0000000-0000-0000-0000-000000000101",
+      "type": "string"
+    },
+    {
+      "key": "accountHolderId",
+      "value": "CIF900101",
+      "type": "string"
+    },
+    {
+      "key": "accountId",
+      "value": "a0000000-0000-0000-0000-000000000101",
+      "type": "string"
+    },
+    {
+      "key": "accountNumber",
+      "value": "510000000101",
+      "type": "string"
+    },
+    {
+      "key": "actionType",
+      "value": "ACCOUNT_OPENING",
+      "type": "string"
+    },
+    {
+      "key": "aggregateId",
+      "value": "a0000000-0000-0000-0000-000000000101",
+      "type": "string"
+    },
+    {
+      "key": "aggregateType",
+      "value": "ACCOUNT",
+      "type": "string"
+    },
+    {
+      "key": "applicationId",
+      "value": "APP-000001",
+      "type": "string"
+    },
+    {
+      "key": "actorEmployeeId",
+      "value": "101",
+      "type": "string"
+    },
+    {
+      "key": "amount",
+      "value": "100.00",
+      "type": "string"
+    },
+    {
+      "key": "branch",
+      "value": "BR001",
+      "type": "string"
+    },
+    {
+      "key": "branchId",
+      "value": "BR001",
+      "type": "string"
+    },
+    {
+      "key": "cardId",
+      "value": "card-000001",
+      "type": "string"
+    },
+    {
+      "key": "channel",
+      "value": "NEFT",
+      "type": "string"
+    },
+    {
+      "key": "cif",
+      "value": "CIF900101",
+      "type": "string"
+    },
+    {
+      "key": "cifNo",
+      "value": "CIF900101",
+      "type": "string"
+    },
+    {
+      "key": "code",
+      "value": "110100",
+      "type": "string"
+    },
+    {
+      "key": "configKey",
+      "value": "business-date",
+      "type": "string"
+    },
+    {
+      "key": "createdBy",
+      "value": "101",
+      "type": "string"
+    },
+    {
+      "key": "customerAccountId",
+      "value": "a0000000-0000-0000-0000-000000000101",
+      "type": "string"
+    },
+    {
+      "key": "customerId",
+      "value": "CIF900101",
+      "type": "string"
+    },
+    {
+      "key": "date",
+      "value": "2026-08-17",
+      "type": "string"
+    },
+    {
+      "key": "documentId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "empId",
+      "value": "1002",
+      "type": "string"
+    },
+    {
+      "key": "employeeId",
+      "value": "1004",
+      "type": "string"
+    },
+    {
+      "key": "eventId",
+      "value": "{{$guid}}",
+      "type": "string"
+    },
+    {
+      "key": "eventType",
+      "value": "ACCOUNT_UPDATED",
+      "type": "string"
+    },
+    {
+      "key": "fileId",
+      "value": "file-000001",
+      "type": "string"
+    },
+    {
+      "key": "fiscalYear",
+      "value": "2026",
+      "type": "string"
+    },
+    {
+      "key": "flagKey",
+      "value": "instant-payments",
+      "type": "string"
+    },
+    {
+      "key": "from",
+      "value": "2026-08-01",
+      "type": "string"
+    },
+    {
+      "key": "holdId",
+      "value": "hold-000001",
+      "type": "string"
+    },
+    {
+      "key": "holidayId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "ifsc",
+      "value": "MBAG0000001",
+      "type": "string"
+    },
+    {
+      "key": "ifscCode",
+      "value": "MBAG0000001",
+      "type": "string"
+    },
+    {
+      "key": "journalId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "limitType",
+      "value": "PER_TRANSACTION",
+      "type": "string"
+    },
+    {
+      "key": "maxAmount",
+      "value": "100000.00",
+      "type": "string"
+    },
+    {
+      "key": "minAmount",
+      "value": "0.01",
+      "type": "string"
+    },
+    {
+      "key": "name",
+      "value": "Asha",
+      "type": "string"
+    },
+    {
+      "key": "namespace",
+      "value": "banking",
+      "type": "string"
+    },
+    {
+      "key": "notificationId",
+      "value": "notification-000001",
+      "type": "string"
+    },
+    {
+      "key": "productCategory",
+      "value": "DEPOSIT",
+      "type": "string"
+    },
+    {
+      "key": "productCode",
+      "value": "SAV-REG",
+      "type": "string"
+    },
+    {
+      "key": "productType",
+      "value": "SAVINGS",
+      "type": "string"
+    },
+    {
+      "key": "productVersionId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "reference",
+      "value": "JE-POSTMAN-001",
+      "type": "string"
+    },
+    {
+      "key": "recipient",
+      "value": "asha@example.com",
+      "type": "string"
+    },
+    {
+      "key": "requestId",
+      "value": "request-000001",
+      "type": "string"
+    },
+    {
+      "key": "rail",
+      "value": "INTERNAL",
+      "type": "string"
+    },
+    {
+      "key": "roleId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "ruleId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "scheduleId",
+      "value": "schedule-000001",
+      "type": "string"
+    },
+    {
+      "key": "search",
+      "value": "admin",
+      "type": "string"
+    },
+    {
+      "key": "size",
+      "value": "25",
+      "type": "string"
+    },
+    {
+      "key": "sourceService",
+      "value": "account-service",
+      "type": "string"
+    },
+    {
+      "key": "status",
+      "value": "ACTIVE",
+      "type": "string"
+    },
+    {
+      "key": "to",
+      "value": "2026-08-17",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "download-token",
+      "type": "string"
+    },
+    {
+      "key": "transactionId",
+      "value": "tx-000001",
+      "type": "string"
+    },
+    {
+      "key": "transactionType",
+      "value": "DEPOSIT",
+      "type": "string"
+    },
+    {
+      "key": "query",
+      "value": "Asha",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "4",
+      "type": "string"
+    },
+    {
+      "key": "versionNumber",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Service Operations",
+      "item": [
+        {
+          "name": "GET Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/actuator/health"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Generated OpenAPI",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api-docs"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "InternalTransactionController",
+      "description": "Source: services/transaction-service/src/main/java/com/moneybags/transaction/controller/InternalTransactionController.java",
+      "item": [
+        {
+          "name": "POST Opening Deposit",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Service-Name",
+                "value": "{{serviceName}}"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": "{{baseUrl}}/internal/v1/transactions/opening-deposits",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/InternalTransactionController.java.openingDeposit\n\nRequest body type: OpeningDepositRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accountId\": \"a0000000-0000-0000-0000-000000000101\",\n  \"amount\": 100,\n  \"currency\": \"INR\",\n  \"applicationReference\": \"string\",\n  \"initiatedByEmployeeId\": \"string\",\n  \"branchCode\": \"BR001\",\n  \"correlationId\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Settle",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/internal/v1/transactions/{{id}}/settle",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/InternalTransactionController.java.settle\n\nRequest body type: CallbackRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"providerEventId\": \"string\",\n  \"externalReference\": \"string\",\n  \"settlementDate\": \"2026-08-17\",\n  \"outcome\": \"string\",\n  \"reason\": \"Postman example\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Fail",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/internal/v1/transactions/{{id}}/fail",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/InternalTransactionController.java.fail\n\nRequest body type: CallbackRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"providerEventId\": \"string\",\n  \"externalReference\": \"string\",\n  \"settlementDate\": \"2026-08-17\",\n  \"outcome\": \"string\",\n  \"reason\": \"Postman example\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Cheque",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/internal/v1/transactions/{{id}}/cheque-clearing",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/InternalTransactionController.java.cheque\n\nRequest body type: CallbackRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"providerEventId\": \"string\",\n  \"externalReference\": \"string\",\n  \"settlementDate\": \"2026-08-17\",\n  \"outcome\": \"string\",\n  \"reason\": \"Postman example\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "ReconciliationController",
+      "description": "Source: services/transaction-service/src/main/java/com/moneybags/transaction/controller/ReconciliationController.java",
+      "item": [
+        {
+          "name": "GET List",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/reconciliation/exceptions?status=ACTIVE&page=0&size=25",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/ReconciliationController.java.list"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/reconciliation/exceptions/{{id}}",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/ReconciliationController.java.get"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Assign",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/reconciliation/exceptions/{{id}}/assign",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/ReconciliationController.java.assign\n\nRequest body type: AssignRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"investigatorId\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Resolve",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/reconciliation/exceptions/{{id}}/resolve",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/ReconciliationController.java.resolve\n\nRequest body type: ResolveRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resolution\": \"RESOLVED\",\n  \"notes\": \"Resolved from Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Run",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/internal/v1/reconciliation/runs",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/ReconciliationController.java.run"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "SwaggerUiController",
+      "description": "Source: services/transaction-service/src/main/java/com/moneybags/transaction/controller/SwaggerUiController.java",
+      "item": [
+        {
+          "name": "GET Home",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/SwaggerUiController.java.home"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "TransactionCommandController",
+      "description": "Source: services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionCommandController.java",
+      "item": [
+        {
+          "name": "POST Deposit",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/transactions/deposits",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionCommandController.java.deposit\n\nRequest body type: CreateRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceAccountId\": \"string\",\n  \"destinationAccountId\": \"string\",\n  \"cardId\": \"string\",\n  \"amount\": 100,\n  \"feeAmount\": 100,\n  \"currency\": \"INR\",\n  \"paymentChannel\": \"BRANCH\",\n  \"paymentMethod\": \"CASH\",\n  \"upiAddress\": \"string\",\n  \"chequeNumber\": \"string\",\n  \"narration\": \"Postman example transaction\",\n  \"clientReference\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Withdrawal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/transactions/withdrawals",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionCommandController.java.withdrawal\n\nRequest body type: CreateRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceAccountId\": \"string\",\n  \"destinationAccountId\": \"string\",\n  \"cardId\": \"string\",\n  \"amount\": 100,\n  \"feeAmount\": 100,\n  \"currency\": \"INR\",\n  \"paymentChannel\": \"BRANCH\",\n  \"paymentMethod\": \"CASH\",\n  \"upiAddress\": \"string\",\n  \"chequeNumber\": \"string\",\n  \"narration\": \"Postman example transaction\",\n  \"clientReference\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Internal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/transactions/transfers/internal",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionCommandController.java.internal\n\nRequest body type: CreateRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceAccountId\": \"string\",\n  \"destinationAccountId\": \"string\",\n  \"cardId\": \"string\",\n  \"amount\": 100,\n  \"feeAmount\": 100,\n  \"currency\": \"INR\",\n  \"paymentChannel\": \"BRANCH\",\n  \"paymentMethod\": \"CASH\",\n  \"upiAddress\": \"string\",\n  \"chequeNumber\": \"string\",\n  \"narration\": \"Postman example transaction\",\n  \"clientReference\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Neft",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/transactions/transfers/neft",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionCommandController.java.neft\n\nRequest body type: CreateRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceAccountId\": \"string\",\n  \"destinationAccountId\": \"string\",\n  \"cardId\": \"string\",\n  \"amount\": 100,\n  \"feeAmount\": 100,\n  \"currency\": \"INR\",\n  \"paymentChannel\": \"BRANCH\",\n  \"paymentMethod\": \"CASH\",\n  \"upiAddress\": \"string\",\n  \"chequeNumber\": \"string\",\n  \"narration\": \"Postman example transaction\",\n  \"clientReference\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Rtgs",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/transactions/transfers/rtgs",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionCommandController.java.rtgs\n\nRequest body type: CreateRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceAccountId\": \"string\",\n  \"destinationAccountId\": \"string\",\n  \"cardId\": \"string\",\n  \"amount\": 100,\n  \"feeAmount\": 100,\n  \"currency\": \"INR\",\n  \"paymentChannel\": \"BRANCH\",\n  \"paymentMethod\": \"CASH\",\n  \"upiAddress\": \"string\",\n  \"chequeNumber\": \"string\",\n  \"narration\": \"Postman example transaction\",\n  \"clientReference\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Imps",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/transactions/transfers/imps",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionCommandController.java.imps\n\nRequest body type: CreateRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceAccountId\": \"string\",\n  \"destinationAccountId\": \"string\",\n  \"cardId\": \"string\",\n  \"amount\": 100,\n  \"feeAmount\": 100,\n  \"currency\": \"INR\",\n  \"paymentChannel\": \"BRANCH\",\n  \"paymentMethod\": \"CASH\",\n  \"upiAddress\": \"string\",\n  \"chequeNumber\": \"string\",\n  \"narration\": \"Postman example transaction\",\n  \"clientReference\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Upi",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/transactions/transfers/upi",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionCommandController.java.upi\n\nRequest body type: CreateRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceAccountId\": \"string\",\n  \"destinationAccountId\": \"string\",\n  \"cardId\": \"string\",\n  \"amount\": 100,\n  \"feeAmount\": 100,\n  \"currency\": \"INR\",\n  \"paymentChannel\": \"BRANCH\",\n  \"paymentMethod\": \"CASH\",\n  \"upiAddress\": \"string\",\n  \"chequeNumber\": \"string\",\n  \"narration\": \"Postman example transaction\",\n  \"clientReference\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Cheque",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/transactions/cheques",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionCommandController.java.cheque\n\nRequest body type: CreateRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceAccountId\": \"string\",\n  \"destinationAccountId\": \"string\",\n  \"cardId\": \"string\",\n  \"amount\": 100,\n  \"feeAmount\": 100,\n  \"currency\": \"INR\",\n  \"paymentChannel\": \"BRANCH\",\n  \"paymentMethod\": \"CASH\",\n  \"upiAddress\": \"string\",\n  \"chequeNumber\": \"string\",\n  \"narration\": \"Postman example transaction\",\n  \"clientReference\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Card",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/transactions/card-payments",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionCommandController.java.card\n\nRequest body type: CreateRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceAccountId\": \"string\",\n  \"destinationAccountId\": \"string\",\n  \"cardId\": \"string\",\n  \"amount\": 100,\n  \"feeAmount\": 100,\n  \"currency\": \"INR\",\n  \"paymentChannel\": \"BRANCH\",\n  \"paymentMethod\": \"CASH\",\n  \"upiAddress\": \"string\",\n  \"chequeNumber\": \"string\",\n  \"narration\": \"Postman example transaction\",\n  \"clientReference\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Product Purchase",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/transactions/product-purchases",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionCommandController.java.productPurchase\n\nRequest body type: ProductPurchaseRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceAccountId\": \"string\",\n  \"productCode\": \"SAV-REG\",\n  \"amount\": 100,\n  \"currency\": \"INR\",\n  \"paymentChannel\": \"BRANCH\",\n  \"narration\": \"Postman example transaction\",\n  \"clientReference\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Approve",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/transactions/{{id}}/approve",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionCommandController.java.approve"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Reject",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/transactions/{{id}}/reject",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionCommandController.java.reject\n\nRequest body type: ActionRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Postman example\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Cancel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/transactions/{{id}}/cancel",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionCommandController.java.cancel\n\nRequest body type: ActionRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Postman example\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Reversal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/transactions/{{id}}/reversals",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionCommandController.java.reversal\n\nRequest body type: ReversalRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Postman example\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "TransactionQueryController",
+      "description": "Source: services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionQueryController.java",
+      "item": [
+        {
+          "name": "GET Search",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/transactions?account=a0000000-0000-0000-0000-000000000101&reference=JE-POSTMAN-001&status=ACTIVE&rail=INTERNAL&transactionType=DEPOSIT&minAmount=0.01&maxAmount=100000.00&from=2026-08-01&to=2026-08-17&createdBy=101&page=0&size=25",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionQueryController.java.search"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Reference",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/transactions/by-reference/{{reference}}",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionQueryController.java.reference"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/transactions/{{id}}/status",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionQueryController.java.status"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/transactions/{{id}}",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionQueryController.java.get"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Product Purchase",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/transactions/{{id}}/product-purchase",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionQueryController.java.productPurchase"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Account",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/{{accountId}}/transactions?page=0&size=25",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionQueryController.java.account"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Mini",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/{{accountId}}/mini-statement?size=25",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionQueryController.java.mini"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Approvals",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/transactions/approvals?branch=BR001&minAmount=0.01&maxAmount=100000.00&rail=INTERNAL&page=0&size=25",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionQueryController.java.approvals"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Quote",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/transactions/limits/quote?accountId=a0000000-0000-0000-0000-000000000101&transactionType=DEPOSIT&rail=INTERNAL&channel=NEFT&currency=INR&amount=100.00",
+            "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionQueryController.java.quote"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

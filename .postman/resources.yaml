@@ -1,0 +1,30 @@
+# Use this workspace to collaborate
+workspace:
+  id: b1d0a0b1-6b0d-40b8-80a4-b02c179cc3dd
+
+localResources:
+  collections:
+    - ../product-service/postman/Product Service Versioned
+      Catalog.postman_collection.json
+  specs:
+    - ../services/customer-service/openapi.yml
+    - ../services/customer-service/target/classes/static/openapi.yml
+
+# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
+
+cloudResources:
+  collections:
+    ../postman/collections/Moneybags - Account Service: c17c1998-0000-4000-8000-c17c1998c17c
+    ../postman/collections/Moneybags - API Gateway: f3ec8b52-0000-4000-8000-f3ec8b52f3ec
+    ../postman/collections/Moneybags - Audit Service: 13179c0c-0000-4000-8000-13179c0c1317
+    ../postman/collections/Moneybags - Branch Employee Service: c02e9f00-0000-4000-8000-c02e9f00c02e
+    ../postman/collections/Moneybags - Configuration Service: 8884e2a1-0000-4000-8000-8884e2a18884
+    ../postman/collections/Moneybags - Customer Service: 552122dd-0000-4000-8000-552122dd5521
+    ../postman/collections/Moneybags - Eureka Server: f8c673a4-0000-4000-8000-f8c673a4f8c6
+    ../postman/collections/Moneybags - Identity Service: ca2fe49b-0000-4000-8000-ca2fe49bca2f
+    ../postman/collections/Moneybags - Ledger Service: ef3d7284-0000-4000-8000-ef3d7284ef3d
+    ../postman/collections/Moneybags - Legacy Product Service: ffb72da4-0000-4000-8000-ffb72da4ffb7
+    ../postman/collections/Moneybags - Notification Service: 5d5296fe-0000-4000-8000-5d5296fe5d52
+    ../postman/collections/Moneybags - Product Service: bc172bfc-0000-4000-8000-bc172bfcbc17
+    ../postman/collections/Moneybags - Statement Reporting Service: f22dbfb5-0000-4000-8000-f22dbfb5f22d
+    ../postman/collections/Moneybags - Transaction Service: 425b4e13-0000-4000-8000-425b4e13425b

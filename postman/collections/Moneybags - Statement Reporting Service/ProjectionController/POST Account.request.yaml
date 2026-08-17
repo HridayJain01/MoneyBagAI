@@ -1,0 +1,27 @@
+$kind: http-request
+description: |-
+  Generated from services/statement-reporting-service/src/main/java/com/moneybags/statement/Controllers.java.account
+
+  Request body type: AccountEvent
+url: "{{baseUrl}}/internal/v1/statement-read-model/accounts"
+method: POST
+headers:
+  Content-Type: application/json
+  X-Service-Name: "{{serviceName}}"
+body:
+  type: json
+  content: |-
+    {
+      "sourceEventId": "{{$guid}}",
+      "accountId": "a0000000-0000-0000-0000-000000000101",
+      "customerId": "CIF900101",
+      "branchId": "BR001",
+      "maskedAccountNumber": "XXXXXXXX0001",
+      "accountName": "Primary Savings Account",
+      "status": "ACTIVE",
+      "currency": "INR",
+      "currentBalance": 100,
+      "dormantSince": "2026-08-17",
+      "sourceUpdatedAt": "2026-08-17T10:00:00Z"
+    }
+order: 1000

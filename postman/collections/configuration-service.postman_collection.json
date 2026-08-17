@@ -1,0 +1,916 @@
+{
+  "info": {
+    "_postman_id": "8884e2a1-0000-4000-8000-8884e2a18884",
+    "name": "Moneybags - Configuration Service",
+    "description": "Generated from the current Spring controller source for services/configuration-service. Requests default to direct service access on port 8092. Set baseUrl to http://localhost:8090 to exercise public routes through the API gateway. Internal /internal routes are intentionally called directly.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{sessionId}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.collectionVariables.get(\"idempotencyKey\")) {",
+          "  pm.collectionVariables.set(\"idempotencyKey\", pm.variables.replaceIn(\"{{$guid}}\"));",
+          "}",
+          "pm.collectionVariables.set(\"correlationId\", pm.variables.replaceIn(\"{{$guid}}\"));"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8092",
+      "type": "string"
+    },
+    {
+      "key": "sessionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "employeeId",
+      "value": "1004",
+      "type": "string"
+    },
+    {
+      "key": "branchCode",
+      "value": "BR001",
+      "type": "string"
+    },
+    {
+      "key": "permissions",
+      "value": "TRANSACTION_CREATE,TRANSACTION_APPROVE,TRANSACTION_CANCEL,TRANSACTION_CANCEL_ANY,TRANSACTION_REVERSE,TRANSACTION_VIEW,TRANSACTION_VIEW_ALL_BRANCHES,RECONCILIATION_MANAGE,STATEMENT_VIEW,REPORT_VIEW,REPORT_ADMIN,ACCOUNT_VIEW,ACCOUNT_VIEW_ALL_BRANCHES,ACCOUNT_OPEN,ACCOUNT_APPROVE,ACCOUNT_STATUS_MANAGE,CUSTOMER_READ,CUSTOMER_UPDATE,KYC_VERIFY,PRODUCT_READ,PRODUCT_MANAGE,USER_MANAGE,ROLE_PERMISSION_MANAGE,BRANCH_MANAGE,EMPLOYEE_MANAGE,CONFIG_MANAGE,NOTIFICATION_MANAGE,AUDIT_VIEW",
+      "type": "string"
+    },
+    {
+      "key": "serviceName",
+      "value": "postman",
+      "type": "string"
+    },
+    {
+      "key": "idempotencyKey",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "correlationId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "account",
+      "value": "a0000000-0000-0000-0000-000000000101",
+      "type": "string"
+    },
+    {
+      "key": "accountHolderId",
+      "value": "CIF900101",
+      "type": "string"
+    },
+    {
+      "key": "accountId",
+      "value": "a0000000-0000-0000-0000-000000000101",
+      "type": "string"
+    },
+    {
+      "key": "accountNumber",
+      "value": "510000000101",
+      "type": "string"
+    },
+    {
+      "key": "actionType",
+      "value": "ACCOUNT_OPENING",
+      "type": "string"
+    },
+    {
+      "key": "aggregateId",
+      "value": "a0000000-0000-0000-0000-000000000101",
+      "type": "string"
+    },
+    {
+      "key": "aggregateType",
+      "value": "ACCOUNT",
+      "type": "string"
+    },
+    {
+      "key": "applicationId",
+      "value": "APP-000001",
+      "type": "string"
+    },
+    {
+      "key": "actorEmployeeId",
+      "value": "101",
+      "type": "string"
+    },
+    {
+      "key": "amount",
+      "value": "100.00",
+      "type": "string"
+    },
+    {
+      "key": "branch",
+      "value": "BR001",
+      "type": "string"
+    },
+    {
+      "key": "branchId",
+      "value": "BR001",
+      "type": "string"
+    },
+    {
+      "key": "cardId",
+      "value": "card-000001",
+      "type": "string"
+    },
+    {
+      "key": "channel",
+      "value": "NEFT",
+      "type": "string"
+    },
+    {
+      "key": "cif",
+      "value": "CIF900101",
+      "type": "string"
+    },
+    {
+      "key": "cifNo",
+      "value": "CIF900101",
+      "type": "string"
+    },
+    {
+      "key": "code",
+      "value": "110100",
+      "type": "string"
+    },
+    {
+      "key": "configKey",
+      "value": "business-date",
+      "type": "string"
+    },
+    {
+      "key": "createdBy",
+      "value": "101",
+      "type": "string"
+    },
+    {
+      "key": "customerAccountId",
+      "value": "a0000000-0000-0000-0000-000000000101",
+      "type": "string"
+    },
+    {
+      "key": "customerId",
+      "value": "CIF900101",
+      "type": "string"
+    },
+    {
+      "key": "date",
+      "value": "2026-08-17",
+      "type": "string"
+    },
+    {
+      "key": "documentId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "empId",
+      "value": "1002",
+      "type": "string"
+    },
+    {
+      "key": "employeeId",
+      "value": "1004",
+      "type": "string"
+    },
+    {
+      "key": "eventId",
+      "value": "{{$guid}}",
+      "type": "string"
+    },
+    {
+      "key": "eventType",
+      "value": "ACCOUNT_UPDATED",
+      "type": "string"
+    },
+    {
+      "key": "fileId",
+      "value": "file-000001",
+      "type": "string"
+    },
+    {
+      "key": "fiscalYear",
+      "value": "2026",
+      "type": "string"
+    },
+    {
+      "key": "flagKey",
+      "value": "instant-payments",
+      "type": "string"
+    },
+    {
+      "key": "from",
+      "value": "2026-08-01",
+      "type": "string"
+    },
+    {
+      "key": "holdId",
+      "value": "hold-000001",
+      "type": "string"
+    },
+    {
+      "key": "holidayId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "ifsc",
+      "value": "MBAG0000001",
+      "type": "string"
+    },
+    {
+      "key": "ifscCode",
+      "value": "MBAG0000001",
+      "type": "string"
+    },
+    {
+      "key": "journalId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "limitType",
+      "value": "PER_TRANSACTION",
+      "type": "string"
+    },
+    {
+      "key": "maxAmount",
+      "value": "100000.00",
+      "type": "string"
+    },
+    {
+      "key": "minAmount",
+      "value": "0.01",
+      "type": "string"
+    },
+    {
+      "key": "name",
+      "value": "Asha",
+      "type": "string"
+    },
+    {
+      "key": "namespace",
+      "value": "banking",
+      "type": "string"
+    },
+    {
+      "key": "notificationId",
+      "value": "notification-000001",
+      "type": "string"
+    },
+    {
+      "key": "productCategory",
+      "value": "DEPOSIT",
+      "type": "string"
+    },
+    {
+      "key": "productCode",
+      "value": "SAV-REG",
+      "type": "string"
+    },
+    {
+      "key": "productType",
+      "value": "SAVINGS",
+      "type": "string"
+    },
+    {
+      "key": "productVersionId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "reference",
+      "value": "JE-POSTMAN-001",
+      "type": "string"
+    },
+    {
+      "key": "recipient",
+      "value": "asha@example.com",
+      "type": "string"
+    },
+    {
+      "key": "requestId",
+      "value": "request-000001",
+      "type": "string"
+    },
+    {
+      "key": "rail",
+      "value": "INTERNAL",
+      "type": "string"
+    },
+    {
+      "key": "roleId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "ruleId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "scheduleId",
+      "value": "schedule-000001",
+      "type": "string"
+    },
+    {
+      "key": "search",
+      "value": "admin",
+      "type": "string"
+    },
+    {
+      "key": "size",
+      "value": "25",
+      "type": "string"
+    },
+    {
+      "key": "sourceService",
+      "value": "account-service",
+      "type": "string"
+    },
+    {
+      "key": "status",
+      "value": "ACTIVE",
+      "type": "string"
+    },
+    {
+      "key": "to",
+      "value": "2026-08-17",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "download-token",
+      "type": "string"
+    },
+    {
+      "key": "transactionId",
+      "value": "tx-000001",
+      "type": "string"
+    },
+    {
+      "key": "transactionType",
+      "value": "DEPOSIT",
+      "type": "string"
+    },
+    {
+      "key": "query",
+      "value": "Asha",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "4",
+      "type": "string"
+    },
+    {
+      "key": "versionNumber",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Service Operations",
+      "item": [
+        {
+          "name": "GET Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/actuator/health"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Generated OpenAPI",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api-docs"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "ChannelLimitController",
+      "description": "Source: services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/ChannelLimitController.java",
+      "item": [
+        {
+          "name": "GET Get All Current",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/configuration/limits/channels",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/ChannelLimitController.java.getAllCurrent"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get Current",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/configuration/limits/channels/{{channel}}/{{limitType}}",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/ChannelLimitController.java.getCurrent"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/configuration/limits/channels/{{channel}}/{{limitType}}/history",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/ChannelLimitController.java.getHistory"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Create Version",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/configuration/limits/channels",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/ChannelLimitController.java.createVersion\n\nRequest body type: CreateChannelLimitRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"channel\": \"EMAIL\",\n  \"limitType\": \"PER_TRANSACTION\",\n  \"maxAmount\": 100,\n  \"currency\": \"INR\",\n  \"effectiveFrom\": \"2026-08-17T10:00:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "ConfigEntryController",
+      "description": "Source: services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/ConfigEntryController.java",
+      "item": [
+        {
+          "name": "GET Get Current",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/configuration/entries/{{namespace}}/{{configKey}}",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/ConfigEntryController.java.getCurrent"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/configuration/entries/{{namespace}}/{{configKey}}/history",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/ConfigEntryController.java.getHistory"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get By Namespace",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/configuration/entries/{{namespace}}",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/ConfigEntryController.java.getByNamespace"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Create Version",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/configuration/entries",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/ConfigEntryController.java.createVersion\n\nRequest body type: CreateConfigEntryRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"namespace\": \"banking\",\n  \"configKey\": \"string\",\n  \"configValue\": \"string\",\n  \"valueType\": \"string\",\n  \"updatedBy\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "FeatureFlagController",
+      "description": "Source: services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/FeatureFlagController.java",
+      "item": [
+        {
+          "name": "GET Get All",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/configuration/feature-flags",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/FeatureFlagController.java.getAll"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get By Key",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/configuration/feature-flags/{{flagKey}}",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/FeatureFlagController.java.getByKey"
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Upsert",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/configuration/feature-flags/{{flagKey}}",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/FeatureFlagController.java.upsert\n\nRequest body type: UpsertFeatureFlagRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"enabled\": true,\n  \"description\": \"Postman example request\",\n  \"targetingRule\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/configuration/feature-flags/{{flagKey}}",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/FeatureFlagController.java.delete"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "InternalEffectiveConfigController",
+      "description": "Source: services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/InternalEffectiveConfigController.java",
+      "item": [
+        {
+          "name": "GET Get Effective",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/internal/v1/configuration/effective",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/InternalEffectiveConfigController.java.getEffective"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "MaintenanceWindowController",
+      "description": "Source: services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/MaintenanceWindowController.java",
+      "item": [
+        {
+          "name": "GET Get All",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/configuration/maintenance-windows",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/MaintenanceWindowController.java.getAll"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get By Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/configuration/maintenance-windows/{{id}}",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/MaintenanceWindowController.java.getById"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/configuration/maintenance-windows",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/MaintenanceWindowController.java.create\n\nRequest body type: CreateMaintenanceWindowRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"string\",\n  \"startsAt\": \"2026-08-17T10:00:00Z\",\n  \"endsAt\": \"2026-08-17T10:00:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH Update",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/configuration/maintenance-windows/{{id}}",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/MaintenanceWindowController.java.update\n\nRequest body type: UpdateMaintenanceWindowRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"string\",\n  \"startsAt\": \"2026-08-17T10:00:00Z\",\n  \"endsAt\": \"2026-08-17T10:00:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Transition Status",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/configuration/maintenance-windows/{{id}}/status",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/MaintenanceWindowController.java.transitionStatus\n\nRequest body type: UpdateStatusRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ACTIVE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "MakerCheckerThresholdController",
+      "description": "Source: services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/MakerCheckerThresholdController.java",
+      "item": [
+        {
+          "name": "GET Get All Current",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/configuration/maker-checker-thresholds",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/MakerCheckerThresholdController.java.getAllCurrent"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get Current",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/configuration/maker-checker-thresholds/{{actionType}}",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/MakerCheckerThresholdController.java.getCurrent"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/configuration/maker-checker-thresholds/{{actionType}}/history",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/MakerCheckerThresholdController.java.getHistory"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Create Version",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/configuration/maker-checker-thresholds",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/MakerCheckerThresholdController.java.createVersion\n\nRequest body type: CreateMakerCheckerThresholdRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"actionType\": \"ACCOUNT_OPENING\",\n  \"thresholdAmount\": 100,\n  \"currency\": \"INR\",\n  \"effectiveFrom\": \"2026-08-17T10:00:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "PolicyController",
+      "description": "Source: services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/PolicyController.java",
+      "item": [
+        {
+          "name": "GET Get Current Password",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/configuration/policies/password",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/PolicyController.java.getCurrentPassword"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get Password History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/configuration/policies/password/history",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/PolicyController.java.getPasswordHistory"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Create Password Version",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/configuration/policies/password",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/PolicyController.java.createPasswordVersion\n\nRequest body type: CreatePasswordPolicyRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"minLength\": 1,\n  \"requireUpper\": true,\n  \"requireDigit\": true,\n  \"requireSpecial\": true,\n  \"historyCount\": 1,\n  \"maxAgeDays\": 1,\n  \"effectiveFrom\": \"2026-08-17T10:00:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get Current Session",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/configuration/policies/session",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/PolicyController.java.getCurrentSession"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get Session History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/configuration/policies/session/history",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/PolicyController.java.getSessionHistory"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Create Session Version",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/configuration/policies/session",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/PolicyController.java.createSessionVersion\n\nRequest body type: CreateSessionPolicyRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idleTimeoutMinutes\": 1,\n  \"absoluteTimeoutMinutes\": 1,\n  \"maxConcurrentSessions\": 1,\n  \"effectiveFrom\": \"2026-08-17T10:00:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get Current Otp",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/configuration/policies/otp",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/PolicyController.java.getCurrentOtp"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get Otp History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/configuration/policies/otp/history",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/PolicyController.java.getOtpHistory"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Create Otp Version",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/configuration/policies/otp",
+            "description": "Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/PolicyController.java.createOtpVersion\n\nRequest body type: CreateOtpPolicyRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"expirySeconds\": 1,\n  \"maxRetries\": 1,\n  \"resendCooldownSeconds\": 1,\n  \"effectiveFrom\": \"2026-08-17T10:00:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

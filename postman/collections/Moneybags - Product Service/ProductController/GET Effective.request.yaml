@@ -1,0 +1,5 @@
+$kind: http-request
+description: Generated from services/product-service/src/main/java/com/moneybags/product/controller/ProductController.java.effective
+url: "{{baseUrl}}/internal/v1/products/{{productCode}}/effective?businessDate=2026-08-17"
+method: GET
+order: 15000

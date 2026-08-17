@@ -1,0 +1,30 @@
+$kind: http-request
+description: |-
+  Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/FeatureFlagController.java.upsert
+
+  Request body type: UpsertFeatureFlagRequest
+url: "{{baseUrl}}/api/v1/configuration/feature-flags/{{flagKey}}"
+method: PUT
+headers:
+  - key: Content-Type
+    value: application/json
+  - key: X-Employee-Id
+    value: "{{employeeId}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Branch-Code
+    value: "{{branchCode}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Permissions
+    value: "{{permissions}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Correlation-Id
+    value: "{{correlationId}}"
+body:
+  type: json
+  content: |-
+    {
+      "enabled": true,
+      "description": "Postman example request",
+      "targetingRule": "string"
+    }
+order: 3000

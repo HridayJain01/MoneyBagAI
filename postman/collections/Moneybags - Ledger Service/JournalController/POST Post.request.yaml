@@ -1,0 +1,42 @@
+$kind: http-request
+description: |-
+  Generated from services/ledger-service/src/main/java/com/moneybags/ledger/controller/JournalController.java.post
+
+  Request body type: JournalPostRequest
+url: "{{baseUrl}}/api/v1/ledger/journals"
+method: POST
+headers:
+  - key: Content-Type
+    value: application/json
+  - key: X-Employee-Id
+    value: "{{employeeId}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Branch-Code
+    value: "{{branchCode}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Permissions
+    value: "{{permissions}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Correlation-Id
+    value: "{{correlationId}}"
+body:
+  type: json
+  content: |-
+    {
+      "journalReference": "JE-POSTMAN-001",
+      "transactionId": "tx-000001",
+      "journalType": "string",
+      "description": "Postman example request",
+      "currencyCode": "INR",
+      "createdBy": "string",
+      "lines": [
+        {
+          "ledgerCode": "string",
+          "customerAccountId": "string",
+          "side": "DEBIT",
+          "amount": 100,
+          "description": "Postman example request"
+        }
+      ]
+    }
+order: 1000

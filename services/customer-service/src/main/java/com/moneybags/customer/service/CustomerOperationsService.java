@@ -1,12 +1,9 @@
 package com.moneybags.customer.service;
 
 import com.moneybags.customer.dto.CustomerOperations.Address;
-import com.moneybags.customer.dto.CustomerOperations.BeneficiaryRequest;
 import com.moneybags.customer.dto.CustomerOperations.KycDecision;
 import com.moneybags.customer.dto.CustomerOperations.KycSubmit;
 import com.moneybags.customer.dto.CustomerOperations.Update;
-import com.moneybags.customer.entity.Beneficiary;
-import com.moneybags.customer.entity.BeneficiaryChangeHistory;
 import com.moneybags.customer.entity.Customer;
 import com.moneybags.customer.entity.CustomerAddress;
 import com.moneybags.customer.entity.KycDocument;
@@ -64,44 +61,4 @@ public interface CustomerOperationsService {
 
     List<KycRejectionHistory> kycHistory(String cif);
 
-    Beneficiary addBeneficiary(
-            String cif,
-            BeneficiaryRequest request
-    );
-
-    Beneficiary updateBeneficiary(
-            String cif,
-            Long beneficiaryId,
-            BeneficiaryRequest request
-    );
-
-    Beneficiary activateBeneficiary(
-            String cif,
-            Long beneficiaryId
-    );
-
-    Map<String, Object> beneficiaryEligibility(
-            String cif,
-            Long beneficiaryId
-    );
-
-    Beneficiary setBeneficiaryBlocked(
-            String cif,
-            Long beneficiaryId,
-            boolean blocked
-    );
-
-    void removeBeneficiary(
-            String cif,
-            Long beneficiaryId
-    );
-
-    List<Beneficiary> beneficiaries(
-            String cif,
-            String status
-    );
-
-    List<BeneficiaryChangeHistory> beneficiaryHistory(
-            Long beneficiaryId
-    );
 }

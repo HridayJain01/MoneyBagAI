@@ -1,0 +1,5 @@
+$kind: http-request
+description: Generated from services/account-service/src/main/java/com/moneybags/account/controller/InternalAccountController.java.statementContext
+url: "{{baseUrl}}/internal/v1/accounts/{{accountId}}/statement-context"
+method: GET
+order: 7000

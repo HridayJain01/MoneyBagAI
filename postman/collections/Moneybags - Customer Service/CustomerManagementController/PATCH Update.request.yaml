@@ -1,0 +1,33 @@
+$kind: http-request
+description: |-
+  Generated from services/customer-service/src/main/java/com/moneybags/customer/controller/CustomerManagementController.java.update
+
+  Request body type: Update
+url: "{{baseUrl}}/api/v1/customers/{{cif}}"
+method: PATCH
+headers:
+  - key: Content-Type
+    value: application/json
+  - key: X-Employee-Id
+    value: "{{employeeId}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Branch-Code
+    value: "{{branchCode}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Permissions
+    value: "{{permissions}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Correlation-Id
+    value: "{{correlationId}}"
+body:
+  type: json
+  content: |-
+    {
+      "firstName": "Asha",
+      "lastName": "Sharma",
+      "dob": "2026-08-17",
+      "gender": "MALE",
+      "mobile": "9876543210",
+      "email": "asha@example.com"
+    }
+order: 1000

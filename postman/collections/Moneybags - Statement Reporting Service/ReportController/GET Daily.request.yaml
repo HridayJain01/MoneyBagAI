@@ -1,0 +1,17 @@
+$kind: http-request
+description: Generated from services/statement-reporting-service/src/main/java/com/moneybags/statement/Controllers.java.daily
+url: "{{baseUrl}}/api/v1/reports/daily-transactions?date=2026-08-17"
+method: GET
+headers:
+  - key: X-Employee-Id
+    value: "{{employeeId}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Branch-Code
+    value: "{{branchCode}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Permissions
+    value: "{{permissions}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Correlation-Id
+    value: "{{correlationId}}"
+order: 1000

@@ -1,0 +1,41 @@
+$kind: http-request
+description: |-
+  Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionCommandController.java.neft
+
+  Request body type: CreateRequest
+url: "{{baseUrl}}/api/v1/transactions/transfers/neft"
+method: POST
+headers:
+  - key: Content-Type
+    value: application/json
+  - key: Idempotency-Key
+    value: "{{idempotencyKey}}"
+  - key: X-Employee-Id
+    value: "{{employeeId}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Branch-Code
+    value: "{{branchCode}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Permissions
+    value: "{{permissions}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Correlation-Id
+    value: "{{correlationId}}"
+body:
+  type: json
+  content: |-
+    {
+      "sourceAccountId": "string",
+      "destinationAccountId": "string",
+      "cardId": "string",
+      "amount": 100,
+      "feeAmount": 100,
+      "currency": "INR",
+      "paymentChannel": "BRANCH",
+      "paymentMethod": "CASH",
+      "upiAddress": "string",
+      "chequeNumber": "string",
+      "narration": "Postman example transaction",
+      "clientReference": "string"
+    }
+order: 4000

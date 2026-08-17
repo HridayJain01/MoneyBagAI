@@ -1,0 +1,33 @@
+$kind: http-request
+description: |-
+  Generated from services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/BranchController.java.replaceWorkingHours
+
+  Request body type: List<WorkingHoursDayRequest>
+url: "{{baseUrl}}/api/v1/branches/{{id}}/working-hours"
+method: PUT
+headers:
+  - key: Content-Type
+    value: application/json
+  - key: X-Employee-Id
+    value: "{{employeeId}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Branch-Code
+    value: "{{branchCode}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Permissions
+    value: "{{permissions}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Correlation-Id
+    value: "{{correlationId}}"
+body:
+  type: json
+  content: |-
+    [
+      {
+        "dayOfWeek": "string",
+        "openTime": "string",
+        "closeTime": "string",
+        "closed": true
+      }
+    ]
+order: 9000

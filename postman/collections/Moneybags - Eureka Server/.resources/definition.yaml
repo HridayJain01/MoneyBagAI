@@ -1,0 +1,233 @@
+$kind: collection
+description: Generated from the current Spring controller source for services/eureka-server. Requests default to direct service access on port 8080. Set baseUrl to http://localhost:8090 to exercise public routes through the API gateway. Internal /internal routes are intentionally called directly.
+variables:
+  - key: baseUrl
+    value: http://localhost:8080
+    secret: false
+  - key: sessionId
+    value: ""
+    secret: false
+  - key: employeeId
+    value: "1004"
+    secret: false
+  - key: branchCode
+    value: BR001
+    secret: false
+  - key: permissions
+    value: ACCOUNT_VIEW,ACCOUNT_CREATE,TRANSACTION_CREATE,TRANSACTION_VIEW,RECONCILIATION_MANAGE
+    secret: false
+  - key: serviceName
+    value: postman
+    secret: false
+  - key: idempotencyKey
+    value: ""
+    secret: false
+  - key: correlationId
+    value: ""
+    secret: false
+  - key: account
+    value: a0000000-0000-0000-0000-000000000101
+    secret: false
+  - key: accountHolderId
+    value: CIF900101
+    secret: false
+  - key: accountId
+    value: a0000000-0000-0000-0000-000000000101
+    secret: false
+  - key: accountNumber
+    value: "510000000101"
+    secret: false
+  - key: actionType
+    value: ACCOUNT_OPENING
+    secret: false
+  - key: aggregateId
+    value: a0000000-0000-0000-0000-000000000101
+    secret: false
+  - key: aggregateType
+    value: ACCOUNT
+    secret: false
+  - key: applicationId
+    value: APP-000001
+    secret: false
+  - key: actorEmployeeId
+    value: "101"
+    secret: false
+  - key: amount
+    value: "100.00"
+    secret: false
+  - key: branch
+    value: BR001
+    secret: false
+  - key: branchId
+    value: BR001
+    secret: false
+  - key: cardId
+    value: card-000001
+    secret: false
+  - key: channel
+    value: NEFT
+    secret: false
+  - key: cif
+    value: CIF900101
+    secret: false
+  - key: cifNo
+    value: CIF900101
+    secret: false
+  - key: code
+    value: "110100"
+    secret: false
+  - key: configKey
+    value: business-date
+    secret: false
+  - key: createdBy
+    value: "101"
+    secret: false
+  - key: customerAccountId
+    value: a0000000-0000-0000-0000-000000000101
+    secret: false
+  - key: date
+    value: 2026-08-17
+    secret: false
+  - key: documentId
+    value: "1"
+    secret: false
+  - key: empId
+    value: "1002"
+    secret: false
+  - key: employeeId
+    value: "1004"
+    secret: false
+  - key: eventId
+    value: "{{$guid}}"
+    secret: false
+  - key: eventType
+    value: ACCOUNT_UPDATED
+    secret: false
+  - key: fileId
+    value: file-000001
+    secret: false
+  - key: fiscalYear
+    value: "2026"
+    secret: false
+  - key: flagKey
+    value: instant-payments
+    secret: false
+  - key: from
+    value: 2026-08-01
+    secret: false
+  - key: holdId
+    value: hold-000001
+    secret: false
+  - key: holidayId
+    value: "1"
+    secret: false
+  - key: id
+    value: "1"
+    secret: false
+  - key: ifsc
+    value: MBAG0000001
+    secret: false
+  - key: ifscCode
+    value: MBAG0000001
+    secret: false
+  - key: journalId
+    value: "1"
+    secret: false
+  - key: limitType
+    value: PER_TRANSACTION
+    secret: false
+  - key: maxAmount
+    value: "100000.00"
+    secret: false
+  - key: minAmount
+    value: "0.01"
+    secret: false
+  - key: name
+    value: Asha
+    secret: false
+  - key: namespace
+    value: banking
+    secret: false
+  - key: notificationId
+    value: notification-000001
+    secret: false
+  - key: productCategory
+    value: DEPOSIT
+    secret: false
+  - key: productCode
+    value: SAV-REG
+    secret: false
+  - key: productType
+    value: SAVINGS
+    secret: false
+  - key: productVersionId
+    value: "1"
+    secret: false
+  - key: reference
+    value: JE-POSTMAN-001
+    secret: false
+  - key: recipient
+    value: asha@example.com
+    secret: false
+  - key: requestId
+    value: request-000001
+    secret: false
+  - key: rail
+    value: INTERNAL
+    secret: false
+  - key: roleId
+    value: "1"
+    secret: false
+  - key: ruleId
+    value: "1"
+    secret: false
+  - key: scheduleId
+    value: schedule-000001
+    secret: false
+  - key: search
+    value: admin
+    secret: false
+  - key: size
+    value: "25"
+    secret: false
+  - key: sourceService
+    value: account-service
+    secret: false
+  - key: status
+    value: ACTIVE
+    secret: false
+  - key: to
+    value: 2026-08-17
+    secret: false
+  - key: token
+    value: download-token
+    secret: false
+  - key: transactionId
+    value: tx-000001
+    secret: false
+  - key: transactionType
+    value: DEPOSIT
+    secret: false
+  - key: query
+    value: Asha
+    secret: false
+  - key: userId
+    value: "101"
+    secret: false
+  - key: versionNumber
+    value: "1"
+    secret: false
+scripts:
+  - type: http:beforeRequest
+    code: |-
+      if (!pm.collectionVariables.get("idempotencyKey")) {
+        pm.collectionVariables.set("idempotencyKey", pm.variables.replaceIn("{{$guid}}"));
+      }
+      pm.collectionVariables.set("correlationId", pm.variables.replaceIn("{{$guid}}"));
+    language: text/javascript
+auth:
+  - id: 1ede6c94-92cd-4dfd-bc96-0f440ddfe7f2
+    type: bearer
+    name: bearer auth
+    credentials:
+      token: "{{sessionId}}"

@@ -1,0 +1,34 @@
+$kind: http-request
+description: |-
+  Generated from services/customer-service/src/main/java/com/moneybags/customer/controller/CustomerAddressController.java.putAddress
+
+  Request body type: Address
+url: "{{baseUrl}}/api/v1/customers/{{cif}}/addresses"
+method: PUT
+headers:
+  - key: Content-Type
+    value: application/json
+  - key: X-Employee-Id
+    value: "{{employeeId}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Branch-Code
+    value: "{{branchCode}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Permissions
+    value: "{{permissions}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Correlation-Id
+    value: "{{correlationId}}"
+body:
+  type: json
+  content: |-
+    {
+      "addressType": "RESIDENTIAL",
+      "line1": "10 Park Road",
+      "city": "Mumbai",
+      "state": "Maharashtra",
+      "pincode": "400001",
+      "country": "India",
+      "isCurrent": true
+    }
+order: 1000

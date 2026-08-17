@@ -1,0 +1,1529 @@
+{
+  "info": {
+    "_postman_id": "c17c1998-0000-4000-8000-c17c1998c17c",
+    "name": "Moneybags - Account Service",
+    "description": "Generated from the current Spring controller source for services/account-service. Requests default to direct service access on port 8083. Set baseUrl to http://localhost:8090 to exercise public routes through the API gateway. Internal /internal routes are intentionally called directly.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{sessionId}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.collectionVariables.get(\"idempotencyKey\")) {",
+          "  pm.collectionVariables.set(\"idempotencyKey\", pm.variables.replaceIn(\"{{$guid}}\"));",
+          "}",
+          "pm.collectionVariables.set(\"correlationId\", pm.variables.replaceIn(\"{{$guid}}\"));"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8083",
+      "type": "string"
+    },
+    {
+      "key": "sessionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "employeeId",
+      "value": "1004",
+      "type": "string"
+    },
+    {
+      "key": "branchCode",
+      "value": "BR001",
+      "type": "string"
+    },
+    {
+      "key": "permissions",
+      "value": "TRANSACTION_CREATE,TRANSACTION_APPROVE,TRANSACTION_CANCEL,TRANSACTION_CANCEL_ANY,TRANSACTION_REVERSE,TRANSACTION_VIEW,TRANSACTION_VIEW_ALL_BRANCHES,RECONCILIATION_MANAGE,STATEMENT_VIEW,REPORT_VIEW,REPORT_ADMIN,ACCOUNT_VIEW,ACCOUNT_VIEW_ALL_BRANCHES,ACCOUNT_OPEN,ACCOUNT_APPROVE,ACCOUNT_STATUS_MANAGE,CUSTOMER_READ,CUSTOMER_UPDATE,KYC_VERIFY,PRODUCT_READ,PRODUCT_MANAGE,USER_MANAGE,ROLE_PERMISSION_MANAGE,BRANCH_MANAGE,EMPLOYEE_MANAGE,CONFIG_MANAGE,NOTIFICATION_MANAGE,AUDIT_VIEW",
+      "type": "string"
+    },
+    {
+      "key": "serviceName",
+      "value": "transaction-service",
+      "type": "string"
+    },
+    {
+      "key": "idempotencyKey",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "correlationId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "account",
+      "value": "a0000000-0000-0000-0000-000000000101",
+      "type": "string"
+    },
+    {
+      "key": "accountHolderId",
+      "value": "CIF900101",
+      "type": "string"
+    },
+    {
+      "key": "accountId",
+      "value": "a0000000-0000-0000-0000-000000000101",
+      "type": "string"
+    },
+    {
+      "key": "accountNumber",
+      "value": "510000000101",
+      "type": "string"
+    },
+    {
+      "key": "actionType",
+      "value": "ACCOUNT_OPENING",
+      "type": "string"
+    },
+    {
+      "key": "aggregateId",
+      "value": "a0000000-0000-0000-0000-000000000101",
+      "type": "string"
+    },
+    {
+      "key": "aggregateType",
+      "value": "ACCOUNT",
+      "type": "string"
+    },
+    {
+      "key": "applicationId",
+      "value": "APP-000001",
+      "type": "string"
+    },
+    {
+      "key": "actorEmployeeId",
+      "value": "101",
+      "type": "string"
+    },
+    {
+      "key": "amount",
+      "value": "100.00",
+      "type": "string"
+    },
+    {
+      "key": "branch",
+      "value": "BR001",
+      "type": "string"
+    },
+    {
+      "key": "branchId",
+      "value": "BR001",
+      "type": "string"
+    },
+    {
+      "key": "cardId",
+      "value": "card-000001",
+      "type": "string"
+    },
+    {
+      "key": "channel",
+      "value": "NEFT",
+      "type": "string"
+    },
+    {
+      "key": "cif",
+      "value": "CIF900101",
+      "type": "string"
+    },
+    {
+      "key": "cifNo",
+      "value": "CIF900101",
+      "type": "string"
+    },
+    {
+      "key": "code",
+      "value": "110100",
+      "type": "string"
+    },
+    {
+      "key": "configKey",
+      "value": "business-date",
+      "type": "string"
+    },
+    {
+      "key": "createdBy",
+      "value": "101",
+      "type": "string"
+    },
+    {
+      "key": "customerAccountId",
+      "value": "a0000000-0000-0000-0000-000000000101",
+      "type": "string"
+    },
+    {
+      "key": "customerId",
+      "value": "CIF900101",
+      "type": "string"
+    },
+    {
+      "key": "date",
+      "value": "2026-08-17",
+      "type": "string"
+    },
+    {
+      "key": "documentId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "empId",
+      "value": "1002",
+      "type": "string"
+    },
+    {
+      "key": "employeeId",
+      "value": "1004",
+      "type": "string"
+    },
+    {
+      "key": "eventId",
+      "value": "{{$guid}}",
+      "type": "string"
+    },
+    {
+      "key": "eventType",
+      "value": "ACCOUNT_UPDATED",
+      "type": "string"
+    },
+    {
+      "key": "fileId",
+      "value": "file-000001",
+      "type": "string"
+    },
+    {
+      "key": "fiscalYear",
+      "value": "2026",
+      "type": "string"
+    },
+    {
+      "key": "flagKey",
+      "value": "instant-payments",
+      "type": "string"
+    },
+    {
+      "key": "from",
+      "value": "2026-08-01",
+      "type": "string"
+    },
+    {
+      "key": "holdId",
+      "value": "hold-000001",
+      "type": "string"
+    },
+    {
+      "key": "holidayId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "ifsc",
+      "value": "MBAG0000001",
+      "type": "string"
+    },
+    {
+      "key": "ifscCode",
+      "value": "MBAG0000001",
+      "type": "string"
+    },
+    {
+      "key": "journalId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "limitType",
+      "value": "PER_TRANSACTION",
+      "type": "string"
+    },
+    {
+      "key": "maxAmount",
+      "value": "100000.00",
+      "type": "string"
+    },
+    {
+      "key": "minAmount",
+      "value": "0.01",
+      "type": "string"
+    },
+    {
+      "key": "name",
+      "value": "Asha",
+      "type": "string"
+    },
+    {
+      "key": "namespace",
+      "value": "banking",
+      "type": "string"
+    },
+    {
+      "key": "notificationId",
+      "value": "notification-000001",
+      "type": "string"
+    },
+    {
+      "key": "productCategory",
+      "value": "DEPOSIT",
+      "type": "string"
+    },
+    {
+      "key": "productCode",
+      "value": "SAV-REG",
+      "type": "string"
+    },
+    {
+      "key": "productType",
+      "value": "SAVINGS",
+      "type": "string"
+    },
+    {
+      "key": "productVersionId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "reference",
+      "value": "JE-POSTMAN-001",
+      "type": "string"
+    },
+    {
+      "key": "recipient",
+      "value": "asha@example.com",
+      "type": "string"
+    },
+    {
+      "key": "requestId",
+      "value": "request-000001",
+      "type": "string"
+    },
+    {
+      "key": "rail",
+      "value": "INTERNAL",
+      "type": "string"
+    },
+    {
+      "key": "roleId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "ruleId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "scheduleId",
+      "value": "schedule-000001",
+      "type": "string"
+    },
+    {
+      "key": "search",
+      "value": "admin",
+      "type": "string"
+    },
+    {
+      "key": "size",
+      "value": "25",
+      "type": "string"
+    },
+    {
+      "key": "sourceService",
+      "value": "account-service",
+      "type": "string"
+    },
+    {
+      "key": "status",
+      "value": "ACTIVE",
+      "type": "string"
+    },
+    {
+      "key": "to",
+      "value": "2026-08-17",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "download-token",
+      "type": "string"
+    },
+    {
+      "key": "transactionId",
+      "value": "tx-000001",
+      "type": "string"
+    },
+    {
+      "key": "transactionType",
+      "value": "DEPOSIT",
+      "type": "string"
+    },
+    {
+      "key": "query",
+      "value": "Asha",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "4",
+      "type": "string"
+    },
+    {
+      "key": "versionNumber",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Service Operations",
+      "item": [
+        {
+          "name": "GET Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/actuator/health"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Generated OpenAPI",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api-docs"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "AccountController",
+      "description": "Source: services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java",
+      "item": [
+        {
+          "name": "POST Create Application",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/applications",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java.createApplication\n\nRequest body type: CreateApplicationRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cifNo\": \"CIF900101\",\n  \"productCode\": \"SAV-REG\",\n  \"accountName\": \"Primary Savings Account\",\n  \"initialDeposit\": 100,\n  \"currency\": \"INR\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Search Applications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/applications?cifNo=CIF900101&status=ACTIVE&page=0&size=25",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java.searchApplications"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Application",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/applications/{{applicationId}}",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java.application"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Approve",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/applications/{{applicationId}}/approve",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java.approve\n\nRequest body type: DecisionRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"remarks\": \"Approved from Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Reject",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/applications/{{applicationId}}/reject",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java.reject\n\nRequest body type: RejectionRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Postman example\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Cancel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/applications/{{applicationId}}/cancel",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java.cancel"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Search",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts?cifNo=CIF900101&productCode=SAV-REG&status=ACTIVE&page=0&size=25",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java.search"
+          },
+          "response": []
+        },
+        {
+          "name": "GET By Number",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/by-number/{{accountNumber}}",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java.byNumber"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/{{accountId}}",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java.detail"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Balance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/{{accountId}}/balance",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java.balance"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Balance History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/{{accountId}}/balance-history?page=0&size=25",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java.balanceHistory"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Status History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/{{accountId}}/status-history",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java.statusHistory"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Owned Products",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/{{accountId}}/products",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java.ownedProducts"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Freeze",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/{{accountId}}/freeze",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java.freeze\n\nRequest body type: StatusChangeRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Postman example\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Unfreeze",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/{{accountId}}/unfreeze",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java.unfreeze\n\nRequest body type: StatusChangeRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Postman example\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Block",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/{{accountId}}/block",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java.block\n\nRequest body type: StatusChangeRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Postman example\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Unblock",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/{{accountId}}/unblock",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java.unblock\n\nRequest body type: StatusChangeRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Postman example\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Mark Dormant",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/{{accountId}}/mark-dormant",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java.markDormant\n\nRequest body type: StatusChangeRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Postman example\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Reactivate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/{{accountId}}/reactivate",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java.reactivate\n\nRequest body type: StatusChangeRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Postman example\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Close",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/{{accountId}}/close",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java.close\n\nRequest body type: StatusChangeRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Postman example\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Holders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/{{accountId}}/holders",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java.holders"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Add Holder",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/{{accountId}}/holders",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java.addHolder\n\nRequest body type: AddHolderRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cifNo\": \"CIF900101\",\n  \"holderRole\": \"JOINT\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Holds",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/{{accountId}}/holds",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java.holds"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Place Hold",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/{{accountId}}/holds",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java.placeHold\n\nRequest body type: ManualHoldRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 100,\n  \"reason\": \"Postman example\",\n  \"holdType\": \"MANUAL\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Limits",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/{{accountId}}/limits",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java.limits"
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Set Limits",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Branch-Code",
+                "value": "{{branchCode}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/accounts/{{accountId}}/limits",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java.setLimits\n\nRequest body type: LimitsRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"perTransactionLimit\": 100,\n  \"dailyWithdrawalLimit\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "InternalAccountController",
+      "description": "Source: services/account-service/src/main/java/com/moneybags/account/controller/InternalAccountController.java",
+      "item": [
+        {
+          "name": "GET Transaction Context",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/internal/v1/accounts/{{accountId}}/transaction-context",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/InternalAccountController.java.transactionContext"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Reserve",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": "{{baseUrl}}/internal/v1/accounts/{{accountId}}/holds",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/InternalAccountController.java.reserve\n\nRequest body type: HoldRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transactionId\": \"tx-000001\",\n  \"amount\": 100,\n  \"currency\": \"INR\",\n  \"reason\": \"Postman example\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Consume",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": "{{baseUrl}}/internal/v1/accounts/{{accountId}}/holds/{{holdId}}/consume",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/InternalAccountController.java.consume"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Release",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": "{{baseUrl}}/internal/v1/accounts/{{accountId}}/holds/{{holdId}}/release",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/InternalAccountController.java.release"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{idempotencyKey}}"
+              }
+            ],
+            "url": "{{baseUrl}}/internal/v1/account-projections",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/InternalAccountController.java.project\n\nRequest body type: ProjectionInstruction",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eventId\": \"{{$guid}}\",\n  \"transactionId\": \"tx-000001\",\n  \"transactionReference\": \"TXN-POSTMAN-001\",\n  \"accountId\": \"a0000000-0000-0000-0000-000000000101\",\n  \"direction\": \"DEBIT\",\n  \"amount\": 100,\n  \"currency\": \"INR\",\n  \"holdId\": \"string\",\n  \"eventType\": \"ACCOUNT_UPDATED\",\n  \"correlationId\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Project Owned Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Service-Name",
+                "value": "{{serviceName}}"
+              }
+            ],
+            "url": "{{baseUrl}}/internal/v1/account-product-ownerships",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/InternalAccountController.java.projectOwnedProduct\n\nRequest body type: OwnedProductProjectionRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ownershipId\": \"string\",\n  \"action\": \"string\",\n  \"purchaseTransactionId\": \"string\",\n  \"reversalTransactionId\": \"string\",\n  \"ownerAccountId\": \"string\",\n  \"productCode\": \"SAV-REG\",\n  \"productName\": \"Postman Savings Product\",\n  \"productType\": \"SAVINGS\",\n  \"productVersionId\": 1,\n  \"productVersionNumber\": 1,\n  \"principalAmount\": 100,\n  \"currency\": \"INR\",\n  \"interestRate\": 100,\n  \"tenureMonths\": 1,\n  \"acquiredOn\": \"2026-08-17\",\n  \"maturityDate\": \"2026-08-17\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Statement Context",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/internal/v1/accounts/{{accountId}}/statement-context",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/InternalAccountController.java.statementContext"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Card Context",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/internal/v1/cards/{{cardId}}/payment-context?accountHolderId=CIF900101",
+            "description": "Generated from services/account-service/src/main/java/com/moneybags/account/controller/InternalAccountController.java.cardContext"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

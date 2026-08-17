@@ -1,0 +1,5 @@
+$kind: http-request
+description: Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/InternalEffectiveConfigController.java.getEffective
+url: "{{baseUrl}}/internal/v1/configuration/effective"
+method: GET
+order: 1000

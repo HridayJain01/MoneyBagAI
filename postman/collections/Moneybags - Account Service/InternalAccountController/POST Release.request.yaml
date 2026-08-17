@@ -1,0 +1,7 @@
+$kind: http-request
+description: Generated from services/account-service/src/main/java/com/moneybags/account/controller/InternalAccountController.java.release
+url: "{{baseUrl}}/internal/v1/accounts/{{accountId}}/holds/{{holdId}}/release"
+method: POST
+headers:
+  Idempotency-Key: "{{idempotencyKey}}"
+order: 4000

@@ -1,0 +1,34 @@
+$kind: http-request
+description: |-
+  Generated from services/statement-reporting-service/src/main/java/com/moneybags/statement/Controllers.java.transaction
+
+  Request body type: TransactionEvent
+url: "{{baseUrl}}/internal/v1/statement-read-model/transactions"
+method: POST
+headers:
+  Content-Type: application/json
+  X-Service-Name: "{{serviceName}}"
+body:
+  type: json
+  content: |-
+    {
+      "sourceEventId": "{{$guid}}",
+      "transactionId": "tx-000001",
+      "ledgerEntryId": "string",
+      "transactionReference": "TXN-POSTMAN-001",
+      "accountId": "a0000000-0000-0000-0000-000000000101",
+      "customerId": "CIF900101",
+      "branchId": "BR001",
+      "direction": "DEBIT",
+      "amount": 100,
+      "feeAmount": 100,
+      "currency": "INR",
+      "transactionType": "DEPOSIT",
+      "status": "ACTIVE",
+      "narration": "Postman example transaction",
+      "reversalOfTransactionId": "string",
+      "postedAt": "2026-08-17T10:00:00Z",
+      "balanceAfter": 100,
+      "sourceUpdatedAt": "2026-08-17T10:00:00Z"
+    }
+order: 2000

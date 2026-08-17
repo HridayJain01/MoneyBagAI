@@ -1,0 +1,38 @@
+$kind: http-request
+description: |-
+  Generated from services/identity-service/src/main/java/com/moneybags/identity/controller/AuthController.java.login
+
+  Request body type: LoginRequest
+url: "{{baseUrl}}/api/v1/auth/login"
+method: POST
+headers:
+  - key: Content-Type
+    value: application/json
+  - key: X-Employee-Id
+    value: "{{employeeId}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Branch-Code
+    value: "{{branchCode}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Permissions
+    value: "{{permissions}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Correlation-Id
+    value: "{{correlationId}}"
+body:
+  type: json
+  content: |-
+    {
+      "username": "opsadmin",
+      "password": "Password@123"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      if (pm.response.code >= 200 && pm.response.code < 300) {
+        const data = pm.response.json();
+        const sessionId = data.sessionId || data.token || data.accessToken;
+        if (sessionId) pm.collectionVariables.set("sessionId", sessionId);
+      }
+    language: text/javascript
+order: 1000

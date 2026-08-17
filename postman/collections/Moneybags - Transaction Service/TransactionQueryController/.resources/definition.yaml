@@ -1,0 +1,3 @@
+$kind: collection
+description: "Source: services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionQueryController.java"
+order: 6000

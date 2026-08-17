@@ -1,0 +1,20 @@
+$kind: http-request
+description: |-
+  Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/InternalTransactionController.java.cheque
+
+  Request body type: CallbackRequest
+url: "{{baseUrl}}/internal/v1/transactions/{{id}}/cheque-clearing"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "providerEventId": "string",
+      "externalReference": "string",
+      "settlementDate": "2026-08-17",
+      "outcome": "string",
+      "reason": "Postman example"
+    }
+order: 4000

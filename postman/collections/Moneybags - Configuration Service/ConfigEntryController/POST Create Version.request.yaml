@@ -1,0 +1,32 @@
+$kind: http-request
+description: |-
+  Generated from services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/ConfigEntryController.java.createVersion
+
+  Request body type: CreateConfigEntryRequest
+url: "{{baseUrl}}/api/v1/configuration/entries"
+method: POST
+headers:
+  - key: Content-Type
+    value: application/json
+  - key: X-Employee-Id
+    value: "{{employeeId}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Branch-Code
+    value: "{{branchCode}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Permissions
+    value: "{{permissions}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Correlation-Id
+    value: "{{correlationId}}"
+body:
+  type: json
+  content: |-
+    {
+      "namespace": "banking",
+      "configKey": "string",
+      "configValue": "string",
+      "valueType": "string",
+      "updatedBy": 1
+    }
+order: 4000

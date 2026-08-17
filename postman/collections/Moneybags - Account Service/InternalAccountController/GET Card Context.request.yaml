@@ -1,0 +1,5 @@
+$kind: http-request
+description: Generated from services/account-service/src/main/java/com/moneybags/account/controller/InternalAccountController.java.cardContext
+url: "{{baseUrl}}/internal/v1/cards/{{cardId}}/payment-context?accountHolderId=CIF900101"
+method: GET
+order: 8000

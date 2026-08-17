@@ -1,0 +1,3 @@
+$kind: collection
+description: "Source: services/ledger-service/src/main/java/com/moneybags/ledger/controller/InternalJournalController.java"
+order: 2000

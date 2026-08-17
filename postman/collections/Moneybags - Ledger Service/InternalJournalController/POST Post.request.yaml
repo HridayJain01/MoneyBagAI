@@ -1,0 +1,31 @@
+$kind: http-request
+description: |-
+  Generated from services/ledger-service/src/main/java/com/moneybags/ledger/controller/InternalJournalController.java.post
+
+  Request body type: JournalPostRequest
+url: "{{baseUrl}}/internal/v1/ledger/journals"
+method: POST
+headers:
+  Content-Type: application/json
+  X-Service-Name: "{{serviceName}}"
+body:
+  type: json
+  content: |-
+    {
+      "journalReference": "JE-POSTMAN-001",
+      "transactionId": "tx-000001",
+      "journalType": "string",
+      "description": "Postman example request",
+      "currencyCode": "INR",
+      "createdBy": "string",
+      "lines": [
+        {
+          "ledgerCode": "string",
+          "customerAccountId": "string",
+          "side": "DEBIT",
+          "amount": 100,
+          "description": "Postman example request"
+        }
+      ]
+    }
+order: 1000

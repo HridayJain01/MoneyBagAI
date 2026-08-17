@@ -1,0 +1,7 @@
+$kind: http-request
+description: Generated from services/account-service/src/main/java/com/moneybags/account/controller/InternalAccountController.java.consume
+url: "{{baseUrl}}/internal/v1/accounts/{{accountId}}/holds/{{holdId}}/consume"
+method: POST
+headers:
+  Idempotency-Key: "{{idempotencyKey}}"
+order: 3000

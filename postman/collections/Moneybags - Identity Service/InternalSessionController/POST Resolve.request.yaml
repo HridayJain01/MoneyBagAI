@@ -1,0 +1,16 @@
+$kind: http-request
+description: |-
+  Generated from services/identity-service/src/main/java/com/moneybags/identity/controller/InternalSessionController.java.resolve
+
+  Request body type: ResolveRequest
+url: "{{baseUrl}}/internal/v1/sessions/resolve"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "sessionId": "string"
+    }
+order: 1000

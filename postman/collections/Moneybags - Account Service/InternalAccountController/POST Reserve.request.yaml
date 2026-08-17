@@ -1,0 +1,20 @@
+$kind: http-request
+description: |-
+  Generated from services/account-service/src/main/java/com/moneybags/account/controller/InternalAccountController.java.reserve
+
+  Request body type: HoldRequest
+url: "{{baseUrl}}/internal/v1/accounts/{{accountId}}/holds"
+method: POST
+headers:
+  Content-Type: application/json
+  Idempotency-Key: "{{idempotencyKey}}"
+body:
+  type: json
+  content: |-
+    {
+      "transactionId": "tx-000001",
+      "amount": 100,
+      "currency": "INR",
+      "reason": "Postman example"
+    }
+order: 2000

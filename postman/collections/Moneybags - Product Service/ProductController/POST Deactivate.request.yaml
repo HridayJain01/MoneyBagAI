@@ -1,0 +1,17 @@
+$kind: http-request
+description: Generated from services/product-service/src/main/java/com/moneybags/product/controller/ProductController.java.deactivate
+url: "{{baseUrl}}/api/v1/products/{{productCode}}/deactivate"
+method: POST
+headers:
+  - key: X-Employee-Id
+    value: "{{employeeId}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Branch-Code
+    value: "{{branchCode}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Permissions
+    value: "{{permissions}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Correlation-Id
+    value: "{{correlationId}}"
+order: 9000

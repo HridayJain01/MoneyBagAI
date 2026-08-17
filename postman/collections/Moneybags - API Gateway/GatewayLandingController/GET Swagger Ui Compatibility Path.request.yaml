@@ -1,0 +1,5 @@
+$kind: http-request
+description: Generated from services/api-gateway/src/main/java/com/moneybags/gateway/controller/GatewayLandingController.java.swaggerUiCompatibilityPath
+url: "{{baseUrl}}/swagger-ui/index.html"
+method: GET
+order: 2000

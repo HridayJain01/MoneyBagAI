@@ -1,0 +1,17 @@
+$kind: http-request
+description: Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionQueryController.java.search
+url: "{{baseUrl}}/api/v1/transactions?account=a0000000-0000-0000-0000-000000000101&reference=JE-POSTMAN-001&status=ACTIVE&rail=INTERNAL&transactionType=DEPOSIT&minAmount=0.01&maxAmount=100000.00&from=2026-08-01&to=2026-08-17&createdBy=101&page=0&size=25"
+method: GET
+headers:
+  - key: X-Employee-Id
+    value: "{{employeeId}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Branch-Code
+    value: "{{branchCode}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Permissions
+    value: "{{permissions}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Correlation-Id
+    value: "{{correlationId}}"
+order: 1000

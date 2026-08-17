@@ -1,0 +1,3 @@
+$kind: collection
+description: "Source: services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/PolicyController.java"
+order: 8000

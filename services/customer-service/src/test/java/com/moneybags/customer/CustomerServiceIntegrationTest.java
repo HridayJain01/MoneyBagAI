@@ -19,7 +19,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
@@ -37,8 +36,6 @@ class CustomerServiceIntegrationTest {
     @Autowired CustomerAddressRepository addresses;
     @Autowired KycDocumentRepository documents;
     @Autowired KycRejectionHistoryRepository rejectionHistory;
-    @Autowired BeneficiaryRepository beneficiaries;
-    @Autowired BeneficiaryChangeHistoryRepository beneficiaryHistory;
     @Autowired CustomerDomainEventRepository domainEvents;
     @Autowired KycDocumentService kycDocumentService;
     @MockBean SecurityClient securityClient;
@@ -46,8 +43,6 @@ class CustomerServiceIntegrationTest {
     @BeforeEach
     void seedH2Only() {
         domainEvents.deleteAll();
-        beneficiaryHistory.deleteAll();
-        beneficiaries.deleteAll();
         rejectionHistory.deleteAll();
         documents.deleteAll();
         addresses.deleteAll();
@@ -144,29 +139,6 @@ class CustomerServiceIntegrationTest {
         assertThat(customers.findById(cif).orElseThrow().getKycStatus()).isEqualTo(KycStatus.VERIFIED);
         assertThat(domainEvents.findAll()).extracting(CustomerDomainEvent::getEventType)
                 .containsOnly("KycVerified");
-    }
-
-    @Test
-    void enforcesBeneficiaryCoolingPeriodAndKeepsChangeHistory() {
-        String cif = createCustomer();
-        Beneficiary beneficiary = (Beneficiary) operations.addBeneficiary(cif,
-                new BeneficiaryRequest("Ravi Kumar", "123456789012", "Demo Bank", "DEMO0000123", "Ravi", "BANK_ACCOUNT"));
-
-        assertThatThrownBy(() -> operations.activateBeneficiary(cif, beneficiary.getBeneficiaryId()))
-                .isInstanceOf(ConflictException.class);
-        assertThat(((Map<?, ?>) operations.beneficiaryEligibility(cif, beneficiary.getBeneficiaryId())).get("eligible"))
-                .isEqualTo(false);
-
-        beneficiary.setAddedAt(LocalDateTime.now().minusHours(25));
-        beneficiaries.save(beneficiary);
-        operations.activateBeneficiary(cif, beneficiary.getBeneficiaryId());
-        assertThat(beneficiaries.findById(beneficiary.getBeneficiaryId()).orElseThrow().getStatus()).isEqualTo("ACTIVE");
-        assertThat(domainEvents.findAll()).extracting(CustomerDomainEvent::getEventType).contains("BeneficiaryActivated");
-
-        operations.updateBeneficiary(cif, beneficiary.getBeneficiaryId(),
-                new BeneficiaryRequest("Ravi Kumar", "999999999999", "Demo Bank", "DEMO0000123", "Ravi Updated", "BANK_ACCOUNT"));
-        assertThat(beneficiaries.findById(beneficiary.getBeneficiaryId()).orElseThrow().getStatus()).isEqualTo("PENDING_ACTIVATION");
-        assertThat(operations.beneficiaryHistory(beneficiary.getBeneficiaryId())).hasSize(3);
     }
 
     @Test

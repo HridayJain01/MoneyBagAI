@@ -1,12 +1,9 @@
 package com.moneybags.customer.service.impl;
 
 import com.moneybags.customer.dto.CustomerOperations.Address;
-import com.moneybags.customer.dto.CustomerOperations.BeneficiaryRequest;
 import com.moneybags.customer.dto.CustomerOperations.KycDecision;
 import com.moneybags.customer.dto.CustomerOperations.KycSubmit;
 import com.moneybags.customer.dto.CustomerOperations.Update;
-import com.moneybags.customer.entity.Beneficiary;
-import com.moneybags.customer.entity.BeneficiaryChangeHistory;
 import com.moneybags.customer.entity.Customer;
 import com.moneybags.customer.entity.CustomerAddress;
 import com.moneybags.customer.entity.KycDocument;
@@ -32,8 +29,6 @@ public class CustomerOperationsServiceImpl implements CustomerOperationsService 
     private final CustomerAddressService addressService;
     private final KycDocumentService kycDocumentService;
     private final KycDocumentHistoryService kycHistoryService;
-    private final BeneficiaryService beneficiaryService;
-    private final BeneficiaryHistoryService beneficiaryHistoryService;
 
     @Override public Customer update(String cif, Update request) { return customerService.update(cif, request); }
     @Override public Map<String, Object> summary(String cif) { return customerService.summary(cif); }
@@ -52,12 +47,4 @@ public class CustomerOperationsServiceImpl implements CustomerOperationsService 
     @Override @Transactional(readOnly = true) public List<KycDocument> pendingKyc() { return kycDocumentService.findPending(); }
     @Override @Transactional(readOnly = true) public List<KycDocument> reKycRequired() { return kycDocumentService.findReKycRequired(); }
     @Override @Transactional(readOnly = true) public List<KycRejectionHistory> kycHistory(String cif) { return kycHistoryService.findByCustomer(cif); }
-    @Override public Beneficiary addBeneficiary(String cif, BeneficiaryRequest request) { return beneficiaryService.add(cif, request); }
-    @Override public Beneficiary updateBeneficiary(String cif, Long beneficiaryId, BeneficiaryRequest request) { return beneficiaryService.update(cif, beneficiaryId, request); }
-    @Override public Beneficiary activateBeneficiary(String cif, Long beneficiaryId) { return beneficiaryService.activate(cif, beneficiaryId); }
-    @Override @Transactional(readOnly = true) public Map<String, Object> beneficiaryEligibility(String cif, Long beneficiaryId) { return beneficiaryService.eligibility(cif, beneficiaryId); }
-    @Override public Beneficiary setBeneficiaryBlocked(String cif, Long beneficiaryId, boolean blocked) { return beneficiaryService.setBlocked(cif, beneficiaryId, blocked); }
-    @Override public void removeBeneficiary(String cif, Long beneficiaryId) { beneficiaryService.remove(cif, beneficiaryId); }
-    @Override @Transactional(readOnly = true) public List<Beneficiary> beneficiaries(String cif, String status) { return beneficiaryService.findByCustomer(cif, status); }
-    @Override @Transactional(readOnly = true) public List<BeneficiaryChangeHistory> beneficiaryHistory(Long beneficiaryId) { return beneficiaryHistoryService.findByBeneficiaryId(beneficiaryId); }
 }

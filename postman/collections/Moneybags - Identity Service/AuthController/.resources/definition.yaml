@@ -1,0 +1,3 @@
+$kind: collection
+description: "Source: services/identity-service/src/main/java/com/moneybags/identity/controller/AuthController.java"
+order: 2000

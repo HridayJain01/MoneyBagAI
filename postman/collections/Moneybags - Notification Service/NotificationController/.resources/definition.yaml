@@ -1,0 +1,3 @@
+$kind: collection
+description: "Source: services/notification-service/src/main/java/com/moneybags/notification/controller/NotificationController.java"
+order: 2000

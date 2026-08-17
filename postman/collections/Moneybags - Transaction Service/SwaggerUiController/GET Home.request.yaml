@@ -1,0 +1,5 @@
+$kind: http-request
+description: Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/SwaggerUiController.java.home
+url: "{{baseUrl}}/"
+method: GET
+order: 1000

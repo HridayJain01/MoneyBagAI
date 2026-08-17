@@ -1,0 +1,5 @@
+$kind: http-request
+description: Generated from services/account-service/src/main/java/com/moneybags/account/controller/InternalAccountController.java.transactionContext
+url: "{{baseUrl}}/internal/v1/accounts/{{accountId}}/transaction-context"
+method: GET
+order: 1000

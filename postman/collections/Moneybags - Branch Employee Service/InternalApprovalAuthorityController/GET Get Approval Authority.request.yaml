@@ -1,0 +1,5 @@
+$kind: http-request
+description: Generated from services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/InternalApprovalAuthorityController.java.getApprovalAuthority
+url: "{{baseUrl}}/internal/v1/approval-authority?employeeId=1004&actionType=ACCOUNT_OPENING"
+method: GET
+order: 1000

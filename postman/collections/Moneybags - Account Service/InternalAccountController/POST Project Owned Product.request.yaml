@@ -1,0 +1,32 @@
+$kind: http-request
+description: |-
+  Generated from services/account-service/src/main/java/com/moneybags/account/controller/InternalAccountController.java.projectOwnedProduct
+
+  Request body type: OwnedProductProjectionRequest
+url: "{{baseUrl}}/internal/v1/account-product-ownerships"
+method: POST
+headers:
+  Content-Type: application/json
+  X-Service-Name: "{{serviceName}}"
+body:
+  type: json
+  content: |-
+    {
+      "ownershipId": "string",
+      "action": "string",
+      "purchaseTransactionId": "string",
+      "reversalTransactionId": "string",
+      "ownerAccountId": "string",
+      "productCode": "SAV-REG",
+      "productName": "Postman Savings Product",
+      "productType": "SAVINGS",
+      "productVersionId": 1,
+      "productVersionNumber": 1,
+      "principalAmount": 100,
+      "currency": "INR",
+      "interestRate": 100,
+      "tenureMonths": 1,
+      "acquiredOn": "2026-08-17",
+      "maturityDate": "2026-08-17"
+    }
+order: 6000

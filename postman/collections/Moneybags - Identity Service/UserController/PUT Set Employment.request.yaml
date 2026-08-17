@@ -1,0 +1,17 @@
+$kind: http-request
+description: |-
+  Generated from services/identity-service/src/main/java/com/moneybags/identity/controller/UserController.java.setEmployment
+
+  Request body type: EmploymentRequest
+url: "{{baseUrl}}/internal/v1/users/{{userId}}/employment"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "employeeId": "string",
+      "branchCode": "BR001"
+    }
+order: 11000

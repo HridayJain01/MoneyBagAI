@@ -1,0 +1,29 @@
+$kind: http-request
+description: |-
+  Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/ReconciliationController.java.resolve
+
+  Request body type: ResolveRequest
+url: "{{baseUrl}}/api/v1/reconciliation/exceptions/{{id}}/resolve"
+method: POST
+headers:
+  - key: Content-Type
+    value: application/json
+  - key: X-Employee-Id
+    value: "{{employeeId}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Branch-Code
+    value: "{{branchCode}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Permissions
+    value: "{{permissions}}"
+    description: Used when calling a service directly; the gateway normally injects it.
+  - key: X-Correlation-Id
+    value: "{{correlationId}}"
+body:
+  type: json
+  content: |-
+    {
+      "resolution": "RESOLVED",
+      "notes": "Resolved from Postman"
+    }
+order: 4000

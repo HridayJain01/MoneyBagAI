@@ -1,0 +1,32 @@
+$kind: http-request
+description: |-
+  Generated from services/audit-service/src/main/java/com/moneybags/audit/controller/AuditController.java.append
+
+  Request body type: AuditEventRequest
+url: "{{baseUrl}}/internal/v1/audit-events"
+method: POST
+headers:
+  Content-Type: application/json
+  X-Service-Name: "{{serviceName}}"
+body:
+  type: json
+  content: |-
+    {
+      "eventId": "{{$guid}}",
+      "sourceService": "postman",
+      "eventType": "ACCOUNT_UPDATED",
+      "aggregateType": "ACCOUNT",
+      "aggregateId": "a0000000-0000-0000-0000-000000000101",
+      "actorUserId": "string",
+      "actorEmployeeId": "101",
+      "branchCode": "BR001",
+      "correlationId": "string",
+      "httpMethod": "string",
+      "httpPath": "string",
+      "httpStatus": 1,
+      "occurredAt": "2026-08-17T10:00:00Z",
+      "payload": {
+        "key": "value"
+      }
+    }
+order: 1000

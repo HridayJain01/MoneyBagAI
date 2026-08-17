@@ -1,0 +1,602 @@
+[
+  {
+    "service": "account-service",
+    "port": 8083,
+    "collection": "collections/account-service.postman_collection.json",
+    "controllerCount": 2,
+    "requestCount": 34,
+    "controllers": [
+      {
+        "name": "AccountController",
+        "source": "services/account-service/src/main/java/com/moneybags/account/controller/AccountController.java",
+        "requests": [
+          "POST /api/v1/accounts/applications",
+          "GET /api/v1/accounts/applications",
+          "GET /api/v1/accounts/applications/{applicationId}",
+          "POST /api/v1/accounts/applications/{applicationId}/approve",
+          "POST /api/v1/accounts/applications/{applicationId}/reject",
+          "POST /api/v1/accounts/applications/{applicationId}/cancel",
+          "GET /api/v1/accounts",
+          "GET /api/v1/accounts/by-number/{accountNumber}",
+          "GET /api/v1/accounts/{accountId}",
+          "GET /api/v1/accounts/{accountId}/balance",
+          "GET /api/v1/accounts/{accountId}/balance-history",
+          "GET /api/v1/accounts/{accountId}/status-history",
+          "GET /api/v1/accounts/{accountId}/products",
+          "POST /api/v1/accounts/{accountId}/freeze",
+          "POST /api/v1/accounts/{accountId}/unfreeze",
+          "POST /api/v1/accounts/{accountId}/block",
+          "POST /api/v1/accounts/{accountId}/unblock",
+          "POST /api/v1/accounts/{accountId}/mark-dormant",
+          "POST /api/v1/accounts/{accountId}/reactivate",
+          "POST /api/v1/accounts/{accountId}/close",
+          "GET /api/v1/accounts/{accountId}/holders",
+          "POST /api/v1/accounts/{accountId}/holders",
+          "GET /api/v1/accounts/{accountId}/holds",
+          "POST /api/v1/accounts/{accountId}/holds",
+          "GET /api/v1/accounts/{accountId}/limits",
+          "PUT /api/v1/accounts/{accountId}/limits"
+        ]
+      },
+      {
+        "name": "InternalAccountController",
+        "source": "services/account-service/src/main/java/com/moneybags/account/controller/InternalAccountController.java",
+        "requests": [
+          "GET /internal/v1/accounts/{accountId}/transaction-context",
+          "POST /internal/v1/accounts/{accountId}/holds",
+          "POST /internal/v1/accounts/{accountId}/holds/{holdId}/consume",
+          "POST /internal/v1/accounts/{accountId}/holds/{holdId}/release",
+          "POST /internal/v1/account-projections",
+          "POST /internal/v1/account-product-ownerships",
+          "GET /internal/v1/accounts/{accountId}/statement-context",
+          "GET /internal/v1/cards/{cardId}/payment-context"
+        ]
+      }
+    ]
+  },
+  {
+    "service": "api-gateway",
+    "port": 8090,
+    "collection": "collections/api-gateway.postman_collection.json",
+    "controllerCount": 1,
+    "requestCount": 2,
+    "controllers": [
+      {
+        "name": "GatewayLandingController",
+        "source": "services/api-gateway/src/main/java/com/moneybags/gateway/controller/GatewayLandingController.java",
+        "requests": [
+          "GET /",
+          "GET /swagger-ui/index.html"
+        ]
+      }
+    ]
+  },
+  {
+    "service": "audit-service",
+    "port": 8091,
+    "collection": "collections/audit-service.postman_collection.json",
+    "controllerCount": 1,
+    "requestCount": 6,
+    "controllers": [
+      {
+        "name": "AuditController",
+        "source": "services/audit-service/src/main/java/com/moneybags/audit/controller/AuditController.java",
+        "requests": [
+          "POST /internal/v1/audit-events",
+          "GET /api/v1/audit-events",
+          "GET /api/v1/audit-events/{eventId}",
+          "GET /api/v1/audit-events/trace/{correlationId}",
+          "GET /api/v1/audit-events/accounts/{accountId}",
+          "GET /api/v1/audit-events/transactions/{transactionId}"
+        ]
+      }
+    ]
+  },
+  {
+    "service": "branch-employee-service",
+    "port": 8081,
+    "collection": "collections/branch-employee-service.postman_collection.json",
+    "controllerCount": 3,
+    "requestCount": 22,
+    "controllers": [
+      {
+        "name": "BranchController",
+        "source": "services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/BranchController.java",
+        "requests": [
+          "GET /api/v1/branches",
+          "GET /api/v1/branches/{id}",
+          "POST /api/v1/branches",
+          "PATCH /api/v1/branches/{id}",
+          "POST /api/v1/branches/{id}/activate",
+          "POST /api/v1/branches/{id}/deactivate",
+          "GET /api/v1/branches/by-ifsc/{ifsc}",
+          "GET /api/v1/branches/{id}/working-hours",
+          "PUT /api/v1/branches/{id}/working-hours",
+          "GET /api/v1/branches/{id}/holidays",
+          "POST /api/v1/branches/{id}/holidays",
+          "DELETE /api/v1/branches/{id}/holidays/{holidayId}"
+        ]
+      },
+      {
+        "name": "EmployeeController",
+        "source": "services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/EmployeeController.java",
+        "requests": [
+          "GET /api/v1/employees",
+          "GET /api/v1/employees/{id}",
+          "POST /api/v1/employees",
+          "PATCH /api/v1/employees/{id}",
+          "GET /api/v1/employees/{id}/reports",
+          "PUT /api/v1/employees/{id}/manager",
+          "POST /api/v1/employees/{id}/transfer",
+          "GET /api/v1/employees/{id}/approval-authority",
+          "PUT /api/v1/employees/{id}/approval-authority"
+        ]
+      },
+      {
+        "name": "InternalApprovalAuthorityController",
+        "source": "services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/InternalApprovalAuthorityController.java",
+        "requests": [
+          "GET /internal/v1/approval-authority"
+        ]
+      }
+    ]
+  },
+  {
+    "service": "configuration-service",
+    "port": 8092,
+    "collection": "collections/configuration-service.postman_collection.json",
+    "controllerCount": 7,
+    "requestCount": 31,
+    "controllers": [
+      {
+        "name": "ChannelLimitController",
+        "source": "services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/ChannelLimitController.java",
+        "requests": [
+          "GET /api/v1/configuration/limits/channels",
+          "GET /api/v1/configuration/limits/channels/{channel}/{limitType}",
+          "GET /api/v1/configuration/limits/channels/{channel}/{limitType}/history",
+          "POST /api/v1/configuration/limits/channels"
+        ]
+      },
+      {
+        "name": "ConfigEntryController",
+        "source": "services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/ConfigEntryController.java",
+        "requests": [
+          "GET /api/v1/configuration/entries/{namespace}/{configKey}",
+          "GET /api/v1/configuration/entries/{namespace}/{configKey}/history",
+          "GET /api/v1/configuration/entries/{namespace}",
+          "POST /api/v1/configuration/entries"
+        ]
+      },
+      {
+        "name": "FeatureFlagController",
+        "source": "services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/FeatureFlagController.java",
+        "requests": [
+          "GET /api/v1/configuration/feature-flags",
+          "GET /api/v1/configuration/feature-flags/{flagKey}",
+          "PUT /api/v1/configuration/feature-flags/{flagKey}",
+          "DELETE /api/v1/configuration/feature-flags/{flagKey}"
+        ]
+      },
+      {
+        "name": "InternalEffectiveConfigController",
+        "source": "services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/InternalEffectiveConfigController.java",
+        "requests": [
+          "GET /internal/v1/configuration/effective"
+        ]
+      },
+      {
+        "name": "MaintenanceWindowController",
+        "source": "services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/MaintenanceWindowController.java",
+        "requests": [
+          "GET /api/v1/configuration/maintenance-windows",
+          "GET /api/v1/configuration/maintenance-windows/{id}",
+          "POST /api/v1/configuration/maintenance-windows",
+          "PATCH /api/v1/configuration/maintenance-windows/{id}",
+          "POST /api/v1/configuration/maintenance-windows/{id}/status"
+        ]
+      },
+      {
+        "name": "MakerCheckerThresholdController",
+        "source": "services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/MakerCheckerThresholdController.java",
+        "requests": [
+          "GET /api/v1/configuration/maker-checker-thresholds",
+          "GET /api/v1/configuration/maker-checker-thresholds/{actionType}",
+          "GET /api/v1/configuration/maker-checker-thresholds/{actionType}/history",
+          "POST /api/v1/configuration/maker-checker-thresholds"
+        ]
+      },
+      {
+        "name": "PolicyController",
+        "source": "services/configuration-service/src/main/java/com/moneybags/configuration_service/controller/PolicyController.java",
+        "requests": [
+          "GET /api/v1/configuration/policies/password",
+          "GET /api/v1/configuration/policies/password/history",
+          "POST /api/v1/configuration/policies/password",
+          "GET /api/v1/configuration/policies/session",
+          "GET /api/v1/configuration/policies/session/history",
+          "POST /api/v1/configuration/policies/session",
+          "GET /api/v1/configuration/policies/otp",
+          "GET /api/v1/configuration/policies/otp/history",
+          "POST /api/v1/configuration/policies/otp"
+        ]
+      }
+    ]
+  },
+  {
+    "service": "customer-service",
+    "port": 8082,
+    "collection": "collections/customer-service.postman_collection.json",
+    "controllerCount": 7,
+    "requestCount": 27,
+    "controllers": [
+      {
+        "name": "CustomerAddressController",
+        "source": "services/customer-service/src/main/java/com/moneybags/customer/controller/CustomerAddressController.java",
+        "requests": [
+          "PUT /api/v1/customers/{cif}/addresses",
+          "GET /api/v1/customers/{cif}/addresses"
+        ]
+      },
+      {
+        "name": "CustomerController",
+        "source": "services/customer-service/src/main/java/com/moneybags/customer/controller/CustomerController.java",
+        "requests": [
+          "POST /api/v1/customers",
+          "GET /api/v1/customers/{cifNo}",
+          "GET /api/v1/customers",
+          "GET /api/v1/customers/search"
+        ]
+      },
+      {
+        "name": "CustomerEventController",
+        "source": "services/customer-service/src/main/java/com/moneybags/customer/controller/CustomerEventController.java",
+        "requests": [
+          "GET /api/v1/customers/events"
+        ]
+      },
+      {
+        "name": "CustomerManagementController",
+        "source": "services/customer-service/src/main/java/com/moneybags/customer/controller/CustomerManagementController.java",
+        "requests": [
+          "PATCH /api/v1/customers/{cif}",
+          "GET /api/v1/customers/{cif}/summary",
+          "GET /api/v1/customers/{cif}/completeness",
+          "PATCH /api/v1/customers/{cif}/status",
+          "PUT /api/v1/customers/{cif}/relationship-manager/{empId}",
+          "DELETE /api/v1/customers/{cif}/relationship-manager",
+          "GET /api/v1/customers/relationship-manager/{empId}",
+          "PUT /api/v1/customers/{cif}/communication-preferences",
+          "GET /api/v1/customers/{cif}/communication-preferences",
+          "PUT /api/v1/customers/{cif}/risk-classification",
+          "GET /api/v1/customers/{cif}/eligibility"
+        ]
+      },
+      {
+        "name": "KycDocumentController",
+        "source": "services/customer-service/src/main/java/com/moneybags/customer/controller/KycDocumentController.java",
+        "requests": [
+          "POST /api/v1/customers/{cif}/kyc-documents",
+          "PUT /api/v1/customers/{cif}/kyc-documents/{documentId}/assignment/{empId}",
+          "PATCH /api/v1/customers/{cif}/kyc-documents/{documentId}/decision",
+          "GET /api/v1/customers/kyc/pending",
+          "GET /api/v1/customers/kyc/re-kyc-required",
+          "GET /api/v1/customers/{cif}/kyc-documents",
+          "POST /api/v1/customers/kyc/expiry-alerts/process"
+        ]
+      },
+      {
+        "name": "KycDocumentHistoryController",
+        "source": "services/customer-service/src/main/java/com/moneybags/customer/controller/KycDocumentHistoryController.java",
+        "requests": [
+          "GET /api/v1/customers/{cif}/kyc-rejections"
+        ]
+      },
+      {
+        "name": "OpenApiFileController",
+        "source": "services/customer-service/src/main/java/com/moneybags/customer/controller/OpenApiFileController.java",
+        "requests": [
+          "GET /openapi.yml"
+        ]
+      }
+    ]
+  },
+  {
+    "service": "eureka-server",
+    "port": 8080,
+    "collection": "collections/eureka-server.postman_collection.json",
+    "controllerCount": 0,
+    "requestCount": 0,
+    "controllers": []
+  },
+  {
+    "service": "identity-service",
+    "port": 8087,
+    "collection": "collections/identity-service.postman_collection.json",
+    "controllerCount": 3,
+    "requestCount": 19,
+    "controllers": [
+      {
+        "name": "AuthController",
+        "source": "services/identity-service/src/main/java/com/moneybags/identity/controller/AuthController.java",
+        "requests": [
+          "POST /api/v1/auth/login",
+          "POST /api/v1/auth/logout",
+          "POST /api/v1/auth/logout-all",
+          "GET /api/v1/auth/sessions",
+          "DELETE /api/v1/auth/sessions/{sessionId}"
+        ]
+      },
+      {
+        "name": "InternalSessionController",
+        "source": "services/identity-service/src/main/java/com/moneybags/identity/controller/InternalSessionController.java",
+        "requests": [
+          "POST /internal/v1/sessions/resolve"
+        ]
+      },
+      {
+        "name": "UserController",
+        "source": "services/identity-service/src/main/java/com/moneybags/identity/controller/UserController.java",
+        "requests": [
+          "GET /api/v1/users/{userId}",
+          "GET /api/v1/users/{userId}/detail",
+          "GET /api/v1/users",
+          "POST /api/v1/users",
+          "POST /api/v1/users/{userId}/lock",
+          "POST /api/v1/users/{userId}/unlock",
+          "POST /api/v1/users/{userId}/disable",
+          "POST /api/v1/users/{userId}/enable",
+          "POST /api/v1/users/{userId}/roles/{roleId}",
+          "DELETE /api/v1/users/{userId}/roles/{roleId}",
+          "PUT /internal/v1/users/{userId}/employment",
+          "GET /api/v1/roles",
+          "GET /api/v1/permissions"
+        ]
+      }
+    ]
+  },
+  {
+    "service": "ledger-service",
+    "port": 8085,
+    "collection": "collections/ledger-service.postman_collection.json",
+    "controllerCount": 3,
+    "requestCount": 10,
+    "controllers": [
+      {
+        "name": "InternalJournalController",
+        "source": "services/ledger-service/src/main/java/com/moneybags/ledger/controller/InternalJournalController.java",
+        "requests": [
+          "POST /internal/v1/ledger/journals"
+        ]
+      },
+      {
+        "name": "JournalController",
+        "source": "services/ledger-service/src/main/java/com/moneybags/ledger/controller/JournalController.java",
+        "requests": [
+          "POST /api/v1/ledger/journals",
+          "POST /api/v1/ledger/journals/{journalId}/reverse",
+          "GET /api/v1/ledger/journals/{id}",
+          "GET /api/v1/ledger/journals/reference/{reference}",
+          "GET /api/v1/ledger/journals",
+          "GET /api/v1/ledger/customer-accounts/{accountId}/entries"
+        ]
+      },
+      {
+        "name": "LedgerAccountController",
+        "source": "services/ledger-service/src/main/java/com/moneybags/ledger/controller/LedgerAccountController.java",
+        "requests": [
+          "GET /api/v1/ledger/accounts",
+          "GET /api/v1/ledger/accounts/{code}",
+          "GET /api/v1/ledger/accounts/{code}/balance"
+        ]
+      }
+    ]
+  },
+  {
+    "service": "notification-service",
+    "port": 8089,
+    "collection": "collections/notification-service.postman_collection.json",
+    "controllerCount": 1,
+    "requestCount": 6,
+    "controllers": [
+      {
+        "name": "NotificationController",
+        "source": "services/notification-service/src/main/java/com/moneybags/notification/controller/NotificationController.java",
+        "requests": [
+          "POST /internal/v1/notifications",
+          "GET /api/v1/notifications",
+          "GET /api/v1/notifications/{notificationId}",
+          "POST /api/v1/notifications/{notificationId}/retry",
+          "GET /api/v1/notification-templates",
+          "POST /api/v1/notification-templates"
+        ]
+      }
+    ]
+  },
+  {
+    "service": "product-service",
+    "port": 8088,
+    "collection": "collections/product-service.postman_collection.json",
+    "controllerCount": 1,
+    "requestCount": 15,
+    "controllers": [
+      {
+        "name": "ProductController",
+        "source": "services/product-service/src/main/java/com/moneybags/product/controller/ProductController.java",
+        "requests": [
+          "GET /api/v1/products",
+          "GET /api/v1/products/{productCode}",
+          "GET /api/v1/products/{productCode}/versions",
+          "GET /api/v1/products/{productCode}/versions/{versionNumber}",
+          "GET /api/v1/products/{productCode}/as-of",
+          "POST /api/v1/products",
+          "PATCH /api/v1/products/{productCode}",
+          "POST /api/v1/products/{productCode}/activate",
+          "POST /api/v1/products/{productCode}/deactivate",
+          "GET /api/v1/products/{productCode}/charges",
+          "PUT /api/v1/products/{productCode}/charges",
+          "GET /api/v1/products/{productCode}/rules",
+          "POST /api/v1/products/{productCode}/rules",
+          "DELETE /api/v1/products/{productCode}/rules/{ruleId}",
+          "GET /internal/v1/products/{productCode}/effective"
+        ]
+      }
+    ]
+  },
+  {
+    "service": "statement-reporting-service",
+    "port": 8086,
+    "collection": "collections/statement-reporting-service.postman_collection.json",
+    "controllerCount": 5,
+    "requestCount": 22,
+    "controllers": [
+      {
+        "name": "CertificateController",
+        "source": "services/statement-reporting-service/src/main/java/com/moneybags/statement/Controllers.java",
+        "requests": [
+          "GET /api/v1/statements/accounts/{accountId}/interest-certificate",
+          "GET /api/v1/statements/accounts/{accountId}/tds-certificate"
+        ]
+      },
+      {
+        "name": "ProjectionController",
+        "source": "services/statement-reporting-service/src/main/java/com/moneybags/statement/Controllers.java",
+        "requests": [
+          "POST /internal/v1/statement-read-model/accounts",
+          "POST /internal/v1/statement-read-model/transactions"
+        ]
+      },
+      {
+        "name": "ReportController",
+        "source": "services/statement-reporting-service/src/main/java/com/moneybags/statement/Controllers.java",
+        "requests": [
+          "GET /api/v1/reports/daily-transactions",
+          "GET /api/v1/reports/branches/{branchId}/transactions",
+          "GET /api/v1/reports/dormant-accounts",
+          "GET /api/v1/reports/interest-accruals",
+          "GET /api/v1/reports/reconciliation"
+        ]
+      },
+      {
+        "name": "ScheduleController",
+        "source": "services/statement-reporting-service/src/main/java/com/moneybags/statement/Controllers.java",
+        "requests": [
+          "POST /api/v1/report-schedules",
+          "GET /api/v1/report-schedules",
+          "GET /api/v1/report-schedules/{id}",
+          "PATCH /api/v1/report-schedules/{id}",
+          "DELETE /api/v1/report-schedules/{id}"
+        ]
+      },
+      {
+        "name": "StatementController",
+        "source": "services/statement-reporting-service/src/main/java/com/moneybags/statement/Controllers.java",
+        "requests": [
+          "GET /api/v1/statements/accounts/{accountId}/mini",
+          "POST /api/v1/statements/accounts/{accountId}",
+          "GET /api/v1/statements/requests",
+          "GET /api/v1/statements/requests/{id}",
+          "POST /api/v1/statements/requests/{id}/cancel",
+          "POST /api/v1/statements/requests/{id}/download-link",
+          "GET /api/v1/statements/files/{fileId}/download",
+          "GET /api/v1/statements/download-history"
+        ]
+      }
+    ]
+  },
+  {
+    "service": "transaction-service",
+    "port": 8084,
+    "collection": "collections/transaction-service.postman_collection.json",
+    "controllerCount": 5,
+    "requestCount": 33,
+    "controllers": [
+      {
+        "name": "InternalTransactionController",
+        "source": "services/transaction-service/src/main/java/com/moneybags/transaction/controller/InternalTransactionController.java",
+        "requests": [
+          "POST /internal/v1/transactions/opening-deposits",
+          "POST /internal/v1/transactions/{id}/settle",
+          "POST /internal/v1/transactions/{id}/fail",
+          "POST /internal/v1/transactions/{id}/cheque-clearing"
+        ]
+      },
+      {
+        "name": "ReconciliationController",
+        "source": "services/transaction-service/src/main/java/com/moneybags/transaction/controller/ReconciliationController.java",
+        "requests": [
+          "GET /api/v1/reconciliation/exceptions",
+          "GET /api/v1/reconciliation/exceptions/{id}",
+          "POST /api/v1/reconciliation/exceptions/{id}/assign",
+          "POST /api/v1/reconciliation/exceptions/{id}/resolve",
+          "POST /internal/v1/reconciliation/runs"
+        ]
+      },
+      {
+        "name": "SwaggerUiController",
+        "source": "services/transaction-service/src/main/java/com/moneybags/transaction/controller/SwaggerUiController.java",
+        "requests": [
+          "GET /"
+        ]
+      },
+      {
+        "name": "TransactionCommandController",
+        "source": "services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionCommandController.java",
+        "requests": [
+          "POST /api/v1/transactions/deposits",
+          "POST /api/v1/transactions/withdrawals",
+          "POST /api/v1/transactions/transfers/internal",
+          "POST /api/v1/transactions/transfers/neft",
+          "POST /api/v1/transactions/transfers/rtgs",
+          "POST /api/v1/transactions/transfers/imps",
+          "POST /api/v1/transactions/transfers/upi",
+          "POST /api/v1/transactions/cheques",
+          "POST /api/v1/transactions/card-payments",
+          "POST /api/v1/transactions/product-purchases",
+          "POST /api/v1/transactions/{id}/approve",
+          "POST /api/v1/transactions/{id}/reject",
+          "POST /api/v1/transactions/{id}/cancel",
+          "POST /api/v1/transactions/{id}/reversals"
+        ]
+      },
+      {
+        "name": "TransactionQueryController",
+        "source": "services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionQueryController.java",
+        "requests": [
+          "GET /api/v1/transactions",
+          "GET /api/v1/transactions/by-reference/{reference}",
+          "GET /api/v1/transactions/{id}/status",
+          "GET /api/v1/transactions/{id}",
+          "GET /api/v1/transactions/{id}/product-purchase",
+          "GET /api/v1/accounts/{accountId}/transactions",
+          "GET /api/v1/accounts/{accountId}/mini-statement",
+          "GET /api/v1/transactions/approvals",
+          "GET /api/v1/transactions/limits/quote"
+        ]
+      }
+    ]
+  },
+  {
+    "service": "legacy-product-service",
+    "port": 8083,
+    "collection": "collections/legacy-product-service.postman_collection.json",
+    "controllerCount": 1,
+    "requestCount": 8,
+    "controllers": [
+      {
+        "name": "ProductController",
+        "source": "product-service/src/main/java/com/example/productservice/controller/ProductController.java",
+        "requests": [
+          "POST /api/v1/products",
+          "GET /api/v1/products",
+          "GET /api/v1/products/{id}",
+          "GET /api/v1/products/code/{productCode}",
+          "GET /api/v1/products/versions/{productVersionId}",
+          "GET /api/v1/products/{id}/versions",
+          "PUT /api/v1/products/{id}",
+          "PATCH /api/v1/products/{id}/status"
+        ]
+      }
+    ]
+  }
+]

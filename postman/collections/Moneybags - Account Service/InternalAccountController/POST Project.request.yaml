@@ -1,0 +1,26 @@
+$kind: http-request
+description: |-
+  Generated from services/account-service/src/main/java/com/moneybags/account/controller/InternalAccountController.java.project
+
+  Request body type: ProjectionInstruction
+url: "{{baseUrl}}/internal/v1/account-projections"
+method: POST
+headers:
+  Content-Type: application/json
+  Idempotency-Key: "{{idempotencyKey}}"
+body:
+  type: json
+  content: |-
+    {
+      "eventId": "{{$guid}}",
+      "transactionId": "tx-000001",
+      "transactionReference": "TXN-POSTMAN-001",
+      "accountId": "a0000000-0000-0000-0000-000000000101",
+      "direction": "DEBIT",
+      "amount": 100,
+      "currency": "INR",
+      "holdId": "string",
+      "eventType": "ACCOUNT_UPDATED",
+      "correlationId": "string"
+    }
+order: 5000

@@ -1,0 +1,3 @@
+$kind: collection
+description: "Source: services/audit-service/src/main/java/com/moneybags/audit/controller/AuditController.java"
+order: 2000

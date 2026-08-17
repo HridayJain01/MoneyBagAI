@@ -1,0 +1,5 @@
+$kind: http-request
+description: Generated from services/customer-service/src/main/java/com/moneybags/customer/controller/OpenApiFileController.java.openApiFile
+url: "{{baseUrl}}/openapi.yml"
+method: GET
+order: 1000

@@ -1,0 +1,3 @@
+$kind: collection
+description: "Source: services/customer-service/src/main/java/com/moneybags/customer/controller/OpenApiFileController.java"
+order: 8000

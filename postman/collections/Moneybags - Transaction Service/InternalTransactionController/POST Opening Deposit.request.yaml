@@ -1,0 +1,24 @@
+$kind: http-request
+description: |-
+  Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/InternalTransactionController.java.openingDeposit
+
+  Request body type: OpeningDepositRequest
+url: "{{baseUrl}}/internal/v1/transactions/opening-deposits"
+method: POST
+headers:
+  Content-Type: application/json
+  X-Service-Name: "{{serviceName}}"
+  Idempotency-Key: "{{idempotencyKey}}"
+body:
+  type: json
+  content: |-
+    {
+      "accountId": "a0000000-0000-0000-0000-000000000101",
+      "amount": 100,
+      "currency": "INR",
+      "applicationReference": "string",
+      "initiatedByEmployeeId": "string",
+      "branchCode": "BR001",
+      "correlationId": "string"
+    }
+order: 1000

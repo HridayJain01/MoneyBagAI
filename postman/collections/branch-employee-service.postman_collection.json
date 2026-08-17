@@ -1,0 +1,788 @@
+{
+  "info": {
+    "_postman_id": "c02e9f00-0000-4000-8000-c02e9f00c02e",
+    "name": "Moneybags - Branch Employee Service",
+    "description": "Generated from the current Spring controller source for services/branch-employee-service. Requests default to direct service access on port 8081. Set baseUrl to http://localhost:8090 to exercise public routes through the API gateway. Internal /internal routes are intentionally called directly.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{sessionId}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.collectionVariables.get(\"idempotencyKey\")) {",
+          "  pm.collectionVariables.set(\"idempotencyKey\", pm.variables.replaceIn(\"{{$guid}}\"));",
+          "}",
+          "pm.collectionVariables.set(\"correlationId\", pm.variables.replaceIn(\"{{$guid}}\"));"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8081",
+      "type": "string"
+    },
+    {
+      "key": "sessionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "employeeId",
+      "value": "1004",
+      "type": "string"
+    },
+    {
+      "key": "branchCode",
+      "value": "BR001",
+      "type": "string"
+    },
+    {
+      "key": "permissions",
+      "value": "TRANSACTION_CREATE,TRANSACTION_APPROVE,TRANSACTION_CANCEL,TRANSACTION_CANCEL_ANY,TRANSACTION_REVERSE,TRANSACTION_VIEW,TRANSACTION_VIEW_ALL_BRANCHES,RECONCILIATION_MANAGE,STATEMENT_VIEW,REPORT_VIEW,REPORT_ADMIN,ACCOUNT_VIEW,ACCOUNT_VIEW_ALL_BRANCHES,ACCOUNT_OPEN,ACCOUNT_APPROVE,ACCOUNT_STATUS_MANAGE,CUSTOMER_READ,CUSTOMER_UPDATE,KYC_VERIFY,PRODUCT_READ,PRODUCT_MANAGE,USER_MANAGE,ROLE_PERMISSION_MANAGE,BRANCH_MANAGE,EMPLOYEE_MANAGE,CONFIG_MANAGE,NOTIFICATION_MANAGE,AUDIT_VIEW",
+      "type": "string"
+    },
+    {
+      "key": "serviceName",
+      "value": "postman",
+      "type": "string"
+    },
+    {
+      "key": "idempotencyKey",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "correlationId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "account",
+      "value": "a0000000-0000-0000-0000-000000000101",
+      "type": "string"
+    },
+    {
+      "key": "accountHolderId",
+      "value": "CIF900101",
+      "type": "string"
+    },
+    {
+      "key": "accountId",
+      "value": "a0000000-0000-0000-0000-000000000101",
+      "type": "string"
+    },
+    {
+      "key": "accountNumber",
+      "value": "510000000101",
+      "type": "string"
+    },
+    {
+      "key": "actionType",
+      "value": "ACCOUNT_OPENING",
+      "type": "string"
+    },
+    {
+      "key": "aggregateId",
+      "value": "a0000000-0000-0000-0000-000000000101",
+      "type": "string"
+    },
+    {
+      "key": "aggregateType",
+      "value": "ACCOUNT",
+      "type": "string"
+    },
+    {
+      "key": "applicationId",
+      "value": "APP-000001",
+      "type": "string"
+    },
+    {
+      "key": "actorEmployeeId",
+      "value": "101",
+      "type": "string"
+    },
+    {
+      "key": "amount",
+      "value": "100.00",
+      "type": "string"
+    },
+    {
+      "key": "branch",
+      "value": "BR001",
+      "type": "string"
+    },
+    {
+      "key": "branchId",
+      "value": "BR001",
+      "type": "string"
+    },
+    {
+      "key": "cardId",
+      "value": "card-000001",
+      "type": "string"
+    },
+    {
+      "key": "channel",
+      "value": "NEFT",
+      "type": "string"
+    },
+    {
+      "key": "cif",
+      "value": "CIF900101",
+      "type": "string"
+    },
+    {
+      "key": "cifNo",
+      "value": "CIF900101",
+      "type": "string"
+    },
+    {
+      "key": "code",
+      "value": "110100",
+      "type": "string"
+    },
+    {
+      "key": "configKey",
+      "value": "business-date",
+      "type": "string"
+    },
+    {
+      "key": "createdBy",
+      "value": "101",
+      "type": "string"
+    },
+    {
+      "key": "customerAccountId",
+      "value": "a0000000-0000-0000-0000-000000000101",
+      "type": "string"
+    },
+    {
+      "key": "customerId",
+      "value": "CIF900101",
+      "type": "string"
+    },
+    {
+      "key": "date",
+      "value": "2026-08-17",
+      "type": "string"
+    },
+    {
+      "key": "documentId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "empId",
+      "value": "1002",
+      "type": "string"
+    },
+    {
+      "key": "employeeId",
+      "value": "1004",
+      "type": "string"
+    },
+    {
+      "key": "eventId",
+      "value": "{{$guid}}",
+      "type": "string"
+    },
+    {
+      "key": "eventType",
+      "value": "ACCOUNT_UPDATED",
+      "type": "string"
+    },
+    {
+      "key": "fileId",
+      "value": "file-000001",
+      "type": "string"
+    },
+    {
+      "key": "fiscalYear",
+      "value": "2026",
+      "type": "string"
+    },
+    {
+      "key": "flagKey",
+      "value": "instant-payments",
+      "type": "string"
+    },
+    {
+      "key": "from",
+      "value": "2026-08-01",
+      "type": "string"
+    },
+    {
+      "key": "holdId",
+      "value": "hold-000001",
+      "type": "string"
+    },
+    {
+      "key": "holidayId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "ifsc",
+      "value": "MBAG0000001",
+      "type": "string"
+    },
+    {
+      "key": "ifscCode",
+      "value": "MBAG0000001",
+      "type": "string"
+    },
+    {
+      "key": "journalId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "limitType",
+      "value": "PER_TRANSACTION",
+      "type": "string"
+    },
+    {
+      "key": "maxAmount",
+      "value": "100000.00",
+      "type": "string"
+    },
+    {
+      "key": "minAmount",
+      "value": "0.01",
+      "type": "string"
+    },
+    {
+      "key": "name",
+      "value": "Asha",
+      "type": "string"
+    },
+    {
+      "key": "namespace",
+      "value": "banking",
+      "type": "string"
+    },
+    {
+      "key": "notificationId",
+      "value": "notification-000001",
+      "type": "string"
+    },
+    {
+      "key": "productCategory",
+      "value": "DEPOSIT",
+      "type": "string"
+    },
+    {
+      "key": "productCode",
+      "value": "SAV-REG",
+      "type": "string"
+    },
+    {
+      "key": "productType",
+      "value": "SAVINGS",
+      "type": "string"
+    },
+    {
+      "key": "productVersionId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "reference",
+      "value": "JE-POSTMAN-001",
+      "type": "string"
+    },
+    {
+      "key": "recipient",
+      "value": "asha@example.com",
+      "type": "string"
+    },
+    {
+      "key": "requestId",
+      "value": "request-000001",
+      "type": "string"
+    },
+    {
+      "key": "rail",
+      "value": "INTERNAL",
+      "type": "string"
+    },
+    {
+      "key": "roleId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "ruleId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "scheduleId",
+      "value": "schedule-000001",
+      "type": "string"
+    },
+    {
+      "key": "search",
+      "value": "admin",
+      "type": "string"
+    },
+    {
+      "key": "size",
+      "value": "25",
+      "type": "string"
+    },
+    {
+      "key": "sourceService",
+      "value": "account-service",
+      "type": "string"
+    },
+    {
+      "key": "status",
+      "value": "ACTIVE",
+      "type": "string"
+    },
+    {
+      "key": "to",
+      "value": "2026-08-17",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "download-token",
+      "type": "string"
+    },
+    {
+      "key": "transactionId",
+      "value": "tx-000001",
+      "type": "string"
+    },
+    {
+      "key": "transactionType",
+      "value": "DEPOSIT",
+      "type": "string"
+    },
+    {
+      "key": "query",
+      "value": "Asha",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "4",
+      "type": "string"
+    },
+    {
+      "key": "versionNumber",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Service Operations",
+      "item": [
+        {
+          "name": "GET Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/actuator/health"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Generated OpenAPI",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api-docs"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "BranchController",
+      "description": "Source: services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/BranchController.java",
+      "item": [
+        {
+          "name": "GET Get All",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/branches",
+            "description": "Generated from services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/BranchController.java.getAll"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get By Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/branches/{{id}}",
+            "description": "Generated from services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/BranchController.java.getById"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/branches",
+            "description": "Generated from services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/BranchController.java.create\n\nRequest body type: CreateBranchRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"branchCode\": \"BR001\",\n  \"name\": \"string\",\n  \"address\": \"string\",\n  \"city\": \"Mumbai\",\n  \"state\": \"Maharashtra\",\n  \"pincode\": \"400001\",\n  \"ifscCode\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH Update",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/branches/{{id}}",
+            "description": "Generated from services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/BranchController.java.update\n\nRequest body type: UpdateBranchRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"string\",\n  \"address\": \"string\",\n  \"city\": \"Mumbai\",\n  \"state\": \"Maharashtra\",\n  \"pincode\": \"400001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Activate",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/branches/{{id}}/activate",
+            "description": "Generated from services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/BranchController.java.activate"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Deactivate",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/branches/{{id}}/deactivate",
+            "description": "Generated from services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/BranchController.java.deactivate"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get By Ifsc",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/branches/by-ifsc/{{ifsc}}",
+            "description": "Generated from services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/BranchController.java.getByIfsc"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get Working Hours",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/branches/{{id}}/working-hours",
+            "description": "Generated from services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/BranchController.java.getWorkingHours"
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Replace Working Hours",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/branches/{{id}}/working-hours",
+            "description": "Generated from services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/BranchController.java.replaceWorkingHours\n\nRequest body type: List<WorkingHoursDayRequest>",
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"dayOfWeek\": \"string\",\n    \"openTime\": \"string\",\n    \"closeTime\": \"string\",\n    \"closed\": true\n  }\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get Holidays",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/branches/{{id}}/holidays",
+            "description": "Generated from services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/BranchController.java.getHolidays"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Add Holiday",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/branches/{{id}}/holidays",
+            "description": "Generated from services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/BranchController.java.addHoliday\n\nRequest body type: CreateHolidayRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"holidayDate\": \"2026-08-17\",\n  \"description\": \"Postman example request\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Delete Holiday",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/branches/{{id}}/holidays/{{holidayId}}",
+            "description": "Generated from services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/BranchController.java.deleteHoliday"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "EmployeeController",
+      "description": "Source: services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/EmployeeController.java",
+      "item": [
+        {
+          "name": "GET Get All",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/employees",
+            "description": "Generated from services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/EmployeeController.java.getAll"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get By Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/employees/{{id}}",
+            "description": "Generated from services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/EmployeeController.java.getById"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/employees",
+            "description": "Generated from services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/EmployeeController.java.create\n\nRequest body type: CreateEmployeeRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"employeeCode\": \"string\",\n  \"dob\": \"2026-08-17\",\n  \"branchId\": 1,\n  \"designation\": \"string\",\n  \"reportingManagerId\": 1,\n  \"joiningDate\": \"2026-08-17\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH Update",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/employees/{{id}}",
+            "description": "Generated from services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/EmployeeController.java.update\n\nRequest body type: UpdateEmployeeRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dob\": \"2026-08-17\",\n  \"designation\": \"string\",\n  \"reportingManagerId\": 1,\n  \"status\": \"ACTIVE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get Reports",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/employees/{{id}}/reports",
+            "description": "Generated from services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/EmployeeController.java.getReports"
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Update Manager",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/employees/{{id}}/manager",
+            "description": "Generated from services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/EmployeeController.java.updateManager\n\nRequest body type: UpdateManagerRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reportingManagerId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Transfer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/employees/{{id}}/transfer",
+            "description": "Generated from services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/EmployeeController.java.transfer\n\nRequest body type: TransferEmployeeRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"toBranchId\": 1,\n  \"remarks\": \"Approved from Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get Approval Authorities",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/employees/{{id}}/approval-authority",
+            "description": "Generated from services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/EmployeeController.java.getApprovalAuthorities"
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Replace Approval Authorities",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/employees/{{id}}/approval-authority",
+            "description": "Generated from services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/EmployeeController.java.replaceApprovalAuthorities\n\nRequest body type: List<ApprovalAuthorityItemRequest>",
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"actionType\": \"ACCOUNT_OPENING\",\n    \"maxAmount\": 100,\n    \"currency\": \"INR\"\n  }\n]",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "InternalApprovalAuthorityController",
+      "description": "Source: services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/InternalApprovalAuthorityController.java",
+      "item": [
+        {
+          "name": "GET Get Approval Authority",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/internal/v1/approval-authority?employeeId=1004&actionType=ACCOUNT_OPENING",
+            "description": "Generated from services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/InternalApprovalAuthorityController.java.getApprovalAuthority"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
