@@ -1,14 +1,14 @@
 server:
-  port: 8088
+  port: ${PRODUCT_SERVICE_PORT:8088}
   forward-headers-strategy: framework
 
 spring:
   application:
     name: product-service
   datasource:
-    url: ${PRODUCT_DB_URL:jdbc:mysql://localhost:3306/moneybags_product?createDatabaseIfNotExist=true&serverTimezone=UTC}
-    username: ${PRODUCT_DB_USERNAME:root}
-    password: ${PRODUCT_DB_PASSWORD:password}
+    url: ${PRODUCT_DB_URL:jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/moneybags_product?createDatabaseIfNotExist=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:password}
   jpa:
     hibernate:
       ddl-auto: validate

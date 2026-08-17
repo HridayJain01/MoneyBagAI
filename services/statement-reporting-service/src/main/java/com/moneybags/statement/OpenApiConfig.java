@@ -19,13 +19,13 @@ public class OpenApiConfig {
         return new OpenAPI().info(new Info()
                 .title("Moneybags Statement & Reporting Service")
                 .version("v1")
-                .description("Statements and reports projected from Account, Transaction, and Ledger services. Authenticate Swagger requests with the session ID returned by /api/v1/auth/login."))
-                .components(new Components().addSecuritySchemes("sessionId", new SecurityScheme()
-                        .type(SecurityScheme.Type.APIKEY)
-                        .in(SecurityScheme.In.HEADER)
-                        .name("X-Session-Id")
-                        .description("Raw sessionId returned by POST /api/v1/auth/login")))
-                .addSecurityItem(new SecurityRequirement().addList("sessionId"));
+                .description("Statements and reports projected from Account, Transaction, and Ledger services. Use the Bearer JWT returned by /api/v1/auth/login."))
+                .components(new Components().addSecuritySchemes("bearerAuth", new SecurityScheme()
+                        .type(SecurityScheme.Type.HTTP)
+                        .scheme("bearer")
+                        .bearerFormat("JWT")
+                        .description("JWT accessToken returned by POST /api/v1/auth/login")))
+                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
     }
 
     @Bean

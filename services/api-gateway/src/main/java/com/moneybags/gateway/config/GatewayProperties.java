@@ -16,6 +16,7 @@ public class GatewayProperties {
 
     private Jwt jwt = new Jwt();
     private List<String> publicPaths = new ArrayList<>();
+    private String accessTokenCookieName = "access-token";
 
     @Getter
     @Setter

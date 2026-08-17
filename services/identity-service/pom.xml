@@ -11,8 +11,8 @@
     <groupId>com.moneybags</groupId>
     <artifactId>identity-service</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <name>MoneyBags Identity Service</name>
-    <description>Users, roles, permissions and JWT authentication</description>
+    <name>MoneyBags Auth and Identity Service</name>
+    <description>Central users, roles, permissions, registration and JWT authentication</description>
 
     <properties>
         <java.version>17</java.version>

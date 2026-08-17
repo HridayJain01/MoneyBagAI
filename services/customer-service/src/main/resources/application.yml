@@ -1,5 +1,5 @@
 server:
-  port: 8082
+  port: ${CUSTOMER_SERVICE_PORT:8082}
   forward-headers-strategy: framework
 spring:
   # The `demo` profile is H2 in-memory with Flyway disabled. It used to be the DEFAULT,
@@ -14,9 +14,9 @@ spring:
     # database that already held unrelated tables (Spring Batch metadata and other
     # scratch work) -- Flyway refuses to migrate a non-empty schema that has no history
     # table, so customer-service could not have started against it.
-    url: ${CUSTOMER_DB_URL:jdbc:mysql://localhost:3306/moneybags_customer?createDatabaseIfNotExist=true&serverTimezone=UTC}
-    username: ${CUSTOMER_DB_USERNAME:root}
-    password: ${CUSTOMER_DB_PASSWORD:password}
+    url: ${CUSTOMER_DB_URL:jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/moneybags_customer?createDatabaseIfNotExist=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:password}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -27,7 +27,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8080/eureka/
+      defaultZone: ${EUREKA_URL:http://localhost:8080/eureka/}
 management:
   endpoints:
     web:

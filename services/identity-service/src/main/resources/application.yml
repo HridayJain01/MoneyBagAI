@@ -1,14 +1,14 @@
 server:
-  port: 8087
+  port: ${AUTH_SERVICE_PORT:${IDENTITY_SERVICE_PORT:8087}}
   forward-headers-strategy: framework
 
 spring:
   application:
     name: security-service
   datasource:
-    url: ${IDENTITY_DB_URL:jdbc:mysql://localhost:3306/moneybags_identity?createDatabaseIfNotExist=true&serverTimezone=UTC}
-    username: ${IDENTITY_DB_USERNAME:root}
-    password: ${IDENTITY_DB_PASSWORD:password}
+    url: ${AUTH_DB_URL:${IDENTITY_DB_URL:jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/moneybags_identity?createDatabaseIfNotExist=true&serverTimezone=UTC}}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:password}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -26,12 +26,18 @@ moneybags:
   identity:
     max-failed-attempts: ${MAX_FAILED_ATTEMPTS:5}
     lock-duration-minutes: ${LOCK_DURATION_MINUTES:15}
+    registration-enabled: ${AUTH_REGISTRATION_ENABLED:true}
+    default-registration-role: ${AUTH_DEFAULT_ROLE:CUSTOMER}
+    cookie:
+      name: ${AUTH_COOKIE_NAME:access-token}
+      secure: ${AUTH_COOKIE_SECURE:false}
+      same-site: ${AUTH_COOKIE_SAME_SITE:Strict}
     jwt:
       # Set the same strong secret in identity-service and api-gateway in production.
       secret: ${JWT_SECRET:moneybags-dev-only-jwt-secret-change-before-production}
       expiration-minutes: ${JWT_EXPIRATION_MINUTES:15}
-      issuer: moneybags-identity
-      audience: moneybags-api
+      issuer: ${JWT_ISSUER:moneybags-identity}
+      audience: ${JWT_AUDIENCE:moneybags-api}
 
 eureka:
   client:

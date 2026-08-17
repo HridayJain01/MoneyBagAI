@@ -1,5 +1,5 @@
 server:
-  port: 8090
+  port: ${API_GATEWAY_PORT:8090}
 
 spring:
   application:
@@ -40,7 +40,7 @@ spring:
         - id: security-service
           uri: lb://security-service
           predicates:
-            - Path=/api/v1/auth/**,/api/v1/users/**,/api/v1/roles/**,/api/v1/permissions/**
+            - Path=/api/v1/auth/**,/api/v1/users/**,/api/v1/roles/**,/api/v1/permissions/**,/api/v1/admin/**
 
         - id: configuration-service
           uri: lb://configuration-service
@@ -52,6 +52,11 @@ spring:
           uri: lb://customer-service
           predicates:
             - Path=/api/v1/customers/**
+
+        - id: kyc-service
+          uri: lb://kyc-service
+          predicates:
+            - Path=/api/v1/kyc/**
 
         - id: branch-employee-service
           uri: lb://branch-employee-service
@@ -115,6 +120,13 @@ spring:
           uri: lb://customer-service
           predicates:
             - Path=/customer-service/openapi.yml
+          filters:
+            - StripPrefix=1
+            - PreserveHostHeader
+        - id: kyc-service-api-docs
+          uri: lb://kyc-service
+          predicates:
+            - Path=/kyc-service/api-docs,/kyc-service/api-docs/**
           filters:
             - StripPrefix=1
             - PreserveHostHeader
@@ -198,14 +210,16 @@ management:
 
 moneybags:
   gateway:
+    access-token-cookie-name: ${AUTH_COOKIE_NAME:access-token}
     jwt:
       # Must match the identity-service secret. Override JWT_SECRET in production.
       secret: ${JWT_SECRET:moneybags-dev-only-jwt-secret-change-before-production}
-      issuer: moneybags-identity
-      audience: moneybags-api
+      issuer: ${JWT_ISSUER:moneybags-identity}
+      audience: ${JWT_AUDIENCE:moneybags-api}
     # Paths reachable without a JWT. Everything else requires one.
     public-paths:
       - /api/v1/auth/login
+      - /api/v1/auth/register
       - /api/v1/auth/password/forgot
       - /api/v1/auth/password/reset
       - /actuator
@@ -217,6 +231,7 @@ moneybags:
       - /security-service/api-docs
       - /customer-service/api-docs
       - /customer-service/openapi.yml
+      - /kyc-service/api-docs
       - /branch-employee-service/api-docs
       - /configuration-service/api-docs
       - /product-service/api-docs
@@ -230,11 +245,14 @@ moneybags:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+    persist-authorization: true
     urls:
       - name: security-service
         url: /security-service/api-docs
       - name: customer-service
         url: /customer-service/api-docs
+      - name: kyc-service
+        url: /kyc-service/api-docs
       - name: branch-employee-service
         url: /branch-employee-service/api-docs
       - name: configuration-service

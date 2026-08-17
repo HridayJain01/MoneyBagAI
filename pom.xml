@@ -28,6 +28,7 @@
 
         <!-- Layer 2: master data -->
         <module>services/customer-service</module>
+        <module>services/kyc-service</module>
         <module>services/branch-employee-service</module>
         <module>services/product-service</module>
 

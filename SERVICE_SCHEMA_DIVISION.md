@@ -11,7 +11,8 @@ API or domain event, not a cross-database foreign key.
 | Service | Tables owned | Existing project action |
 |---|---|---|
 | Identity and Access | `users`, `roles`, `permissions`, `user_roles`, `role_permissions`, `login_audit` | JWT authentication and access control |
-| Customer | `customers`, `customer_addresses`, `kyc_documents`, `beneficiaries` | Extend current `customer-service` |
+| Customer | `customers`, `customer_addresses`, legacy `kyc_documents`, `beneficiaries` | Canonical customer profile, eligibility and overall KYC status |
+| KYC | `kyc_sessions`, `kyc_documents`, `kyc_frames`, `kyc_verifications` | KYC workflow, binary evidence and reviewer decisions |
 | Product | `products`, `product_charges` | Keep current `product-service` |
 | Bank Organisation | `branches`, `employees` | New service; extract from current `security-service` |
 | Account | `accounts`, `account_approvals` | Keep current `account-service` |
@@ -45,7 +46,7 @@ store CIF as the main customer association in `users`.
 
 ## Customer Service
 
-Tables: `customers`, `customer_addresses`, `kyc_documents`, `beneficiaries`.
+Tables: `customers`, `customer_addresses`, legacy `kyc_documents`, `beneficiaries`.
 
 Local relationships:
 
@@ -65,6 +66,38 @@ kyc_documents.verified_by_emp_id -> Bank / employees.emp_id
 
 `beneficiaries` belongs here because a beneficiary is a customer-maintained
 payee. A future Payment Service can use it but should not own it.
+
+Customer Service remains authoritative for `customers.kyc_status`. It also
+stores the latest external KYC session, decision, and decision time so retries
+from KYC Service are idempotent and an older callback cannot overwrite a newer
+decision. The existing customer-owned document endpoints remain available
+during the migration period, but new binary KYC evidence belongs to KYC Service.
+
+## KYC Service
+
+Tables: `kyc_sessions`, `kyc_documents`, `kyc_frames`, `kyc_verifications`.
+
+Local relationships:
+
+```text
+kyc_sessions 1 -> many kyc_documents
+kyc_sessions 1 -> many kyc_frames
+kyc_sessions 1 -> zero/one kyc_verifications
+```
+
+Logical references and integration:
+
+```text
+kyc_sessions.cif_no -> Customer / customers.cif_no
+kyc_verifications.reviewer_id -> Bank / employees.emp_id
+KYC decision -> Customer Service /internal/v1/customers/{cif}/kyc-decision
+```
+
+KYC Service validates a CIF through Customer Service before creating or listing
+sessions. Approve/reject updates the KYC-owned workflow and synchronizes the
+canonical customer status in one request. Other services continue to consume
+Customer Service's eligibility/summary API, so they do not need individual KYC
+clients.
 
 ## Product Service
 
@@ -188,7 +221,7 @@ lifecycle of its own yet.
 
 ## Current module layout
 
-Thirteen modules under `services/`, built by the root aggregator `pom.xml`.
+Fourteen modules under `services/`, built by the root aggregator `pom.xml`.
 
 | Port | Module | Eureka name | Schema |
 |---|---|---|---|
@@ -205,6 +238,7 @@ Thirteen modules under `services/`, built by the root aggregator `pom.xml`.
 | 8090 | api-gateway | `api-gateway` | — |
 | 8091 | audit-service | `audit-service` | `moneybags_audit` |
 | 8092 | configuration-service | `configuration-service` | `moneybags_configuration` |
+| 8093 | kyc-service | `kyc-service` | `moneybags_kyc` |
 
 Two things worth knowing before changing any of it:
 

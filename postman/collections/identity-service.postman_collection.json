@@ -186,6 +186,11 @@
       "type": "string"
     },
     {
+      "key": "documentType",
+      "value": "PAN",
+      "type": "string"
+    },
+    {
       "key": "empId",
       "value": "1002",
       "type": "string"
@@ -253,6 +258,11 @@
     {
       "key": "journalId",
       "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "kycSessionId",
+      "value": "kyc-session-000001",
       "type": "string"
     },
     {
@@ -338,6 +348,11 @@
     {
       "key": "scheduleId",
       "value": "schedule-000001",
+      "type": "string"
+    },
+    {
+      "key": "frameNumber",
+      "value": "1",
       "type": "string"
     },
     {
@@ -467,69 +482,14 @@
           "name": "POST Logout",
           "request": {
             "method": "POST",
-            "header": [],
-            "url": "{{baseUrl}}/api/v1/auth/logout",
-            "description": "Generated from services/identity-service/src/main/java/com/moneybags/identity/controller/AuthController.java.logout"
-          },
-          "response": []
-        },
-        {
-          "name": "POST Logout All",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": "{{baseUrl}}/api/v1/auth/logout-all",
-            "description": "Generated from services/identity-service/src/main/java/com/moneybags/identity/controller/AuthController.java.logoutAll"
-          },
-          "response": []
-        },
-        {
-          "name": "GET Sessions",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api/v1/auth/sessions",
-            "description": "Generated from services/identity-service/src/main/java/com/moneybags/identity/controller/AuthController.java.sessions"
-          },
-          "response": []
-        },
-        {
-          "name": "DELETE Revoke",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": "{{baseUrl}}/api/v1/auth/sessions/{{sessionId}}",
-            "description": "Generated from services/identity-service/src/main/java/com/moneybags/identity/controller/AuthController.java.revoke"
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "InternalSessionController",
-      "description": "Source: services/identity-service/src/main/java/com/moneybags/identity/controller/InternalSessionController.java",
-      "item": [
-        {
-          "name": "POST Resolve",
-          "request": {
-            "method": "POST",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
+                "key": "X-User-Id",
+                "value": "{{userId}}"
               }
             ],
-            "url": "{{baseUrl}}/internal/v1/sessions/resolve",
-            "description": "Generated from services/identity-service/src/main/java/com/moneybags/identity/controller/InternalSessionController.java.resolve\n\nRequest body type: ResolveRequest",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"sessionId\": \"string\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
+            "url": "{{baseUrl}}/api/v1/auth/logout",
+            "description": "Generated from services/identity-service/src/main/java/com/moneybags/identity/controller/AuthController.java.logout"
           },
           "response": []
         }

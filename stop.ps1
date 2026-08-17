@@ -17,21 +17,28 @@ $ErrorActionPreference = 'Continue'
 $projectRoot  = $PSScriptRoot
 $pidDirectory = Join-Path $projectRoot '.moneybags-pids'
 
+function Get-EnvironmentPort {
+    param([string]$Name, [int]$Default)
+    $value = [Environment]::GetEnvironmentVariable($Name, 'Process')
+    return $(if ($value) { [int]$value } else { $Default })
+}
+
 # Reverse of the startup order: edge first, registry last.
 $services = @(
-    @{ Name = 'api-gateway';                 Port = 8090 },
-    @{ Name = 'statement-reporting-service'; Port = 8086 },
-    @{ Name = 'transaction-service';         Port = 8084 },
-    @{ Name = 'account-service';             Port = 8083 },
-    @{ Name = 'audit-service';               Port = 8091 },
-    @{ Name = 'notification-service';        Port = 8089 },
-    @{ Name = 'ledger-service';              Port = 8085 },
-    @{ Name = 'customer-service';            Port = 8082 },
-    @{ Name = 'configuration-service';       Port = 8092 },
-    @{ Name = 'branch-employee-service';     Port = 8081 },
-    @{ Name = 'product-service';             Port = 8088 },
-    @{ Name = 'identity-service';            Port = 8087 },
-    @{ Name = 'eureka-server';               Port = 8080 }
+    @{ Name = 'api-gateway';                 Port = Get-EnvironmentPort 'API_GATEWAY_PORT' 8090 },
+    @{ Name = 'statement-reporting-service'; Port = Get-EnvironmentPort 'STATEMENT_SERVICE_PORT' 8086 },
+    @{ Name = 'transaction-service';         Port = Get-EnvironmentPort 'TRANSACTION_SERVICE_PORT' 8084 },
+    @{ Name = 'account-service';             Port = Get-EnvironmentPort 'ACCOUNT_SERVICE_PORT' 8083 },
+    @{ Name = 'audit-service';               Port = Get-EnvironmentPort 'AUDIT_SERVICE_PORT' 8091 },
+    @{ Name = 'notification-service';        Port = Get-EnvironmentPort 'NOTIFICATION_SERVICE_PORT' 8089 },
+    @{ Name = 'kyc-service';                 Port = Get-EnvironmentPort 'KYC_SERVICE_PORT' 8093 },
+    @{ Name = 'ledger-service';              Port = Get-EnvironmentPort 'LEDGER_SERVICE_PORT' 8085 },
+    @{ Name = 'customer-service';            Port = Get-EnvironmentPort 'CUSTOMER_SERVICE_PORT' 8082 },
+    @{ Name = 'configuration-service';       Port = Get-EnvironmentPort 'CONFIG_SERVICE_PORT' 8092 },
+    @{ Name = 'branch-employee-service';     Port = Get-EnvironmentPort 'BRANCH_SERVICE_PORT' 8081 },
+    @{ Name = 'product-service';             Port = Get-EnvironmentPort 'PRODUCT_SERVICE_PORT' 8088 },
+    @{ Name = 'identity-service';            Port = Get-EnvironmentPort 'IDENTITY_SERVICE_PORT' 8087 },
+    @{ Name = 'eureka-server';               Port = Get-EnvironmentPort 'EUREKA_SERVER_PORT' 8080 }
 )
 
 function Stop-ByPidFile {

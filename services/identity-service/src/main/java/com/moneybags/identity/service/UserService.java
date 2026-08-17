@@ -15,6 +15,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 @Service
@@ -71,6 +72,8 @@ public class UserService {
                 .email(request.email())
                 .passwordHash(passwordHash)
                 .fullName(request.fullName())
+                .firstName(firstName(request.fullName()))
+                .lastName(lastName(request.fullName()))
                 .mobile(request.mobile())
                 .status(UserStatus.ACTIVE)
                 .failedAttempts(0)
@@ -143,6 +146,47 @@ public class UserService {
         return toDetail(users.save(user));
     }
 
+    @Transactional
+    public UserDetail replaceRole(Long userId, String roleName) {
+        User user = require(userId);
+        Role role = roles.findByRoleName(roleName)
+                .orElseThrow(() -> ApiException.invalid("UNKNOWN_ROLE", "No such role: " + roleName));
+        user.getRoles().clear();
+        user.getRoles().add(role);
+        return toDetail(users.save(user));
+    }
+
+    @Transactional
+    public UserDetail createAdminUser(AdminCreateUserRequest request, String passwordHash) {
+        String email = request.email().trim().toLowerCase(Locale.ROOT);
+        if (users.existsByUsername(email)) {
+            throw ApiException.conflict("USERNAME_TAKEN", "A user already uses this email as a username");
+        }
+        if (users.existsByEmail(email)) {
+            throw ApiException.conflict("EMAIL_TAKEN", "Email already exists");
+        }
+        Role role = roles.findByRoleName(request.role())
+                .orElseThrow(() -> ApiException.invalid("UNKNOWN_ROLE", "No such role: " + request.role()));
+        String firstName = request.firstName().trim();
+        String lastName = request.lastName().trim();
+        User user = User.builder()
+                .username(email)
+                .email(email)
+                .passwordHash(passwordHash)
+                .firstName(firstName)
+                .lastName(lastName)
+                .fullName(firstName + " " + lastName)
+                .dateOfBirth(request.dob())
+                .gender(request.gender())
+                .mobile(request.mobile())
+                .status(UserStatus.ACTIVE)
+                .failedAttempts(0)
+                .passwordChangedAt(Instant.now())
+                .roles(new LinkedHashSet<>(List.of(role)))
+                .build();
+        return toDetail(users.save(user));
+    }
+
     @Transactional(readOnly = true)
     public List<RoleDetail> listRoles() {
         return roles.findAll().stream()
@@ -175,5 +219,17 @@ public class UserService {
 
     private String blankToNull(String value) {
         return (value == null || value.isBlank()) ? null : value;
+    }
+
+    private String firstName(String fullName) {
+        String trimmed = fullName.trim();
+        int separator = trimmed.indexOf(' ');
+        return separator < 0 ? trimmed : trimmed.substring(0, separator);
+    }
+
+    private String lastName(String fullName) {
+        String trimmed = fullName.trim();
+        int separator = trimmed.indexOf(' ');
+        return separator < 0 ? null : trimmed.substring(separator + 1).trim();
     }
 }

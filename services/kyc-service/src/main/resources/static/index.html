@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KYC Service Portal</title>
+    <link rel="stylesheet" href="https://static.oracle.com/cdn/jet/19.0.0/default/css/redwood/oj-redwood-min.css">
+    <style>
+        :root {
+            --ink: #1f2937;
+            --muted: #5f6b7a;
+            --surface: #ffffff;
+            --page: #f6f8fb;
+            --line: #d6dee8;
+            --bank: #064e3b;
+            --bank-dark: #043527;
+            --customer: #0b5cab;
+            --customer-dark: #083f75;
+            --warn: #b54708;
+            --danger: #b42318;
+            --ok: #067647;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: var(--page);
+            color: var(--ink);
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .shell { min-height: 100vh; }
+
+        .topbar {
+            background: #0f172a;
+            color: #fff;
+            padding: 18px 28px;
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            align-items: center;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 24px;
+            letter-spacing: 0;
+        }
+
+        .brand p {
+            margin: 6px 0 0;
+            color: #dbe4f0;
+            font-size: 14px;
+        }
+
+        .role-switch {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .role-switch button,
+        button.native {
+            min-height: 40px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            padding: 8px 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .role-switch button {
+            background: #334155;
+            color: white;
+        }
+
+        .role-switch button.active.customer { background: var(--customer); }
+        .role-switch button.active.banker { background: var(--bank); }
+
+        main {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 18px;
+            display: grid;
+            grid-template-columns: minmax(320px, 430px) minmax(0, 1fr);
+            gap: 18px;
+        }
+
+        section,
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+
+        section { padding: 16px; }
+
+        .panel { padding: 14px; margin-bottom: 14px; }
+
+        h2 {
+            margin: 0 0 12px;
+            font-size: 18px;
+        }
+
+        h3 {
+            margin: 0 0 10px;
+            font-size: 15px;
+            color: #334155;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            min-height: 40px;
+            border: 1px solid #b8c4d3;
+            border-radius: 6px;
+            padding: 8px 10px;
+            font: inherit;
+            background: white;
+            color: var(--ink);
+        }
+
+        textarea { min-height: 82px; resize: vertical; }
+
+        button.native.primary { background: var(--customer); color: white; }
+        button.native.primary:hover { background: var(--customer-dark); }
+        button.native.bank { background: var(--bank); color: white; }
+        button.native.bank:hover { background: var(--bank-dark); }
+        button.native.secondary { background: #e8eef5; color: #172033; border-color: #cad4e0; }
+        button.native.danger { background: var(--danger); color: white; }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .role-view { display: none; }
+        .role-view.active { display: block; }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: 120px minmax(0, 1fr);
+            gap: 8px;
+            padding: 12px;
+            background: #eef4fa;
+            border: 1px solid #d7e2ee;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 14px;
+        }
+
+        .status-grid strong { color: #334155; }
+        .pill { display: inline-block; padding: 3px 8px; border-radius: 999px; background: #dbeafe; color: #0b3b75; font-weight: 700; }
+        .pill.bank { background: #d1fae5; color: #064e3b; }
+        .pill.warn { background: #fff7ed; color: #9a3412; }
+
+        .journey {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .step {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 10px;
+            background: #fbfdff;
+            min-height: 72px;
+        }
+
+        .step strong { display: block; margin-bottom: 4px; }
+        .step span { color: var(--muted); font-size: 12px; }
+
+        video {
+            width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            background: #111827;
+        }
+
+        .frame-list {
+            display: grid;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .frame-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 10px;
+            background: #fbfdff;
+        }
+
+        .small { color: var(--muted); font-size: 12px; }
+
+        .response {
+            min-height: 420px;
+            max-height: 720px;
+            overflow: auto;
+            margin: 0;
+            padding: 14px;
+            background: #0b1220;
+            color: #dbeafe;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-size: 13px;
+        }
+
+        .message {
+            display: none;
+            padding: 10px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            border: 1px solid transparent;
+        }
+
+        .message.show { display: block; }
+        .message.ok { color: var(--ok); background: #ecfdf3; border-color: #abefc6; }
+        .message.bad { color: var(--danger); background: #fff1f0; border-color: #fecdca; }
+
+        oj-form-layout { max-width: none; }
+        oj-button { margin-right: 8px; margin-top: 8px; }
+
+        @media (max-width: 980px) {
+            .topbar { align-items: flex-start; flex-direction: column; }
+            main { grid-template-columns: 1fr; }
+            .journey { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 560px) {
+            .journey { grid-template-columns: 1fr; }
+            .status-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="shell">
+    <header class="topbar">
+        <div class="brand">
+            <h1>KYC Service Portal</h1>
+            <p>Accessible KYC workspace for customer onboarding and banker review.</p>
+        </div>
+        <div class="role-switch" aria-label="Choose workspace">
+            <button id="customerRole" class="active customer" type="button" onclick="showRole('customer')">Customer View</button>
+            <button id="bankerRole" type="button" onclick="showRole('banker')">Banker View</button>
+        </div>
+    </header>
+
+    <main>
+        <section aria-label="KYC actions">
+            <div class="status-grid">
+                <strong>Current role</strong><span id="roleLabel" class="pill">Customer</span>
+                <strong>Session ID</strong><span id="currentSession">None</span>
+                <strong>Status</strong><span id="currentStatus">Not started</span>
+                <strong>Document</strong><span id="currentDocument">AADHAAR</span>
+            </div>
+            <div id="message" class="message"></div>
+
+            <div id="customerView" class="role-view active">
+                <div class="journey" aria-label="Customer KYC journey">
+                    <div class="step"><strong>1. Start</strong><span>Create a session.</span></div>
+                    <div class="step"><strong>2. Document</strong><span>Upload identity proof.</span></div>
+                    <div class="step"><strong>3. Selfie</strong><span>Upload or capture frames.</span></div>
+                    <div class="step"><strong>4. Result</strong><span>Check review outcome.</span></div>
+                </div>
+
+                <div class="panel">
+                    <h2>Customer Onboarding</h2>
+                    <oj-form-layout max-columns="2" label-edge="top" class="oj-formlayout-full-width">
+                        <oj-input-text id="cifNoOj" label-hint="Customer CIF" value="CIF900101"></oj-input-text>
+                        <oj-input-text id="purposeOj" label-hint="Purpose" value="ACCOUNT_OPENING"></oj-input-text>
+                    </oj-form-layout>
+                    <label for="documentType">Document Type</label>
+                    <select id="documentType" onchange="syncDocumentType()">
+                        <option>AADHAAR</option>
+                        <option>PAN</option>
+                        <option>PASSPORT</option>
+                        <option>DRIVING_LICENSE</option>
+                        <option>VOTER_ID</option>
+                    </select>
+                    <div class="actions">
+                        <oj-button chroming="callToAction" onclick="createSession()"><span>Create Session</span></oj-button>
+                        <button class="native secondary" type="button" onclick="getSession()">Refresh Session</button>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h2>Document Upload</h2>
+                    <label for="documentFile">Identity Document PDF</label>
+                    <input id="documentFile" type="file" accept="application/pdf">
+                    <div class="actions">
+                        <button class="native primary" type="button" onclick="uploadDocument()">Upload Document</button>
+                        <button class="native secondary" type="button" onclick="downloadDocument()">Download Uploaded Document</button>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h2>Face Frames</h2>
+                    <label for="frameFiles">Upload Frame Images</label>
+                    <input id="frameFiles" type="file" accept="image/*" multiple>
+                    <div class="actions">
+                        <button class="native primary" type="button" onclick="uploadFrameFiles()">Upload Selected Frames</button>
+                        <button class="native secondary" type="button" onclick="listFrames()">List Frames</button>
+                    </div>
+
+                    <h3>Camera Capture</h3>
+                    <video id="video" autoplay playsinline muted aria-label="Camera preview"></video>
+                    <div class="actions">
+                        <button class="native secondary" type="button" onclick="startCamera()">Start Camera</button>
+                        <button class="native primary" type="button" onclick="captureFrames()">Capture 5 Frames</button>
+                        <button class="native secondary" type="button" onclick="stopCamera()">Stop Camera</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="bankerView" class="role-view">
+                <div class="panel">
+                    <h2>Banker Review Queue</h2>
+                    <p class="small">Search by the customer’s account ID. Session IDs stay internal to the service.</p>
+                    <label for="accountIdInput">Customer CIF</label>
+                    <input id="accountIdInput" placeholder="e.g. CIF900101" autocomplete="off">
+                    <div class="actions">
+                        <button class="native bank" type="button" onclick="fetchPendingByAccount()">Find pending reviews</button>
+                    </div>
+                    <div id="pendingQueue" class="frame-list"></div>
+                </div>
+
+                <div class="panel">
+                    <h2>Evidence Review</h2>
+                    <label for="bankerDocumentType">Document Type</label>
+                    <select id="bankerDocumentType" onchange="copyBankerDocumentType()">
+                        <option>AADHAAR</option>
+                        <option>PAN</option>
+                        <option>PASSPORT</option>
+                        <option>DRIVING_LICENSE</option>
+                        <option>VOTER_ID</option>
+                    </select>
+                    <label for="frameNumber">Frame Number</label>
+                    <input id="frameNumber" type="number" min="1" value="1">
+                    <div class="actions">
+                        <button class="native secondary" type="button" onclick="downloadDocument()">Open Document</button>
+                        <button class="native secondary" type="button" onclick="listFrames()">List Frames</button>
+                        <button class="native secondary" type="button" onclick="downloadFrame()">Open Frame</button>
+                    </div>
+                    <div id="frameList" class="frame-list"></div>
+                </div>
+
+                <div class="panel">
+                    <h2>Manual Decision</h2>
+                    <oj-form-layout max-columns="2" label-edge="top" class="oj-formlayout-full-width">
+                        <oj-input-text id="reasonOj" label-hint="Reason" value="manual-review"></oj-input-text>
+                        <oj-text-area id="remarksOj" label-hint="Remarks" value="Checked manually"></oj-text-area>
+                    </oj-form-layout>
+                    <div class="actions">
+                        <button class="native bank" type="button" onclick="approveSession()">Approve</button>
+                        <button class="native danger" type="button" onclick="rejectSession()">Reject</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section aria-label="API response">
+            <div style="display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:12px;">
+                <h2 style="margin:0;">API Response</h2>
+                <button class="native secondary" type="button" onclick="clearOutput()">Clear</button>
+            </div>
+            <pre id="output" class="response">Ready.</pre>
+        </section>
+    </main>
+</div>
+
+<script src="https://static.oracle.com/cdn/jet/19.0.0/3rdparty/require/require.js"></script>
+<script>
+    requirejs.config({
+        paths: {
+            knockout: "https://static.oracle.com/cdn/jet/19.0.0/3rdparty/knockout/knockout-3.5.1",
+            jquery: "https://static.oracle.com/cdn/jet/19.0.0/3rdparty/jquery/jquery-3.7.1.min",
+            "jqueryui-amd": "https://static.oracle.com/cdn/jet/19.0.0/3rdparty/jquery/jqueryui-amd-1.13.2.min",
+            ojs: "https://static.oracle.com/cdn/jet/19.0.0/default/js/min",
+            ojL10n: "https://static.oracle.com/cdn/jet/19.0.0/default/js/ojL10n",
+            ojtranslations: "https://static.oracle.com/cdn/jet/19.0.0/default/js/resources",
+            text: "https://static.oracle.com/cdn/jet/19.0.0/3rdparty/require/text",
+            css: "https://static.oracle.com/cdn/jet/19.0.0/3rdparty/require-css/css.min"
+        }
+    });
+    require(["ojs/ojcore", "knockout", "jquery", "ojs/ojknockout", "ojs/ojbutton", "ojs/ojinputtext", "ojs/ojformlayout"], function () {});
+</script>
+
+<script>
+    let sessionId = null;
+    let stream = null;
+    const FRAME_COUNT = 5;
+    const FRAME_INTERVAL = 700;
+
+    function readOjValue(id) {
+        const element = document.getElementById(id);
+        return (element && element.value !== undefined ? element.value : "").toString().trim();
+    }
+
+    async function createSession() {
+        const response = await fetch("/api/v1/kyc/sessions", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                cifNo: readOjValue("cifNoOj"),
+                purpose: readOjValue("purposeOj"),
+                documentType: document.getElementById("documentType").value
+            })
+        });
+        const result = await readResponse(response);
+        print(result);
+        if (result.ok) {
+            setSession(result.body.sessionId, result.body.status, result.body.documentType);
+            showMessage("Customer session created.", false);
+        }
+    }
+
+    function useTypedSession() {
+        const typedSessionId = document.getElementById("sessionIdInput").value.trim();
+        if (!typedSessionId) {
+            showMessage("Enter a session ID first.", true);
+            return;
+        }
+        setSession(typedSessionId, "Loaded", document.getElementById("bankerDocumentType").value);
+        print({message: "Session loaded for banker review", sessionId});
+    }
+
+    async function fetchPendingByAccount() {
+        const accountId = document.getElementById("accountIdInput").value.trim();
+        if (!accountId) { showMessage("Enter a customer account ID first.", true); return; }
+        const response = await fetch("/api/v1/kyc/customers/" + encodeURIComponent(accountId) + "/sessions/pending");
+        const result = await readResponse(response);
+        print(result);
+        renderPendingQueue(result);
+        showMessage(result.ok ? (result.body.length ? "Pending reviews loaded." : "No pending reviews for this account.") : "Unable to load the review queue.", !result.ok);
+    }
+
+    function renderPendingQueue(result) {
+        const queue = document.getElementById("pendingQueue");
+        queue.innerHTML = "";
+        if (!result.ok || !Array.isArray(result.body)) return;
+        result.body.forEach(item => {
+            const row = document.createElement("div"); row.className = "frame-item";
+            row.innerHTML = '<div><strong>' + (item.purpose || "KYC review") + '</strong><div class="small">' +
+                item.cifNo + ' · ' + item.documentType + ' · <span class="pill warn">' + item.status + '</span></div></div>';
+            const button = document.createElement("button"); button.className = "native bank"; button.type = "button"; button.textContent = "Review";
+            button.onclick = () => { setSession(item.sessionId, item.status, item.documentType); document.getElementById("accountIdInput").value = item.cifNo; getSession(); };
+            row.appendChild(button); queue.appendChild(row);
+        });
+    }
+
+    async function getSession() {
+        if (!hasSession()) return;
+        const response = await fetch("/api/v1/kyc/sessions/" + encodeURIComponent(sessionId));
+        const result = await readResponse(response);
+        print(result);
+        if (result.ok) setSession(result.body.sessionId, result.body.status, result.body.documentType || document.getElementById("documentType").value);
+    }
+
+    async function uploadDocument() {
+        if (!hasSession()) return;
+        const file = document.getElementById("documentFile").files[0];
+        if (!file) {
+            showMessage("Choose a PDF document first.", true);
+            return;
+        }
+        const form = new FormData();
+        form.append("documentType", document.getElementById("documentType").value);
+        form.append("file", file);
+        const response = await fetch("/api/v1/kyc/sessions/" + encodeURIComponent(sessionId) + "/documents", {method: "POST", body: form});
+        const result = await readResponse(response);
+        print(result);
+        showMessage(result.ok ? "Document uploaded." : "Document upload failed.", !result.ok);
+    }
+
+    function downloadDocument() {
+        if (!hasSession()) return;
+        const type = document.getElementById("documentType").value;
+        window.open("/api/v1/kyc/sessions/" + encodeURIComponent(sessionId) + "/documents/" + encodeURIComponent(type), "_blank");
+        print({message: "Document opened in a new tab", sessionId, documentType: type});
+    }
+
+    async function uploadFrameFiles() {
+        if (!hasSession()) return;
+        const files = Array.from(document.getElementById("frameFiles").files);
+        if (files.length === 0) {
+            showMessage("Choose one or more frame images first.", true);
+            return;
+        }
+        const form = new FormData();
+        files.forEach(file => form.append("frames", file));
+        const response = await fetch("/api/v1/kyc/sessions/" + encodeURIComponent(sessionId) + "/frames", {method: "POST", body: form});
+        const result = await readResponse(response);
+        print(result);
+        showMessage(result.ok ? "Frames uploaded." : "Frame upload failed.", !result.ok);
+    }
+
+    async function startCamera() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
+            document.getElementById("video").srcObject = stream;
+            showMessage("Camera started.", false);
+        } catch (error) {
+            showMessage(error.message || "Camera could not start.", true);
+        }
+    }
+
+    function stopCamera() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+            document.getElementById("video").srcObject = null;
+        }
+        showMessage("Camera stopped.", false);
+    }
+
+    async function captureFrames() {
+        if (!hasSession()) return;
+        if (!stream) {
+            showMessage("Start the camera first.", true);
+            return;
+        }
+        const video = document.getElementById("video");
+        const canvas = document.createElement("canvas");
+        canvas.width = 640;
+        canvas.height = 480;
+        const context = canvas.getContext("2d");
+        const form = new FormData();
+        for (let i = 1; i <= FRAME_COUNT; i += 1) {
+            await sleep(FRAME_INTERVAL);
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.8));
+            form.append("frames", blob, "frame-" + i + ".jpg");
+        }
+        const response = await fetch("/api/v1/kyc/sessions/" + encodeURIComponent(sessionId) + "/frames", {method: "POST", body: form});
+        const result = await readResponse(response);
+        print(result);
+        showMessage(result.ok ? "Camera frames uploaded." : "Camera frame upload failed.", !result.ok);
+    }
+
+    async function listFrames() {
+        if (!hasSession()) return;
+        const response = await fetch("/api/v1/kyc/sessions/" + encodeURIComponent(sessionId) + "/frames");
+        const result = await readResponse(response);
+        print(result);
+        renderFrameList(result);
+    }
+
+    function downloadFrame(frameNumber) {
+        if (!hasSession()) return;
+        const target = frameNumber || document.getElementById("frameNumber").value;
+        window.open("/api/v1/kyc/sessions/" + encodeURIComponent(sessionId) + "/frames/" + encodeURIComponent(target), "_blank");
+        print({message: "Frame opened in a new tab", sessionId, frameNumber: target});
+    }
+
+    async function getResult() {
+        if (!hasSession()) return;
+        const response = await fetch("/api/v1/kyc/sessions/" + encodeURIComponent(sessionId) + "/result");
+        const result = await readResponse(response);
+        print(result);
+    }
+
+    async function approveSession() { await sendDecision("approve"); }
+    async function rejectSession() { await sendDecision("reject"); }
+
+    async function sendDecision(action) {
+        if (!hasSession()) return;
+        const response = await fetch("/api/v1/kyc/sessions/" + encodeURIComponent(sessionId) + "/" + action, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                reason: readOjValue("reasonOj"),
+                remarks: readOjValue("remarksOj")
+            })
+        });
+        const result = await readResponse(response);
+        print(result);
+        if (result.ok) setSession(sessionId, action === "approve" ? "VERIFIED" : "REJECTED", document.getElementById("documentType").value);
+        showMessage(result.ok ? "Decision saved." : "Decision failed.", !result.ok);
+    }
+
+    async function readResponse(response) {
+        const contentType = response.headers.get("content-type") || "";
+        const body = contentType.includes("application/json") ? await response.json() : await response.text();
+        return {status: response.status, ok: response.ok, body};
+    }
+
+    function renderFrameList(result) {
+        const container = document.getElementById("frameList");
+        container.innerHTML = "";
+        if (!result.ok || !Array.isArray(result.body)) return;
+        if (result.body.length === 0) {
+            container.innerHTML = '<p class="small">No frames found for this session.</p>';
+            return;
+        }
+        result.body.forEach(frame => {
+            const row = document.createElement("div");
+            row.className = "frame-item";
+            row.innerHTML = '<div><strong>Frame ' + frame.frameNumber + '</strong><div class="small">' +
+                (frame.fileName || "unnamed") + ' | ' + (frame.contentType || "unknown") + ' | ' + frame.size +
+                ' bytes</div></div>';
+            const button = document.createElement("button");
+            button.className = "native secondary";
+            button.type = "button";
+            button.textContent = "Open";
+            button.onclick = () => downloadFrame(frame.frameNumber);
+            row.appendChild(button);
+            container.appendChild(row);
+        });
+    }
+
+    function showRole(role) {
+        const isCustomer = role === "customer";
+        document.getElementById("customerView").classList.toggle("active", isCustomer);
+        document.getElementById("bankerView").classList.toggle("active", !isCustomer);
+        document.getElementById("customerRole").classList.toggle("active", isCustomer);
+        document.getElementById("bankerRole").classList.toggle("active", !isCustomer);
+        const roleLabel = document.getElementById("roleLabel");
+        roleLabel.textContent = isCustomer ? "Customer" : "Banker";
+        roleLabel.className = isCustomer ? "pill" : "pill bank";
+    }
+
+    function setSession(nextSessionId, status, documentType) {
+        sessionId = nextSessionId;
+        document.getElementById("sessionIdInput").value = nextSessionId || "";
+        document.getElementById("currentSession").textContent = nextSessionId || "None";
+        document.getElementById("currentStatus").textContent = status || "Loaded";
+        if (documentType) {
+            document.getElementById("documentType").value = documentType;
+            document.getElementById("bankerDocumentType").value = documentType;
+            document.getElementById("currentDocument").textContent = documentType;
+        }
+    }
+
+    function syncDocumentType() {
+        const type = document.getElementById("documentType").value;
+        document.getElementById("bankerDocumentType").value = type;
+        document.getElementById("currentDocument").textContent = type;
+    }
+
+    function copyBankerDocumentType() {
+        const type = document.getElementById("bankerDocumentType").value;
+        document.getElementById("documentType").value = type;
+        document.getElementById("currentDocument").textContent = type;
+    }
+
+    function hasSession() {
+        if (!sessionId) {
+            showMessage("Create or load a session first.", true);
+            return false;
+        }
+        return true;
+    }
+
+    function showMessage(text, bad) {
+        const message = document.getElementById("message");
+        message.textContent = text;
+        message.className = "message show " + (bad ? "bad" : "ok");
+    }
+
+    function print(obj) { document.getElementById("output").textContent = JSON.stringify(obj, null, 2); }
+    function clearOutput() { document.getElementById("output").textContent = "Ready."; }
+    function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+</script>
+</body>
+</html>

@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "customers")
@@ -47,6 +48,12 @@ public class Customer {
     private Boolean pushNotificationsEnabled;
     @Column(name = "kyc_failure_count", nullable = false)
     private Integer kycFailureCount;
+    @Column(name = "external_kyc_session_id", length = 36)
+    private String externalKycSessionId;
+    @Column(name = "external_kyc_decision", length = 20)
+    private String externalKycDecision;
+    @Column(name = "external_kyc_decided_at")
+    private Instant externalKycDecidedAt;
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
     @Column(name = "updated_at", nullable = false)

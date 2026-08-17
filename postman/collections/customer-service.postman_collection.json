@@ -186,6 +186,11 @@
       "type": "string"
     },
     {
+      "key": "documentType",
+      "value": "PAN",
+      "type": "string"
+    },
+    {
       "key": "empId",
       "value": "1002",
       "type": "string"
@@ -253,6 +258,11 @@
     {
       "key": "journalId",
       "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "kycSessionId",
+      "value": "kyc-session-000001",
       "type": "string"
     },
     {
@@ -338,6 +348,11 @@
     {
       "key": "scheduleId",
       "value": "schedule-000001",
+      "type": "string"
+    },
+    {
+      "key": "frameNumber",
+      "value": "1",
       "type": "string"
     },
     {
@@ -689,6 +704,46 @@
             "header": [],
             "url": "{{baseUrl}}/api/v1/customers/{{cif}}/eligibility",
             "description": "Generated from services/customer-service/src/main/java/com/moneybags/customer/controller/CustomerManagementController.java.eligibility"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "InternalKycController",
+      "description": "Source: services/customer-service/src/main/java/com/moneybags/customer/controller/InternalKycController.java",
+      "item": [
+        {
+          "name": "GET Context",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/internal/v1/customers/{{cif}}/kyc-context",
+            "description": "Generated from services/customer-service/src/main/java/com/moneybags/customer/controller/InternalKycController.java.context"
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Synchronize Decision",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/internal/v1/customers/{{cif}}/kyc-decision",
+            "description": "Generated from services/customer-service/src/main/java/com/moneybags/customer/controller/InternalKycController.java.synchronizeDecision\n\nRequest body type: KycDecisionRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionId\": \"string\",\n  \"status\": \"ACTIVE\",\n  \"reviewerId\": \"string\",\n  \"reason\": \"Postman example\",\n  \"remarks\": \"Approved from Postman\",\n  \"decidedAt\": \"2026-08-17T10:00:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
           },
           "response": []
         }

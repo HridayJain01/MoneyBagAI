@@ -3,12 +3,12 @@ description: |-
   Generated from services/notification-service/src/main/java/com/moneybags/notification/controller/NotificationController.java.queue
 
   Request body type: SendRequest
-url: "{{baseUrl}}/internal/v1/notifications"
+url: "{{baseUrl}}/api/v1/notifications"
 method: POST
 headers:
   Content-Type: application/json
   Idempotency-Key: "{{idempotencyKey}}"
-  X-Service-Name: "{{serviceName}}"
+  X-Permissions: "{{permissions}}"
 body:
   type: json
   content: |-

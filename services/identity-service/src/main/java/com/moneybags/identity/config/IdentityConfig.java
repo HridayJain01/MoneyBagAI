@@ -1,7 +1,9 @@
 package com.moneybags.identity.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +34,12 @@ public class IdentityConfig {
         return new OpenAPI().info(new Info()
                 .title("MoneyBags Identity Service")
                 .version("v1")
-                .description("Users, roles, permissions and JWT authentication."));
+                .description("Central authentication, users, roles and permissions."))
+                .components(new Components().addSecuritySchemes("bearerAuth", new SecurityScheme()
+                        .type(SecurityScheme.Type.HTTP)
+                        .scheme("bearer")
+                        .bearerFormat("JWT")
+                        .description("JWT accessToken returned by POST /api/v1/auth/login")));
     }
 
     @Getter
@@ -42,7 +49,10 @@ public class IdentityConfig {
     public static class IdentityProperties {
         private int maxFailedAttempts = 5;
         private long lockDurationMinutes = 15;
+        private boolean registrationEnabled = true;
+        private String defaultRegistrationRole = "CUSTOMER";
         private Jwt jwt = new Jwt();
+        private Cookie cookie = new Cookie();
 
         @Getter
         @Setter
@@ -51,6 +61,14 @@ public class IdentityConfig {
             private long expirationMinutes = 15;
             private String issuer = "moneybags-identity";
             private String audience = "moneybags-api";
+        }
+
+        @Getter
+        @Setter
+        public static class Cookie {
+            private String name = "access-token";
+            private boolean secure = false;
+            private String sameSite = "Strict";
         }
     }
 
@@ -71,7 +89,7 @@ public class IdentityConfig {
                 log.error("spring.application.name is '{}' but customer-service's SecurityClient "
                         + "resolves the Eureka id 'security-service'. User lookups will fail.", applicationName);
             } else {
-                log.info("Registered with Eureka as 'security-service' (module identity-service).");
+                log.info("Auth and identity service registered with Eureka as 'security-service'.");
             }
         }
     }

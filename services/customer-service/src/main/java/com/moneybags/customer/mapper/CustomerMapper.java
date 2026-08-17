@@ -12,6 +12,9 @@ public interface CustomerMapper {
     @Mapping(target = "emailNotificationsEnabled", ignore = true)
     @Mapping(target = "smsNotificationsEnabled", ignore = true)
     @Mapping(target = "pushNotificationsEnabled", ignore = true)
+    @Mapping(target = "externalKycSessionId", ignore = true)
+    @Mapping(target = "externalKycDecision", ignore = true)
+    @Mapping(target = "externalKycDecidedAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     Customer toEntity(CustomerRequest request);

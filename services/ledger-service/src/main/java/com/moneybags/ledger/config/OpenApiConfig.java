@@ -14,13 +14,13 @@ public class OpenApiConfig {
     OpenAPI ledgerOpenApi() {
         return new OpenAPI().info(new Info()
                 .title("MoneyBags Ledger Service API")
-                .description("Auditable double-entry general ledger. Posted journals are immutable and corrections use reversals. Authenticate Swagger requests with the session ID returned by /api/v1/auth/login.")
+                .description("Auditable double-entry general ledger. Posted journals are immutable and corrections use reversals. Use the Bearer JWT returned by /api/v1/auth/login.")
                 .version("v1"))
-                .components(new Components().addSecuritySchemes("sessionId", new SecurityScheme()
-                        .type(SecurityScheme.Type.APIKEY)
-                        .in(SecurityScheme.In.HEADER)
-                        .name("X-Session-Id")
-                        .description("Raw sessionId returned by POST /api/v1/auth/login")))
-                .addSecurityItem(new SecurityRequirement().addList("sessionId"));
+                .components(new Components().addSecuritySchemes("bearerAuth", new SecurityScheme()
+                        .type(SecurityScheme.Type.HTTP)
+                        .scheme("bearer")
+                        .bearerFormat("JWT")
+                        .description("JWT accessToken returned by POST /api/v1/auth/login")))
+                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
     }
 }
