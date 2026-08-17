@@ -14,8 +14,14 @@ import java.util.List;
 @ConfigurationProperties(prefix = "moneybags.gateway")
 public class GatewayProperties {
 
-    private String identityUri = "lb://security-service";
-    private long sessionCacheTtlSeconds = 30;
-    private long sessionCacheMaxSize = 10_000;
+    private Jwt jwt = new Jwt();
     private List<String> publicPaths = new ArrayList<>();
+
+    @Getter
+    @Setter
+    public static class Jwt {
+        private String secret = "moneybags-dev-only-jwt-secret-change-before-production";
+        private String issuer = "moneybags-identity";
+        private String audience = "moneybags-api";
+    }
 }

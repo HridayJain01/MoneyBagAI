@@ -1,8 +1,8 @@
 /**
  * Session store.
  *
- * The gateway issues an opaque session id (not a JWT) from
- * POST /api/v1/auth/login and resolves it per-request via identity-service.
+ * Identity-service issues a short-lived JWT access token from
+ * POST /api/v1/auth/login. The gateway validates it on every protected request.
  * We keep it in sessionStorage rather than localStorage: a bearer credential
  * that outlives the tab is the wrong default for a banking console.
  */
@@ -22,7 +22,7 @@ define([], function () {
       }
       var parsed = JSON.parse(raw);
       // Defend against a hand-edited or half-written entry.
-      return parsed && typeof parsed.sessionId === 'string' ? parsed : null;
+      return parsed && typeof parsed.accessToken === 'string' ? parsed : null;
     } catch (e) {
       return null;
     }

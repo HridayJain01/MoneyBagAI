@@ -32,7 +32,7 @@ public class IdentityConfig {
         return new OpenAPI().info(new Info()
                 .title("MoneyBags Identity Service")
                 .version("v1")
-                .description("Users, roles, permissions and opaque sessions."));
+                .description("Users, roles, permissions and JWT authentication."));
     }
 
     @Getter
@@ -40,9 +40,18 @@ public class IdentityConfig {
     @Configuration
     @ConfigurationProperties(prefix = "moneybags.identity")
     public static class IdentityProperties {
-        private long sessionTtlMinutes = 480;
         private int maxFailedAttempts = 5;
         private long lockDurationMinutes = 15;
+        private Jwt jwt = new Jwt();
+
+        @Getter
+        @Setter
+        public static class Jwt {
+            private String secret = "moneybags-dev-only-jwt-secret-change-before-production";
+            private long expirationMinutes = 15;
+            private String issuer = "moneybags-identity";
+            private String audience = "moneybags-api";
+        }
     }
 
     /**

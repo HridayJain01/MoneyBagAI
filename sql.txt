@@ -25,11 +25,6 @@ INSERT INTO employees (emp_id, user_id, employee_code, designation, branch_code,
 (1, 1, 'EMP001', 'Branch Manager', 'MB001', 'ACTIVE', '2023-01-10'),
 (2, 2, 'EMP002', 'Customer Executive', 'MB002', 'ACTIVE', '2024-02-15');
 
-INSERT INTO user_sessions
-(session_id, user_id, access_token_hash, refresh_token_hash, device_type, device_name, browser, operating_system, ip_address, login_time, last_activity_time, expires_at, logout_time, session_status) VALUES
-(UUID_TO_BIN('11111111-1111-1111-1111-111111111111'), 1, 'access_admin_001', 'refresh_admin_001', 'DESKTOP', 'Admin PC', 'Chrome', 'Windows 11', '127.0.0.1', NOW(), NOW(), DATE_ADD(NOW(), INTERVAL 8 HOUR), NULL, 'ACTIVE'),
-(UUID_TO_BIN('22222222-2222-2222-2222-222222222222'), 2, 'access_rahul_001', 'refresh_rahul_001', 'MOBILE', 'Rahul Phone', 'Chrome', 'Android', '127.0.0.2', NOW(), NOW(), DATE_ADD(NOW(), INTERVAL 8 HOUR), NULL, 'ACTIVE');
-
 INSERT INTO login_audit (user_id, username, event_type, event_time, ip_address, device_info, failure_reason, status) VALUES
 (1, 'admin', 'LOGIN_SUCCESS', NOW(), '127.0.0.1', 'Admin PC / Chrome', NULL, 'ACTIVE'),
 (2, 'rahul.sharma', 'LOGIN_SUCCESS', NOW(), '127.0.0.2', 'Android / Chrome', NULL, 'ACTIVE');

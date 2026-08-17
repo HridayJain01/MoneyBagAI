@@ -34,22 +34,18 @@ Use `201 Created` for new resources, `202 Accepted` for queued approval/export/j
 
 ## 2. Identity and Access Service
 
-**Schema:** `USERS`, `ROLES`, `PERMISSIONS`, `ROLE_PERMISSIONS`; **Derived:** sessions, refresh tokens, OTP challenges, password history and security audit/outbox.
+**Schema:** `USERS`, `ROLES`, `PERMISSIONS`, `ROLE_PERMISSIONS`, `LOGIN_AUDIT`; JWT access tokens are stateless.
 
 | Method | Endpoint | Permission / access | Purpose |
 |---|---|---|---|
 | POST | `/api/v1/auth/register` | public | Register a customer identity and start CIF/KYC onboarding. |
-| POST | `/api/v1/auth/login` | public | Authenticate email/password and create access/refresh tokens or an OTP challenge. |
+| POST | `/api/v1/auth/login` | public | Authenticate username/password and issue a short-lived JWT access token. |
 | POST | `/api/v1/auth/otp/challenges/{challengeId}/verify` | public with challenge | Complete MFA/OTP login. |
-| POST | `/api/v1/auth/token/refresh` | valid refresh token | Rotate a refresh token. |
-| POST | `/api/v1/auth/logout` | authenticated | Revoke current session/token family. |
-| POST | `/api/v1/auth/logout-all` | authenticated | Revoke all sessions for current user. |
+| POST | `/api/v1/auth/logout` | authenticated | Record logout; the client discards its stateless JWT. |
 | POST | `/api/v1/auth/password/forgot` | public | Create and send password-reset OTP/link. |
 | POST | `/api/v1/auth/password/reset` | public with reset proof | Set a new password after reset verification. |
 | POST | `/api/v1/auth/password/change` | authenticated | Change own password; validates password policy/history. |
 | POST | `/api/v1/auth/otp/challenges` | authenticated | Request OTP for a sensitive operation. |
-| GET | `/api/v1/auth/sessions` | authenticated | List current user's active sessions. |
-| DELETE | `/api/v1/auth/sessions/{sessionId}` | owner | Revoke one session. |
 | GET | `/api/v1/users` | `USER_MANAGE` | Search/filter users by email, role, status, created date. |
 | POST | `/api/v1/users` | `USER_MANAGE` | Create staff/service user. |
 | GET | `/api/v1/users/{userId}` | owner or `USER_MANAGE` | Retrieve a user profile (never password hash). |

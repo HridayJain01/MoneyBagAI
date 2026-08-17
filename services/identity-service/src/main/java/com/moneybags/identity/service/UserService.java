@@ -2,7 +2,6 @@ package com.moneybags.identity.service;
 
 import com.moneybags.identity.api.ApiModels.*;
 import com.moneybags.identity.entity.*;
-import com.moneybags.identity.entity.SessionStatus;
 import com.moneybags.identity.entity.UserStatus;
 import com.moneybags.identity.repository.*;
 import com.moneybags.identity.support.ApiException;
@@ -25,7 +24,6 @@ public class UserService {
     private final UserRepository users;
     private final RoleRepository roles;
     private final PermissionRepository permissions;
-    private final SessionRepository sessions;
 
     /**
      * customer-service probes this before creating a customer. It discards the body
@@ -86,7 +84,7 @@ public class UserService {
 
     /**
      * Called by branch-employee-service when an employee is created, so the gateway
-     * can resolve employee and branch from the session in a single hop.
+     * can include employee and branch in newly issued JWTs.
      */
     @Transactional
     public UserDetail setEmployment(Long userId, EmploymentRequest request) {
@@ -101,7 +99,6 @@ public class UserService {
         User user = require(userId);
         user.setStatus(UserStatus.LOCKED);
         user.setLockedUntil(Instant.now().plus(minutes, ChronoUnit.MINUTES));
-        sessions.revokeAllForUser(userId, SessionStatus.REVOKED, SessionStatus.ACTIVE, Instant.now());
         return toDetail(users.save(user));
     }
 
@@ -118,8 +115,6 @@ public class UserService {
     public UserDetail disable(Long userId) {
         User user = require(userId);
         user.setStatus(UserStatus.DISABLED);
-        // Disabling without revoking sessions would leave the user working until TTL.
-        sessions.revokeAllForUser(userId, SessionStatus.REVOKED, SessionStatus.ACTIVE, Instant.now());
         return toDetail(users.save(user));
     }
 

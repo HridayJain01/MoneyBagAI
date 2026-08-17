@@ -10,7 +10,7 @@ API or domain event, not a cross-database foreign key.
 
 | Service | Tables owned | Existing project action |
 |---|---|---|
-| Identity and Access | `users`, `roles`, `user_roles`, `user_sessions`, `login_audit` | Extract from current `security-service` |
+| Identity and Access | `users`, `roles`, `permissions`, `user_roles`, `role_permissions`, `login_audit` | JWT authentication and access control |
 | Customer | `customers`, `customer_addresses`, `kyc_documents`, `beneficiaries` | Extend current `customer-service` |
 | Product | `products`, `product_charges` | Keep current `product-service` |
 | Bank Organisation | `branches`, `employees` | New service; extract from current `security-service` |
@@ -22,14 +22,13 @@ API or domain event, not a cross-database foreign key.
 
 ## Identity and Access Service
 
-Tables: `users`, `roles`, `user_roles`, `user_sessions`, `login_audit`.
+Tables: `users`, `roles`, `permissions`, `user_roles`, `role_permissions`, `login_audit`.
 
 Local relationships:
 
 ```text
 users 1 -> many user_roles
 roles 1 -> many user_roles
-users 1 -> many user_sessions
 users 1 -> many login_audit records
 ```
 
@@ -217,11 +216,12 @@ Two things worth knowing before changing any of it:
 
 ## Authentication
 
-There is no JWT. identity-service issues an opaque session id; the gateway
-resolves it (behind a 30-second cache) and injects `X-User-Id`, `X-Employee-Id`,
-`X-Branch-Code`, `X-Branch-Id`, `X-Permissions` and `X-Correlation-Id`
-downstream. It strips all of those from inbound requests first, so a client
-cannot forge them.
+identity-service issues a signed, short-lived JWT containing the authenticated
+user's roles, permissions, employee id and branch. The gateway validates its
+signature, issuer, audience and expiry locally, then injects `X-User-Id`,
+`X-Employee-Id`, `X-Branch-Code`, `X-Branch-Id`, `X-Permissions` and
+`X-Correlation-Id` downstream. It strips all of those from inbound requests
+first, so a client cannot forge them.
 
 `X-Branch-Code` and `X-Branch-Id` deliberately carry the same value:
 transaction-service reads the first, statement-reporting-service the second.

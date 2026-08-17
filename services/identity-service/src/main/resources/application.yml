@@ -24,9 +24,14 @@ spring:
 
 moneybags:
   identity:
-    session-ttl-minutes: ${SESSION_TTL_MINUTES:480}
     max-failed-attempts: ${MAX_FAILED_ATTEMPTS:5}
     lock-duration-minutes: ${LOCK_DURATION_MINUTES:15}
+    jwt:
+      # Set the same strong secret in identity-service and api-gateway in production.
+      secret: ${JWT_SECRET:moneybags-dev-only-jwt-secret-change-before-production}
+      expiration-minutes: ${JWT_EXPIRATION_MINUTES:15}
+      issuer: moneybags-identity
+      audience: moneybags-api
 
 eureka:
   client:

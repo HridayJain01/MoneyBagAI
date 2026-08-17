@@ -42,11 +42,11 @@ function Step {
 
 function Invoke-Api {
     param(
-        [string]$Method, [string]$Path, $Body, [string]$Session,
+        [string]$Method, [string]$Path, $Body, [string]$AccessToken,
         [hashtable]$ExtraHeaders = @{}
     )
     $headers = @{ 'X-Correlation-Id' = $script:correlationId }
-    if ($Session) { $headers['Authorization'] = "Bearer $Session" }
+    if ($AccessToken) { $headers['Authorization'] = "Bearer $AccessToken" }
     foreach ($key in $ExtraHeaders.Keys) { $headers[$key] = $ExtraHeaders[$key] }
 
     $parameters = @{
@@ -73,31 +73,31 @@ $checker = Step 'login as checker1 (approver)' {
     }
 }
 if (-not $teller -or -not $checker) {
-    Write-Host 'Cannot continue without both sessions.' -ForegroundColor Red
+    Write-Host 'Cannot continue without both access tokens.' -ForegroundColor Red
     exit 1
 }
 
 Step 'gateway strips a forged X-Permissions header' {
     # Expect this to be rejected or ignored, never honoured.
-    $response = Invoke-Api -Method GET -Path '/api/v1/products' -Session $teller.sessionId `
+    $response = Invoke-Api -Method GET -Path '/api/v1/products' -AccessToken $teller.accessToken `
         -ExtraHeaders @{ 'X-Permissions' = 'ACCOUNT_APPROVE,TRANSACTION_APPROVE' }
     if (-not $response) { throw 'No product catalogue returned' }
     'stripped'
 } | Out-Null
 
 Step 'read the product catalogue' {
-    $products = Invoke-Api -Method GET -Path '/api/v1/products' -Session $teller.sessionId
+    $products = Invoke-Api -Method GET -Path '/api/v1/products' -AccessToken $teller.accessToken
     if (@($products).Count -lt 6) { throw "Expected 6 seeded products, saw $(@($products).Count)" }
     $products
 } | Out-Null
 
 Step 'read a seeded customer' {
-    Invoke-Api -Method GET -Path '/api/v1/customers/CIF900101' -Session $teller.sessionId
+    Invoke-Api -Method GET -Path '/api/v1/customers/CIF900101' -AccessToken $teller.accessToken
 } | Out-Null
 
 # 2. Open an account for an existing customer.
 $application = Step 'create an account application (teller)' {
-    Invoke-Api -Method POST -Path '/api/v1/accounts/applications' -Session $teller.sessionId -Body @{
+    Invoke-Api -Method POST -Path '/api/v1/accounts/applications' -AccessToken $teller.accessToken -Body @{
         cifNo = 'CIF900101'; productCode = 'SAV-REG'
         accountName = 'Smoke Test Savings'; initialDeposit = 5000
     }
@@ -106,7 +106,7 @@ $application = Step 'create an account application (teller)' {
 Step 'maker cannot approve their own application' {
     try {
         Invoke-Api -Method POST -Path "/api/v1/accounts/applications/$($application.applicationId)/approve" `
-            -Session $teller.sessionId -Body @{ remarks = 'self-approval attempt' }
+            -AccessToken $teller.accessToken -Body @{ remarks = 'self-approval attempt' }
         throw 'Self-approval was allowed; maker-checker is not being enforced'
     } catch {
         if ($_.Exception.Message -like '*not being enforced*') { throw }
@@ -116,7 +116,7 @@ Step 'maker cannot approve their own application' {
 
 $approved = Step 'approve the application (checker)' {
     Invoke-Api -Method POST -Path "/api/v1/accounts/applications/$($application.applicationId)/approve" `
-        -Session $checker.sessionId -Body @{ remarks = 'smoke test approval' }
+        -AccessToken $checker.accessToken -Body @{ remarks = 'smoke test approval' }
 }
 
 $accountId = $approved.createdAccountId
@@ -127,7 +127,7 @@ if (-not $accountId) {
 
     # 3. Money movement. Each POST carries its own idempotency key.
     Step 'deposit 5000' {
-        Invoke-Api -Method POST -Path '/api/v1/transactions/deposits' -Session $teller.sessionId `
+        Invoke-Api -Method POST -Path '/api/v1/transactions/deposits' -AccessToken $teller.accessToken `
             -ExtraHeaders @{ 'Idempotency-Key' = [guid]::NewGuid().ToString() } -Body @{
                 accountId = $accountId; amount = 5000; currency = 'INR'
                 narration = 'Smoke test opening deposit'
@@ -137,9 +137,9 @@ if (-not $accountId) {
     Step 'replaying the deposit does not double-post' {
         $key = [guid]::NewGuid().ToString()
         $body = @{ accountId = $accountId; amount = 100; currency = 'INR'; narration = 'Idempotency probe' }
-        $first  = Invoke-Api -Method POST -Path '/api/v1/transactions/deposits' -Session $teller.sessionId `
+        $first  = Invoke-Api -Method POST -Path '/api/v1/transactions/deposits' -AccessToken $teller.accessToken `
             -ExtraHeaders @{ 'Idempotency-Key' = $key } -Body $body
-        $second = Invoke-Api -Method POST -Path '/api/v1/transactions/deposits' -Session $teller.sessionId `
+        $second = Invoke-Api -Method POST -Path '/api/v1/transactions/deposits' -AccessToken $teller.accessToken `
             -ExtraHeaders @{ 'Idempotency-Key' = $key } -Body $body
         if ($first.transactionId -ne $second.transactionId) {
             throw "Replay created a second transaction ($($first.transactionId) vs $($second.transactionId))"
@@ -151,7 +151,7 @@ if (-not $accountId) {
     Step 'balance reflects the deposits' {
         $deadline = (Get-Date).AddSeconds(45)
         while ((Get-Date) -lt $deadline) {
-            $balance = Invoke-Api -Method GET -Path "/api/v1/accounts/$accountId/balance" -Session $teller.sessionId
+            $balance = Invoke-Api -Method GET -Path "/api/v1/accounts/$accountId/balance" -AccessToken $teller.accessToken
             if ([decimal]$balance.ledgerBalance -ge 5100) { return $balance }
             Start-Sleep -Seconds 3
         }
@@ -159,7 +159,7 @@ if (-not $accountId) {
     } | Out-Null
 
     Step 'internal transfer to the seeded account' {
-        Invoke-Api -Method POST -Path '/api/v1/transactions/transfers/internal' -Session $teller.sessionId `
+        Invoke-Api -Method POST -Path '/api/v1/transactions/transfers/internal' -AccessToken $teller.accessToken `
             -ExtraHeaders @{ 'Idempotency-Key' = [guid]::NewGuid().ToString() } -Body @{
                 sourceAccountId = $accountId
                 destinationAccountId = 'a0000000-0000-0000-0000-000000000103'
@@ -170,7 +170,7 @@ if (-not $accountId) {
     Step 'holds are released after settlement' {
         $deadline = (Get-Date).AddSeconds(45)
         while ((Get-Date) -lt $deadline) {
-            $balance = Invoke-Api -Method GET -Path "/api/v1/accounts/$accountId/balance" -Session $teller.sessionId
+            $balance = Invoke-Api -Method GET -Path "/api/v1/accounts/$accountId/balance" -AccessToken $teller.accessToken
             if ([decimal]$balance.heldAmount -eq 0) { return $balance }
             Start-Sleep -Seconds 3
         }
@@ -178,22 +178,22 @@ if (-not $accountId) {
     } | Out-Null
 
     Step 'account transaction history' {
-        Invoke-Api -Method GET -Path "/api/v1/accounts/$accountId/transactions" -Session $teller.sessionId
+        Invoke-Api -Method GET -Path "/api/v1/accounts/$accountId/transactions" -AccessToken $teller.accessToken
     } | Out-Null
 
     Step 'mini statement' {
-        Invoke-Api -Method GET -Path "/api/v1/statements/accounts/$accountId/mini" -Session $teller.sessionId
+        Invoke-Api -Method GET -Path "/api/v1/statements/accounts/$accountId/mini" -AccessToken $teller.accessToken
     } | Out-Null
 
     Step 'balance history is recorded' {
-        $history = Invoke-Api -Method GET -Path "/api/v1/accounts/$accountId/balance-history" -Session $teller.sessionId
+        $history = Invoke-Api -Method GET -Path "/api/v1/accounts/$accountId/balance-history" -AccessToken $teller.accessToken
         if (@($history.items).Count -lt 1) { throw 'No balance history rows' }
         $history
     } | Out-Null
 }
 
 Step 'audit trail for this correlation id' {
-    $trace = Invoke-Api -Method GET -Path "/api/v1/audit-events/trace/$script:correlationId" -Session $checker.sessionId
+    $trace = Invoke-Api -Method GET -Path "/api/v1/audit-events/trace/$script:correlationId" -AccessToken $checker.accessToken
     if (@($trace).Count -lt 1) { throw 'No audit events recorded for this request chain' }
     $trace
 } | Out-Null

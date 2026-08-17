@@ -391,7 +391,7 @@ Write-Host "  Logs         $logDirectory"
 Write-Host ''
 Write-Host '  Sign in:  POST http://localhost:8090/api/v1/auth/login'
 Write-Host '            {"username":"teller1","password":"Password@123"}'
-Write-Host '            then send  Authorization: Bearer <sessionId>'
+Write-Host '            then send  Authorization: Bearer <accessToken>'
 
 # ---------------------------------------------------------------- Phase 4
 if ($Smoke) {

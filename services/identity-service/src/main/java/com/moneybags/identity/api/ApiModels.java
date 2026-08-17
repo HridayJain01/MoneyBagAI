@@ -13,7 +13,6 @@ import java.util.List;
  * <ul>
  *   <li>{@link UserSummary} -- customer-service's {@code SecurityClient.UserSummary}
  *       record binds to it field-for-field.</li>
- *   <li>{@link SessionPrincipal} -- the api-gateway session filter binds to it.</li>
  * </ul>
  */
 public final class ApiModels {
@@ -26,7 +25,8 @@ public final class ApiModels {
     }
 
     public record LoginResponse(
-            String sessionId,
+            String accessToken,
+            String tokenType,
             Instant expiresAt,
             Long userId,
             String username,
@@ -37,24 +37,6 @@ public final class ApiModels {
             List<String> permissions) {
     }
 
-    /** Gateway -> identity. POST, not GET, so the session id never lands in an access log. */
-    public record ResolveRequest(@NotBlank String sessionId) {
-    }
-
-    /**
-     * What the gateway turns into downstream actor headers. {@code branchCode} is
-     * emitted as BOTH X-Branch-Code and X-Branch-Id -- transaction-service reads the
-     * former, statement-reporting-service the latter, and they must agree.
-     */
-    public record SessionPrincipal(
-            Long userId,
-            String username,
-            String employeeId,
-            String branchCode,
-            List<String> permissions,
-            String status,
-            Instant expiresAt) {
-    }
 
     /**
      * Frozen by customer-service's SecurityClient. {@code userId} is a Long, and the
@@ -104,11 +86,6 @@ public final class ApiModels {
 
     public record PermissionDetail(Long permissionId, String permissionCode, String description,
                                    String serviceName, String action) {
-    }
-
-    public record SessionDetail(String sessionId, Long userId, String status,
-                                Instant issuedAt, Instant lastActivityAt, Instant expiresAt,
-                                String ipAddress) {
     }
 
     public record PageResponse<T>(List<T> items, int page, int size, long totalItems, int totalPages) {

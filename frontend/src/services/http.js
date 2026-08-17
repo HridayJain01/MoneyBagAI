@@ -99,7 +99,7 @@ define(['./session'], function (session) {
     }
     var s = session.getSession();
     if (s) {
-      headers.Authorization = 'Bearer ' + s.sessionId;
+      headers.Authorization = 'Bearer ' + s.accessToken;
     }
     return headers;
   }
@@ -183,8 +183,7 @@ define(['./session'], function (session) {
             return body;
           }
 
-          // SESSION_REQUIRED / SESSION_INVALID come from the gateway's
-          // SessionAuthenticationGlobalFilter. Either way the credential is dead.
+          // JWT_REQUIRED / JWT_INVALID come from the gateway's JWT filter.
           if (response.status === 401) {
             session.clearSession();
             authListeners.forEach(function (fn) {

@@ -42,28 +42,6 @@ CREATE TABLE IF NOT EXISTS user_roles (
     FOREIGN KEY (role_id) REFERENCES roles(role_id)
     ) ENGINE = InnoDB;
 
-CREATE TABLE IF NOT EXISTS user_sessions (
-                                             session_id BINARY(16) NOT NULL,
-    user_id BIGINT NOT NULL,
-    access_token_hash VARCHAR(255) NOT NULL,
-    refresh_token_hash VARCHAR(255),
-    device_type VARCHAR(50),
-    device_name VARCHAR(100),
-    browser VARCHAR(100),
-    operating_system VARCHAR(100),
-    ip_address VARCHAR(45),
-    login_time DATETIME(6) NOT NULL,
-    last_activity_time DATETIME(6) NOT NULL,
-    expires_at DATETIME(6) NOT NULL,
-    logout_time DATETIME(6),
-    session_status VARCHAR(20) NOT NULL,
-
-    PRIMARY KEY (session_id),
-
-    CONSTRAINT fk_user_sessions_user
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
-    ) ENGINE = InnoDB;
-
 CREATE TABLE IF NOT EXISTS login_audit (
                                            audit_id BIGINT NOT NULL AUTO_INCREMENT,
                                            user_id BIGINT,

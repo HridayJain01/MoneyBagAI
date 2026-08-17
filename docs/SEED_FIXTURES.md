@@ -15,8 +15,8 @@ those literals must agree.
 ## Users and employees
 
 `identity-service` owns the users; `branch-employee-service` owns the employees. The link
-between them is denormalised onto `users.employee_id` / `users.branch_code` so the gateway
-can resolve a session in one call.
+between them is denormalised onto `users.employee_id` / `users.branch_code` so those values
+can be included in the JWT at login.
 
 | user_id | username | password | employee_id | branch_code | role |
 |---|---|---|---|---|---|

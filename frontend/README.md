@@ -7,7 +7,7 @@ No TypeScript, no build-time compile step beyond `ojet build`.
 ## Who this is for
 
 Only **employees** authenticate. `POST /api/v1/auth/login` returns an opaque
-session id which is sent as `Authorization: Bearer <sessionId>` on every later
+JWT access token which is sent as `Authorization: Bearer <accessToken>` on every later
 request. Customers are data in this system, never callers — so screens that look
 like personal banking (balance hero, recent activity, mini statement) are an
 employee *servicing* a customer's account.

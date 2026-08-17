@@ -14,7 +14,7 @@ spring:
         locator:
           # Deliberately OFF. When enabled it auto-exposes every registered service
           # under /<service-id>/**, including their /internal/** routes, which would
-          # bypass the session filter's internal-path block entirely.
+          # bypass the JWT filter's internal-path block entirely.
           enabled: false
       routes:
         # ---------------------------------------------------------------------
@@ -198,12 +198,12 @@ management:
 
 moneybags:
   gateway:
-    # Identity is reached through the load balancer, not a fixed host, so the
-    # gateway keeps working if identity moves or scales out.
-    identity-uri: lb://security-service
-    session-cache-ttl-seconds: 30
-    session-cache-max-size: 10000
-    # Paths reachable without a session. Everything else requires one.
+    jwt:
+      # Must match the identity-service secret. Override JWT_SECRET in production.
+      secret: ${JWT_SECRET:moneybags-dev-only-jwt-secret-change-before-production}
+      issuer: moneybags-identity
+      audience: moneybags-api
+    # Paths reachable without a JWT. Everything else requires one.
     public-paths:
       - /api/v1/auth/login
       - /api/v1/auth/password/forgot
@@ -213,7 +213,7 @@ moneybags:
       - /v3/api-docs
       - /webjars
       # Swagger UI fetches each service definition through these gateway
-      # aggregation routes before a user has a session.
+      # aggregation routes before a user has a JWT.
       - /security-service/api-docs
       - /customer-service/api-docs
       - /customer-service/openapi.yml
