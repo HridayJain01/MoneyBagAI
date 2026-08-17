@@ -14,6 +14,7 @@ const services = [
   { slug: 'eureka-server', name: 'Eureka Server', root: 'services/eureka-server', port: 8080 },
   { slug: 'identity-service', name: 'Identity Service', root: 'services/identity-service', port: 8087 },
   { slug: 'ledger-service', name: 'Ledger Service', root: 'services/ledger-service', port: 8085 },
+  { slug: 'kyc-service', name: 'KYC Service', root: 'services/kyc-service', port: 8093 },
   { slug: 'notification-service', name: 'Notification Service', root: 'services/notification-service', port: 8089 },
   { slug: 'product-service', name: 'Product Service', root: 'services/product-service', port: 8088 },
   { slug: 'statement-reporting-service', name: 'Statement Reporting Service', root: 'services/statement-reporting-service', port: 8086 },
@@ -47,6 +48,7 @@ const variableExamples = {
   customerId: 'CIF900101',
   date: '2026-08-17',
   documentId: '1',
+  documentType: 'PAN',
   empId: '1002',
   employeeId: '1004',
   eventId: '{{$guid}}',
@@ -61,6 +63,7 @@ const variableExamples = {
   ifsc: 'MBAG0000001',
   ifscCode: 'MBAG0000001',
   journalId: '1',
+  kycSessionId: 'kyc-session-000001',
   limitType: 'PER_TRANSACTION',
   maxAmount: '100000.00',
   minAmount: '0.01',
@@ -78,6 +81,7 @@ const variableExamples = {
   roleId: '1',
   ruleId: '1',
   scheduleId: 'schedule-000001',
+  frameNumber: '1',
   search: 'admin',
   sessionId: '',
   size: '25',
@@ -354,7 +358,8 @@ function namedAnnotationValue(options) {
 }
 
 function parseParameters(signature) {
-  const result = { query: [], headers: [], bodyType: null };
+  const result = { query: [], formdata: [], headers: [], bodyType: null };
+  const requestParams = [];
   for (const parameter of splitTopLevel(signature)) {
     const name = parameterName(parameter);
     if (!name) continue;
@@ -362,7 +367,11 @@ function parseParameters(signature) {
     if (requestParam !== null) {
       const key = namedAnnotationValue(requestParam) || name;
       const defaultMatch = requestParam.match(/defaultValue\s*=\s*"([^"]+)"/);
-      result.query.push({ key, value: defaultMatch ? defaultMatch[1] : exampleVariable(key) });
+      requestParams.push({
+        key,
+        value: defaultMatch ? defaultMatch[1] : exampleVariable(key),
+        file: /\bMultipartFile\b/.test(parameterType(parameter) || '')
+      });
     }
     const requestHeader = annotationOptions(parameter, 'RequestHeader');
     if (requestHeader !== null) {
@@ -375,6 +384,15 @@ function parseParameters(signature) {
     if (/\bPageable\b/.test(parameter)) {
       result.query.push({ key: 'page', value: '0' }, { key: 'size', value: '25' });
     }
+  }
+  if (requestParams.some(parameter => parameter.file)) {
+    result.formdata = requestParams.map(parameter => ({
+      key: parameter.key,
+      value: parameter.file ? '' : parameter.value,
+      type: parameter.file ? 'file' : 'text'
+    }));
+  } else {
+    result.query = requestParams.map(({ key, value }) => ({ key, value }));
   }
   return result;
 }
@@ -541,8 +559,19 @@ function headerExample(name) {
   const normalized = name.toLowerCase();
   if (normalized === 'idempotency-key') return '{{idempotencyKey}}';
   if (normalized === 'x-service-name') return '{{serviceName}}';
+  if (normalized === 'x-permissions') return '{{permissions}}';
   if (normalized === 'x-session-id') return '{{sessionId}}';
-  return `{{${name.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())}}}`;
+  const actorHeaders = {
+    'x-user-id': 'userId',
+    'x-employee-id': 'employeeId',
+    'x-branch-code': 'branchCode',
+    'x-branch-id': 'branchId',
+    'x-customer-id': 'customerId',
+    'x-correlation-id': 'correlationId'
+  };
+  if (actorHeaders[normalized]) return `{{${actorHeaders[normalized]}}}`;
+  const camelCase = normalized.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+  return `{{${camelCase}}}`;
 }
 
 function titleCase(value) {
@@ -573,6 +602,12 @@ function requestItem(method, typeIndex, service) {
       { key: 'X-Correlation-Id', value: '{{correlationId}}' }
     );
   }
+  if (method.path.startsWith('/api/') && service.slug === 'kyc-service') {
+    headers.push(
+      { key: 'X-Permissions', value: '{{permissions}}', description: 'Direct calls only; the gateway injects this from sessionId.' },
+      { key: 'X-Correlation-Id', value: '{{correlationId}}' }
+    );
+  }
   if (method.path.startsWith('/api/') && service.slug === 'statement-reporting-service') {
     headers.push(
       { key: 'X-User-Id', value: '{{userId}}', description: 'Direct calls only; the gateway injects this from sessionId.' },
@@ -595,6 +630,8 @@ function requestItem(method, typeIndex, service) {
       raw: JSON.stringify(exampleForType(method.bodyType, typeIndex), null, 2),
       options: { raw: { language: 'json' } }
     };
+  } else if (method.formdata.length) {
+    request.body = { mode: 'formdata', formdata: method.formdata };
   }
   const item = { name: `${method.httpMethod} ${titleCase(method.methodName)}`, request, response: [] };
   if (method.methodName === 'login') {
@@ -607,6 +644,20 @@ function requestItem(method, typeIndex, service) {
           '  const data = pm.response.json();',
           '  const sessionId = data.sessionId || data.token || data.accessToken;',
           '  if (sessionId) pm.collectionVariables.set("sessionId", sessionId);',
+          '}'
+        ]
+      }
+    }];
+  }
+  if (service.slug === 'kyc-service' && method.methodName === 'createSession') {
+    item.event = [{
+      listen: 'test',
+      script: {
+        type: 'text/javascript',
+        exec: [
+          'if (pm.response.code >= 200 && pm.response.code < 300) {',
+          '  const data = pm.response.json();',
+          '  if (data.sessionId) pm.collectionVariables.set("kycSessionId", data.sessionId);',
           '}'
         ]
       }

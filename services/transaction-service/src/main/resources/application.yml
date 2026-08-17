@@ -1,13 +1,13 @@
 server:
-  port: 8084
+  port: ${TRANSACTION_SERVICE_PORT:8084}
   forward-headers-strategy: framework
 spring:
   application:
     name: transaction-service
   datasource:
-    url: ${TRANSACTION_DB_URL:jdbc:mysql://localhost:3306/moneybags_transaction?createDatabaseIfNotExist=true}
-    username: ${TRANSACTION_DB_USERNAME:root}
-    password: ${TRANSACTION_DB_PASSWORD:password}
+    url: ${TRANSACTION_DB_URL:jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/moneybags_transaction?createDatabaseIfNotExist=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:password}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -19,7 +19,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8080/eureka/
+      defaultZone: ${EUREKA_URL:http://localhost:8080/eureka/}
 management:
   endpoints:
     web:
@@ -32,16 +32,16 @@ springdoc:
     path: /swagger-ui.html
 moneybags:
   transaction:
-    default-currency: INR
-    mini-statement-size: 10
+    default-currency: ${DEFAULT_CURRENCY:INR}
+    mini-statement-size: ${TRANSACTION_MINI_STATEMENT_SIZE:10}
     outbox:
-      batch-size: 50
-      fixed-delay-ms: 5000
-      max-attempts: 10
+      batch-size: ${TRANSACTION_OUTBOX_BATCH_SIZE:50}
+      fixed-delay-ms: ${TRANSACTION_OUTBOX_DELAY_MS:5000}
+      max-attempts: ${TRANSACTION_OUTBOX_MAX_ATTEMPTS:10}
     ledger:
-      cash-asset: "110100"
-      account-deposit-control: "210000"
-      term-deposit-control: "210100"
-      internal-clearing: "220100"
-      external-clearing: "220200"
-      fee-income: "410100"
+      cash-asset: ${GL_CASH_ASSET:110100}
+      account-deposit-control: ${GL_ACCOUNT_DEPOSIT_CONTROL:210000}
+      term-deposit-control: ${GL_TERM_DEPOSIT_CONTROL:210100}
+      internal-clearing: ${GL_INTERNAL_CLEARING:220100}
+      external-clearing: ${GL_EXTERNAL_CLEARING:220200}
+      fee-income: ${GL_FEE_INCOME:410100}

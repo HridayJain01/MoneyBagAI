@@ -1,16 +1,16 @@
 server:
   # Moved off 8082, which collided with customer-service. customer-service keeps 8082
   # because it is live, has a CI workflow pinned to it, and appears in the run scripts.
-  port: 8092
+  port: ${CONFIG_SERVICE_PORT:8092}
   forward-headers-strategy: framework
 
 spring:
   application:
     name: configuration-service
   datasource:
-    url: ${CONFIG_DB_URL:jdbc:mysql://localhost:3306/moneybags_configuration?createDatabaseIfNotExist=true&serverTimezone=UTC}
-    username: ${CONFIG_DB_USERNAME:root}
-    password: ${CONFIG_DB_PASSWORD:password}
+    url: ${CONFIG_DB_URL:jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/moneybags_configuration?createDatabaseIfNotExist=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:password}
   jpa:
     hibernate:
       ddl-auto: validate

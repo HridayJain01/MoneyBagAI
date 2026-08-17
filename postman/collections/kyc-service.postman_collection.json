@@ -1,0 +1,751 @@
+{
+  "info": {
+    "_postman_id": "2f9f05a2-0000-4000-8000-2f9f05a22f9f",
+    "name": "Moneybags - KYC Service",
+    "description": "Generated from the current Spring controller source for services/kyc-service. Requests default to direct service access on port 8093. Set baseUrl to http://localhost:8090 to exercise public routes through the API gateway. Internal /internal routes are intentionally called directly.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{sessionId}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.collectionVariables.get(\"idempotencyKey\")) {",
+          "  pm.collectionVariables.set(\"idempotencyKey\", pm.variables.replaceIn(\"{{$guid}}\"));",
+          "}",
+          "pm.collectionVariables.set(\"correlationId\", pm.variables.replaceIn(\"{{$guid}}\"));"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8093",
+      "type": "string"
+    },
+    {
+      "key": "sessionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "employeeId",
+      "value": "1004",
+      "type": "string"
+    },
+    {
+      "key": "branchCode",
+      "value": "BR001",
+      "type": "string"
+    },
+    {
+      "key": "permissions",
+      "value": "TRANSACTION_CREATE,TRANSACTION_APPROVE,TRANSACTION_CANCEL,TRANSACTION_CANCEL_ANY,TRANSACTION_REVERSE,TRANSACTION_VIEW,TRANSACTION_VIEW_ALL_BRANCHES,RECONCILIATION_MANAGE,STATEMENT_VIEW,REPORT_VIEW,REPORT_ADMIN,ACCOUNT_VIEW,ACCOUNT_VIEW_ALL_BRANCHES,ACCOUNT_OPEN,ACCOUNT_APPROVE,ACCOUNT_STATUS_MANAGE,CUSTOMER_READ,CUSTOMER_UPDATE,KYC_VERIFY,PRODUCT_READ,PRODUCT_MANAGE,USER_MANAGE,ROLE_PERMISSION_MANAGE,BRANCH_MANAGE,EMPLOYEE_MANAGE,CONFIG_MANAGE,NOTIFICATION_MANAGE,AUDIT_VIEW",
+      "type": "string"
+    },
+    {
+      "key": "serviceName",
+      "value": "postman",
+      "type": "string"
+    },
+    {
+      "key": "idempotencyKey",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "correlationId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "account",
+      "value": "a0000000-0000-0000-0000-000000000101",
+      "type": "string"
+    },
+    {
+      "key": "accountHolderId",
+      "value": "CIF900101",
+      "type": "string"
+    },
+    {
+      "key": "accountId",
+      "value": "a0000000-0000-0000-0000-000000000101",
+      "type": "string"
+    },
+    {
+      "key": "accountNumber",
+      "value": "510000000101",
+      "type": "string"
+    },
+    {
+      "key": "actionType",
+      "value": "ACCOUNT_OPENING",
+      "type": "string"
+    },
+    {
+      "key": "aggregateId",
+      "value": "a0000000-0000-0000-0000-000000000101",
+      "type": "string"
+    },
+    {
+      "key": "aggregateType",
+      "value": "ACCOUNT",
+      "type": "string"
+    },
+    {
+      "key": "applicationId",
+      "value": "APP-000001",
+      "type": "string"
+    },
+    {
+      "key": "actorEmployeeId",
+      "value": "101",
+      "type": "string"
+    },
+    {
+      "key": "amount",
+      "value": "100.00",
+      "type": "string"
+    },
+    {
+      "key": "branch",
+      "value": "BR001",
+      "type": "string"
+    },
+    {
+      "key": "branchId",
+      "value": "BR001",
+      "type": "string"
+    },
+    {
+      "key": "cardId",
+      "value": "card-000001",
+      "type": "string"
+    },
+    {
+      "key": "channel",
+      "value": "NEFT",
+      "type": "string"
+    },
+    {
+      "key": "cif",
+      "value": "CIF900101",
+      "type": "string"
+    },
+    {
+      "key": "cifNo",
+      "value": "CIF900101",
+      "type": "string"
+    },
+    {
+      "key": "code",
+      "value": "110100",
+      "type": "string"
+    },
+    {
+      "key": "configKey",
+      "value": "business-date",
+      "type": "string"
+    },
+    {
+      "key": "createdBy",
+      "value": "101",
+      "type": "string"
+    },
+    {
+      "key": "customerAccountId",
+      "value": "a0000000-0000-0000-0000-000000000101",
+      "type": "string"
+    },
+    {
+      "key": "customerId",
+      "value": "CIF900101",
+      "type": "string"
+    },
+    {
+      "key": "date",
+      "value": "2026-08-17",
+      "type": "string"
+    },
+    {
+      "key": "documentId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "documentType",
+      "value": "PAN",
+      "type": "string"
+    },
+    {
+      "key": "empId",
+      "value": "1002",
+      "type": "string"
+    },
+    {
+      "key": "employeeId",
+      "value": "1004",
+      "type": "string"
+    },
+    {
+      "key": "eventId",
+      "value": "{{$guid}}",
+      "type": "string"
+    },
+    {
+      "key": "eventType",
+      "value": "ACCOUNT_UPDATED",
+      "type": "string"
+    },
+    {
+      "key": "fileId",
+      "value": "file-000001",
+      "type": "string"
+    },
+    {
+      "key": "fiscalYear",
+      "value": "2026",
+      "type": "string"
+    },
+    {
+      "key": "flagKey",
+      "value": "instant-payments",
+      "type": "string"
+    },
+    {
+      "key": "from",
+      "value": "2026-08-01",
+      "type": "string"
+    },
+    {
+      "key": "holdId",
+      "value": "hold-000001",
+      "type": "string"
+    },
+    {
+      "key": "holidayId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "ifsc",
+      "value": "MBAG0000001",
+      "type": "string"
+    },
+    {
+      "key": "ifscCode",
+      "value": "MBAG0000001",
+      "type": "string"
+    },
+    {
+      "key": "journalId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "kycSessionId",
+      "value": "kyc-session-000001",
+      "type": "string"
+    },
+    {
+      "key": "limitType",
+      "value": "PER_TRANSACTION",
+      "type": "string"
+    },
+    {
+      "key": "maxAmount",
+      "value": "100000.00",
+      "type": "string"
+    },
+    {
+      "key": "minAmount",
+      "value": "0.01",
+      "type": "string"
+    },
+    {
+      "key": "name",
+      "value": "Asha",
+      "type": "string"
+    },
+    {
+      "key": "namespace",
+      "value": "banking",
+      "type": "string"
+    },
+    {
+      "key": "notificationId",
+      "value": "notification-000001",
+      "type": "string"
+    },
+    {
+      "key": "productCategory",
+      "value": "DEPOSIT",
+      "type": "string"
+    },
+    {
+      "key": "productCode",
+      "value": "SAV-REG",
+      "type": "string"
+    },
+    {
+      "key": "productType",
+      "value": "SAVINGS",
+      "type": "string"
+    },
+    {
+      "key": "productVersionId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "reference",
+      "value": "JE-POSTMAN-001",
+      "type": "string"
+    },
+    {
+      "key": "recipient",
+      "value": "asha@example.com",
+      "type": "string"
+    },
+    {
+      "key": "requestId",
+      "value": "request-000001",
+      "type": "string"
+    },
+    {
+      "key": "rail",
+      "value": "INTERNAL",
+      "type": "string"
+    },
+    {
+      "key": "roleId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "ruleId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "scheduleId",
+      "value": "schedule-000001",
+      "type": "string"
+    },
+    {
+      "key": "frameNumber",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "search",
+      "value": "admin",
+      "type": "string"
+    },
+    {
+      "key": "size",
+      "value": "25",
+      "type": "string"
+    },
+    {
+      "key": "sourceService",
+      "value": "account-service",
+      "type": "string"
+    },
+    {
+      "key": "status",
+      "value": "ACTIVE",
+      "type": "string"
+    },
+    {
+      "key": "to",
+      "value": "2026-08-17",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "download-token",
+      "type": "string"
+    },
+    {
+      "key": "transactionId",
+      "value": "tx-000001",
+      "type": "string"
+    },
+    {
+      "key": "transactionType",
+      "value": "DEPOSIT",
+      "type": "string"
+    },
+    {
+      "key": "query",
+      "value": "Asha",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "4",
+      "type": "string"
+    },
+    {
+      "key": "versionNumber",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Service Operations",
+      "item": [
+        {
+          "name": "GET Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/actuator/health"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Generated OpenAPI",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api-docs"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "KycController",
+      "description": "Source: services/kyc-service/src/main/java/com/harshul/demo/kyc/controller/KycController.java",
+      "item": [
+        {
+          "name": "POST Create Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/kyc/sessions",
+            "description": "Generated from services/kyc-service/src/main/java/com/harshul/demo/kyc/controller/KycController.java.createSession\n\nRequest body type: CreateKycSessionRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cifNo\": \"CIF900101\",\n  \"purpose\": \"string\",\n  \"documentType\": \"AADHAAR\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) {",
+                  "  const data = pm.response.json();",
+                  "  if (data.sessionId) pm.collectionVariables.set(\"kycSessionId\", data.sessionId);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Get Session",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/kyc/sessions/{{kycSessionId}}",
+            "description": "Generated from services/kyc-service/src/main/java/com/harshul/demo/kyc/controller/KycController.java.getSession"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Upload Document",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/kyc/sessions/{{kycSessionId}}/documents",
+            "description": "Generated from services/kyc-service/src/main/java/com/harshul/demo/kyc/controller/KycController.java.uploadDocument",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "documentType",
+                  "value": "PAN",
+                  "type": "text"
+                },
+                {
+                  "key": "file",
+                  "value": "",
+                  "type": "file"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get Pending Sessions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/kyc/customers/{{cif}}/sessions/pending",
+            "description": "Generated from services/kyc-service/src/main/java/com/harshul/demo/kyc/controller/KycController.java.getPendingSessions"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get Document",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/kyc/sessions/{{kycSessionId}}/documents/{{documentType}}",
+            "description": "Generated from services/kyc-service/src/main/java/com/harshul/demo/kyc/controller/KycController.java.getDocument"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Upload Frames",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/kyc/sessions/{{kycSessionId}}/frames",
+            "description": "Generated from services/kyc-service/src/main/java/com/harshul/demo/kyc/controller/KycController.java.uploadFrames",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "frames",
+                  "value": "",
+                  "type": "file"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get Frames",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/kyc/sessions/{{kycSessionId}}/frames",
+            "description": "Generated from services/kyc-service/src/main/java/com/harshul/demo/kyc/controller/KycController.java.getFrames"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get Frame",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/kyc/sessions/{{kycSessionId}}/frames/{{frameNumber}}",
+            "description": "Generated from services/kyc-service/src/main/java/com/harshul/demo/kyc/controller/KycController.java.getFrame"
+          },
+          "response": []
+        },
+        {
+          "name": "GET Get Result",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/kyc/sessions/{{kycSessionId}}/result",
+            "description": "Generated from services/kyc-service/src/main/java/com/harshul/demo/kyc/controller/KycController.java.getResult"
+          },
+          "response": []
+        },
+        {
+          "name": "POST Approve",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}"
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/kyc/sessions/{{kycSessionId}}/approve",
+            "description": "Generated from services/kyc-service/src/main/java/com/harshul/demo/kyc/controller/KycController.java.approve\n\nRequest body type: ManualDecisionRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Postman example\",\n  \"remarks\": \"Approved from Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Reject",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Employee-Id",
+                "value": "{{employeeId}}"
+              },
+              {
+                "key": "X-Permissions",
+                "value": "{{permissions}}",
+                "description": "Direct calls only; the gateway injects this from sessionId."
+              },
+              {
+                "key": "X-Correlation-Id",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/kyc/sessions/{{kycSessionId}}/reject",
+            "description": "Generated from services/kyc-service/src/main/java/com/harshul/demo/kyc/controller/KycController.java.reject\n\nRequest body type: ManualDecisionRequest",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Postman example\",\n  \"remarks\": \"Approved from Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

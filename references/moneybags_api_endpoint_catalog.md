@@ -70,9 +70,9 @@ Use `201 Created` for new resources, `202 Accepted` for queued approval/export/j
 | POST | `/api/v1/auth/introspect` | internal | Validate token/subject for trusted internal callers if needed. |
 | GET | `/.well-known/jwks.json` | public | JWT verification keys for gateway/services. |
 
-## 3. Customer and KYC Service
+## 3. Customer and KYC Services
 
-**Schema:** `CUSTOMERS`, `CUSTOMER_ADDRESSES`, `CUSTOMER_DOCUMENTATION`; **Derived:** communication preferences, risk classifications, beneficiaries, nominees, document expiry alerts.
+**Customer schema:** `CUSTOMERS`, `CUSTOMER_ADDRESSES`, legacy customer-owned KYC document metadata, and `BENEFICIARIES`. **KYC schema:** `KYC_SESSIONS`, `KYC_DOCUMENTS`, `KYC_FRAMES`, and `KYC_VERIFICATIONS`. Customer Service owns the canonical customer KYC status; KYC Service owns the workflow and binary evidence.
 
 | Method | Endpoint | Permission / access | Purpose |
 |---|---|---|---|
@@ -98,6 +98,17 @@ Use `201 Created` for new resources, `202 Accepted` for queued approval/export/j
 | POST | `/api/v1/customers/{cif}/kyc/verify` | `KYC_VERIFY` | Mark customer KYC verified after all requirements pass. |
 | POST | `/api/v1/customers/{cif}/kyc/reject` | `KYC_VERIFY` | Mark customer KYC rejected with reason. |
 | POST | `/api/v1/customers/{cif}/kyc/resubmit` | owner/staff | Move rejected KYC back to pending after resubmission. |
+| POST | `/api/v1/kyc/sessions` | `KYC_VERIFY` | Validate the CIF through Customer Service and create a KYC session. |
+| GET | `/api/v1/kyc/sessions/{sessionId}` | `KYC_VERIFY` | Read the KYC session and current workflow status. |
+| GET | `/api/v1/kyc/customers/{cif}/sessions/pending` | `KYC_VERIFY` | List pending KYC sessions for a customer. |
+| POST | `/api/v1/kyc/sessions/{sessionId}/documents` | `KYC_VERIFY` | Store one identity document as multipart binary evidence. |
+| GET | `/api/v1/kyc/sessions/{sessionId}/documents/{documentType}` | `KYC_VERIFY` | Download the KYC-owned identity document. |
+| POST | `/api/v1/kyc/sessions/{sessionId}/frames` | `KYC_VERIFY` | Store one or more face frames as multipart binary evidence. |
+| GET | `/api/v1/kyc/sessions/{sessionId}/frames` | `KYC_VERIFY` | List captured frame metadata. |
+| GET | `/api/v1/kyc/sessions/{sessionId}/frames/{frameNumber}` | `KYC_VERIFY` | Download one captured frame. |
+| GET | `/api/v1/kyc/sessions/{sessionId}/result` | `KYC_VERIFY` | Read the current verification result. |
+| POST | `/api/v1/kyc/sessions/{sessionId}/approve` | `KYC_VERIFY` | Approve the session and idempotently synchronize Customer Service. |
+| POST | `/api/v1/kyc/sessions/{sessionId}/reject` | `KYC_VERIFY` | Reject the session and idempotently synchronize Customer Service. |
 | GET | `/api/v1/customers/{cif}/risk-classification` | owner or `CUSTOMER_READ` | Read risk classification. |
 | PUT | `/api/v1/customers/{cif}/risk-classification` | `CUSTOMER_UPDATE` | Set risk class and assessment rationale. |
 | GET | `/api/v1/customers/{cif}/beneficiaries` | owner or staff scope | List registered transfer beneficiaries. |
@@ -310,6 +321,7 @@ Use `201 Created` for new resources, `202 Accepted` for queued approval/export/j
 
 | Method | Endpoint | Permission / access | Purpose |
 |---|---|---|---|
+| POST | `/api/v1/notifications` | `NOTIFICATION_MANAGE` | Queue an email, SMS or push notification; delivery is asynchronous and idempotent when `Idempotency-Key` is supplied. |
 | GET | `/api/v1/notifications` | owner/operations | List notifications by recipient, type, status and date. |
 | GET | `/api/v1/notifications/{notificationId}` | owner/operations | Read delivery status. |
 | POST | `/api/v1/notifications/{notificationId}/resend` | owner/operations policy | Request resend of eligible notification. |
@@ -321,7 +333,6 @@ Use `201 Created` for new resources, `202 Accepted` for queued approval/export/j
 | POST | `/api/v1/notification-templates/{templateId}/deactivate` | notification admin | Deactivate template. |
 | GET | `/api/v1/notifications/failures` | operations | List failed/delayed deliveries. |
 | POST | `/api/v1/notifications/failures/{notificationId}/retry` | operations | Retry failed delivery. |
-| POST | `/internal/v1/notifications/otp` | Auth service | Urgently deliver OTP; asynchronous audit still applies. |
 
 ## 11. Audit Service
 

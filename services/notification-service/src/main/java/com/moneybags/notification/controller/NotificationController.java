@@ -5,13 +5,16 @@ import com.moneybags.notification.entity.NotificationTemplate;
 import com.moneybags.notification.repository.NotificationTemplateRepository;
 import com.moneybags.notification.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,18 +25,23 @@ public class NotificationController {
     private final NotificationService notificationService;
     private final NotificationTemplateRepository templates;
 
-    /** Producer path. Idempotent on Idempotency-Key. */
+    /**
+     * Public, gateway-protected producer path. Idempotent on Idempotency-Key.
+     * Notifications are still delivered asynchronously by the dispatcher.
+     */
     @Operation(summary = "Queue a notification")
-    @PostMapping("/internal/v1/notifications")
+    @PostMapping("/api/v1/notifications")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public NotificationDetail queue(
             @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey,
-            @RequestHeader(value = "X-Service-Name", required = false) String serviceName,
+            @Parameter(hidden = true)
+            @RequestHeader(value = "X-Permissions", required = false) String permissions,
             @Valid @RequestBody SendRequest request) {
+        requireNotificationManage(permissions);
         String dedupKey = (idempotencyKey == null || idempotencyKey.isBlank())
                 ? UUID.randomUUID().toString()
                 : idempotencyKey;
-        return notificationService.queue(dedupKey, serviceName == null ? "unknown" : serviceName, request);
+        return notificationService.queue(dedupKey, "external-api", request);
     }
 
     @GetMapping("/api/v1/notifications")
@@ -81,5 +89,15 @@ public class NotificationController {
         return new TemplateDetail(template.getTemplateCode(), template.getChannel(),
                 template.getSubjectTemplate(), template.getBodyTemplate(), template.getLocale(),
                 Boolean.TRUE.equals(template.getActive()), template.getUpdatedAt());
+    }
+
+    private void requireNotificationManage(String permissions) {
+        boolean allowed = permissions != null && Arrays.stream(permissions.split(","))
+                .map(String::trim)
+                .anyMatch("NOTIFICATION_MANAGE"::equals);
+        if (!allowed) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "NOTIFICATION_MANAGE permission is required to queue notifications");
+        }
     }
 }

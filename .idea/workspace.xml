@@ -5,16 +5,50 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3ed1cd6b-f7be-4008-9942-5ef42f39a0a8" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/customer-service/src/main/java/com/moneybags/customer/controller/BeneficiaryController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/customer-service/src/main/java/com/moneybags/customer/controller/BeneficiaryHistoryController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/customer-service/src/main/java/com/moneybags/customer/service/BeneficiaryHistoryService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/customer-service/src/main/java/com/moneybags/customer/service/BeneficiaryService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/customer-service/src/main/java/com/moneybags/customer/service/CustomerOperationsService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/customer-service/src/main/java/com/moneybags/customer/service/CustomerOperationsService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/customer-service/src/main/java/com/moneybags/customer/service/impl/BeneficiaryHistoryServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/customer-service/src/main/java/com/moneybags/customer/service/impl/BeneficiaryServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/customer-service/src/main/java/com/moneybags/customer/service/impl/CustomerOperationsServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/customer-service/src/main/java/com/moneybags/customer/service/impl/CustomerOperationsServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SERVICE_SCHEMA_DIVISION.md" beforeDir="false" afterPath="$PROJECT_DIR$/SERVICE_SCHEMA_DIVISION.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/postman/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/postman/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/postman/collections/Moneybags - Notification Service/NotificationController/POST Queue.request.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/postman/collections/Moneybags - Notification Service/NotificationController/POST Queue.request.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/postman/collections/account-service.postman_collection.json" beforeDir="false" afterPath="$PROJECT_DIR$/postman/collections/account-service.postman_collection.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/postman/collections/api-gateway.postman_collection.json" beforeDir="false" afterPath="$PROJECT_DIR$/postman/collections/api-gateway.postman_collection.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/postman/collections/audit-service.postman_collection.json" beforeDir="false" afterPath="$PROJECT_DIR$/postman/collections/audit-service.postman_collection.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/postman/collections/branch-employee-service.postman_collection.json" beforeDir="false" afterPath="$PROJECT_DIR$/postman/collections/branch-employee-service.postman_collection.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/postman/collections/configuration-service.postman_collection.json" beforeDir="false" afterPath="$PROJECT_DIR$/postman/collections/configuration-service.postman_collection.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/postman/collections/customer-service.postman_collection.json" beforeDir="false" afterPath="$PROJECT_DIR$/postman/collections/customer-service.postman_collection.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/postman/collections/eureka-server.postman_collection.json" beforeDir="false" afterPath="$PROJECT_DIR$/postman/collections/eureka-server.postman_collection.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/postman/collections/identity-service.postman_collection.json" beforeDir="false" afterPath="$PROJECT_DIR$/postman/collections/identity-service.postman_collection.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/postman/collections/ledger-service.postman_collection.json" beforeDir="false" afterPath="$PROJECT_DIR$/postman/collections/ledger-service.postman_collection.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/postman/collections/legacy-product-service.postman_collection.json" beforeDir="false" afterPath="$PROJECT_DIR$/postman/collections/legacy-product-service.postman_collection.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/postman/collections/notification-service.postman_collection.json" beforeDir="false" afterPath="$PROJECT_DIR$/postman/collections/notification-service.postman_collection.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/postman/collections/product-service.postman_collection.json" beforeDir="false" afterPath="$PROJECT_DIR$/postman/collections/product-service.postman_collection.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/postman/collections/statement-reporting-service.postman_collection.json" beforeDir="false" afterPath="$PROJECT_DIR$/postman/collections/statement-reporting-service.postman_collection.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/postman/collections/transaction-service.postman_collection.json" beforeDir="false" afterPath="$PROJECT_DIR$/postman/collections/transaction-service.postman_collection.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/postman/coverage-report.json" beforeDir="false" afterPath="$PROJECT_DIR$/postman/coverage-report.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/postman/generate-collections.cjs" beforeDir="false" afterPath="$PROJECT_DIR$/postman/generate-collections.cjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/references/moneybags_api_endpoint_catalog.md" beforeDir="false" afterPath="$PROJECT_DIR$/references/moneybags_api_endpoint_catalog.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/run-all.ps1" beforeDir="false" afterPath="$PROJECT_DIR$/run-all.ps1" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/account-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/services/account-service/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/api-gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/services/api-gateway/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/audit-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/services/audit-service/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/branch-employee-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/services/branch-employee-service/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/configuration-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/services/configuration-service/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/customer-service/src/main/java/com/moneybags/customer/entity/Customer.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/customer-service/src/main/java/com/moneybags/customer/entity/Customer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/customer-service/src/main/java/com/moneybags/customer/mapper/CustomerMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/customer-service/src/main/java/com/moneybags/customer/mapper/CustomerMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/customer-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/services/customer-service/src/main/resources/application.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/customer-service/src/test/java/com/moneybags/customer/CustomerServiceIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/customer-service/src/test/java/com/moneybags/customer/CustomerServiceIntegrationTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/eureka-server/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/services/eureka-server/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/identity-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/services/identity-service/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/ledger-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/services/ledger-service/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/notification-service/src/main/java/com/moneybags/notification/NotificationServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/notification-service/src/main/java/com/moneybags/notification/NotificationServiceApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/notification-service/src/main/java/com/moneybags/notification/controller/NotificationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/notification-service/src/main/java/com/moneybags/notification/controller/NotificationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/notification-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/services/notification-service/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/product-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/services/product-service/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/statement-reporting-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/services/statement-reporting-service/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/transaction-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/services/transaction-service/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stop.ps1" beforeDir="false" afterPath="$PROJECT_DIR$/stop.ps1" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,6 +56,11 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -32,8 +71,8 @@
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/jay-sharmaa/money-bag-mumbai&quot;,
-    &quot;accountId&quot;: &quot;85c0ab2e-f155-446b-9377-2f27dee07053&quot;
+    &quot;url&quot;: &quot;https://github.com/jay-sharmaa/money-bag-mumbai.git&quot;,
+    &quot;accountId&quot;: &quot;b2b2f62a-e026-4f84-b710-d24caff7b01d&quot;
   }
 }</component>
   <component name="MavenImportPreferences">
@@ -77,9 +116,9 @@
     &quot;Spring Boot.StatementReportingApplication.executor&quot;: &quot;Run&quot;,
     &quot;Spring Boot.TransactionServiceApplication.executor&quot;: &quot;Run&quot;,
     &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;test-notification-branch&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/moneybagsfinal&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Jheel Parikh/IdeaProjects/money-bag-mumbai&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.0&quot;,

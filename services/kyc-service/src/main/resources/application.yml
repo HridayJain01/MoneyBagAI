@@ -1,0 +1,45 @@
+server:
+  port: ${KYC_SERVICE_PORT:8093}
+  forward-headers-strategy: framework
+
+spring:
+  application:
+    name: kyc-service
+  servlet:
+    multipart:
+      max-file-size: ${KYC_MAX_FILE_SIZE:50MB}
+      max-request-size: ${KYC_MAX_REQUEST_SIZE:100MB}
+  datasource:
+    url: ${KYC_DB_URL:jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/moneybags_kyc?createDatabaseIfNotExist=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:password}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    database-platform: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
+    properties:
+      hibernate.jdbc.time_zone: UTC
+  flyway:
+    enabled: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8080/eureka/}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    persist-authorization: true

@@ -8,7 +8,7 @@ gated on a TCP listener rather than on readiness.
 
 Phases:
   0. Preflight   - java 17+, maven, MySQL reachable
-  1. Schemas     - CREATE DATABASE IF NOT EXISTS for all 11 schemas
+  1. Schemas     - CREATE DATABASE IF NOT EXISTS for all 12 schemas
   2. Build       - one reactor build from the root aggregator pom
   3. Start       - health-gated waves, launching built jars
   4. Smoke       - optional end-to-end flow
@@ -24,8 +24,10 @@ param(
     [switch]$Reset,
     [switch]$SkipBuild,
     [switch]$Smoke,
+    [string]$MySqlHost = 'localhost',
+    [int]$MySqlPort = 3306,
     [string]$MySqlUser = 'root',
-    [string]$MySqlPassword = 'password',
+    [string]$MySqlPassword = 'jheel',
     [int]$HealthTimeoutSeconds = 180
 )
 
@@ -50,6 +52,73 @@ $projectRoot   = $PSScriptRoot
 $servicesRoot  = Join-Path $projectRoot 'services'
 $logDirectory  = Join-Path $projectRoot 'logs'
 $pidDirectory  = Join-Path $projectRoot '.moneybags-pids'
+
+function Import-DotEnv {
+    param([string]$Path)
+
+    if (-not (Test-Path -LiteralPath $Path)) { return 0 }
+
+    $loaded = 0
+    foreach ($rawLine in Get-Content -LiteralPath $Path) {
+        $line = $rawLine.Trim()
+        if (-not $line -or $line.StartsWith('#')) { continue }
+        if ($line.StartsWith('export ')) { $line = $line.Substring(7).Trim() }
+
+        $separator = $line.IndexOf('=')
+        if ($separator -lt 1) { continue }
+        $name = $line.Substring(0, $separator).Trim()
+        if ($name -notmatch '^[A-Za-z_][A-Za-z0-9_]*$') {
+            throw "Invalid environment variable name '$name' in $Path"
+        }
+
+        $value = $line.Substring($separator + 1).Trim()
+        if ($value.Length -ge 2 -and
+            (($value.StartsWith('"') -and $value.EndsWith('"')) -or
+             ($value.StartsWith("'") -and $value.EndsWith("'")))) {
+            $value = $value.Substring(1, $value.Length - 2)
+        }
+
+        # The root .env is the single source of truth for local launches. Always
+        # refresh the process value so edits are picked up in the same shell.
+        [Environment]::SetEnvironmentVariable($name, $value, 'Process')
+        $loaded++
+    }
+    return $loaded
+}
+
+$envFile = Join-Path $projectRoot '.env'
+$loadedEnvironmentVariables = Import-DotEnv -Path $envFile
+if ($loadedEnvironmentVariables -gt 0) {
+    Write-Host "Loaded $loadedEnvironmentVariables values from $envFile" -ForegroundColor DarkGray
+}
+
+if (-not $PSBoundParameters.ContainsKey('MySqlHost') -and $env:DB_HOST) {
+    $MySqlHost = $env:DB_HOST
+}
+if (-not $PSBoundParameters.ContainsKey('MySqlPort') -and $env:DB_PORT) {
+    $MySqlPort = [int]$env:DB_PORT
+}
+if (-not $PSBoundParameters.ContainsKey('MySqlUser') -and $env:DB_USERNAME) {
+    $MySqlUser = $env:DB_USERNAME
+}
+if (-not $PSBoundParameters.ContainsKey('MySqlPassword') -and $env:DB_PASSWORD) {
+    $MySqlPassword = $env:DB_PASSWORD
+}
+
+function Get-EnvironmentPort {
+    param([string]$Name, [int]$Default)
+    $value = [Environment]::GetEnvironmentVariable($Name, 'Process')
+    return $(if ($value) { [int]$value } else { $Default })
+}
+
+$eurekaServerPort = Get-EnvironmentPort 'EUREKA_SERVER_PORT' 8080
+$apiGatewayPort = Get-EnvironmentPort 'API_GATEWAY_PORT' 8090
+$javaExecutable = if ($env:JAVA_HOME -and (Test-Path (Join-Path $env:JAVA_HOME 'bin\java.exe'))) {
+    Join-Path $env:JAVA_HOME 'bin\java.exe'
+} else {
+    (Get-Command java.exe -ErrorAction Stop).Source
+}
+
 New-Item -ItemType Directory -Path $logDirectory -Force | Out-Null
 New-Item -ItemType Directory -Path $pidDirectory -Force | Out-Null
 
@@ -58,23 +127,24 @@ New-Item -ItemType Directory -Path $pidDirectory -Force | Out-Null
 # resolves against a populated registry.
 $waves = @(
     @{ Name = 'Registry';    Services = @(
-        @{ Name = 'eureka-server'; Port = 8080 }) },
+        @{ Name = 'eureka-server'; Port = $eurekaServerPort }) },
     @{ Name = 'Foundation';  Services = @(
-        @{ Name = 'identity-service';      Port = 8087 },
-        @{ Name = 'product-service';       Port = 8088 },
-        @{ Name = 'branch-employee-service'; Port = 8081 },
-        @{ Name = 'configuration-service'; Port = 8092 },
-        @{ Name = 'customer-service';      Port = 8082 },
-        @{ Name = 'ledger-service';        Port = 8085 },
-        @{ Name = 'notification-service';  Port = 8089 },
-        @{ Name = 'audit-service';         Port = 8091 }) },
+        @{ Name = 'identity-service';      Port = Get-EnvironmentPort 'IDENTITY_SERVICE_PORT' 8087 },
+        @{ Name = 'product-service';       Port = Get-EnvironmentPort 'PRODUCT_SERVICE_PORT' 8088 },
+        @{ Name = 'branch-employee-service'; Port = Get-EnvironmentPort 'BRANCH_SERVICE_PORT' 8081 },
+        @{ Name = 'configuration-service'; Port = Get-EnvironmentPort 'CONFIG_SERVICE_PORT' 8092 },
+        @{ Name = 'customer-service';      Port = Get-EnvironmentPort 'CUSTOMER_SERVICE_PORT' 8082 },
+        @{ Name = 'kyc-service';           Port = Get-EnvironmentPort 'KYC_SERVICE_PORT' 8093 },
+        @{ Name = 'ledger-service';        Port = Get-EnvironmentPort 'LEDGER_SERVICE_PORT' 8085 },
+        @{ Name = 'notification-service';  Port = Get-EnvironmentPort 'NOTIFICATION_SERVICE_PORT' 8089 },
+        @{ Name = 'audit-service';         Port = Get-EnvironmentPort 'AUDIT_SERVICE_PORT' 8091 }) },
     @{ Name = 'Accounts';    Services = @(
-        @{ Name = 'account-service'; Port = 8083 }) },
+        @{ Name = 'account-service'; Port = Get-EnvironmentPort 'ACCOUNT_SERVICE_PORT' 8083 }) },
     @{ Name = 'Financial';   Services = @(
-        @{ Name = 'transaction-service';         Port = 8084 },
-        @{ Name = 'statement-reporting-service'; Port = 8086 }) },
+        @{ Name = 'transaction-service';         Port = Get-EnvironmentPort 'TRANSACTION_SERVICE_PORT' 8084 },
+        @{ Name = 'statement-reporting-service'; Port = Get-EnvironmentPort 'STATEMENT_SERVICE_PORT' 8086 }) },
     @{ Name = 'Edge';        Services = @(
-        @{ Name = 'api-gateway'; Port = 8090 }) }
+        @{ Name = 'api-gateway'; Port = $apiGatewayPort }) }
 )
 
 # One schema per service, all under the moneybags_ prefix so -Reset can drop the whole
@@ -83,7 +153,7 @@ $schemas = @(
     'moneybags_identity', 'moneybags_customer', 'moneybags_branch',
     'moneybags_configuration', 'moneybags_product', 'moneybags_account',
     'moneybags_transaction', 'moneybags_ledger', 'moneybags_statement',
-    'moneybags_notification', 'moneybags_audit'
+    'moneybags_notification', 'moneybags_audit', 'moneybags_kyc'
 )
 
 function Write-Phase {
@@ -131,7 +201,8 @@ function Invoke-MySqlStatement {
     $startInfo.CreateNoWindow = $true
     $startInfo.RedirectStandardOutput = $true
     $startInfo.RedirectStandardError = $true
-    $startInfo.Arguments = '-u "{0}" -e "{1}"' -f $MySqlUser, $Statement.Replace('"', '\"')
+    $startInfo.Arguments = '-h "{0}" -P {1} -u "{2}" -e "{3}"' -f `
+        $MySqlHost, $MySqlPort, $MySqlUser, $Statement.Replace('"', '\"')
 
     # MYSQL_PWD keeps the password off the command line, which is both safer than
     # -pPASSWORD and the reason mysql stops emitting its warning at all.
@@ -171,10 +242,10 @@ if (-not (Get-Command mvn.cmd -ErrorAction SilentlyContinue)) {
 }
 Write-Host '  Maven found' -ForegroundColor Green
 
-if (-not (Test-TcpPort -TargetHost 'localhost' -Port 3306)) {
-    throw "MySQL is not reachable on localhost:3306. Start the MySQL service and retry."
+if (-not (Test-TcpPort -TargetHost $MySqlHost -Port $MySqlPort)) {
+    throw "MySQL is not reachable on ${MySqlHost}:${MySqlPort}. Start the MySQL service and retry."
 }
-Write-Host '  MySQL reachable on 3306' -ForegroundColor Green
+Write-Host "  MySQL reachable on ${MySqlHost}:${MySqlPort}" -ForegroundColor Green
 
 # Java's NIO selector opens its internal pipe over an AF_UNIX socket. If that is broken
 # on this machine, every Tomcat and Netty server fails with "Unable to establish loopback
@@ -287,7 +358,7 @@ function Start-MoneyBagsService {
     # The jar path is quoted because Start-Process joins -ArgumentList into a single
     # command line. This repository lives under "C:\Users\Hriday Jain\...", so an
     # unquoted path would reach java as two separate arguments.
-    $process = Start-Process -FilePath 'java' `
+    $process = Start-Process -FilePath $javaExecutable `
         -ArgumentList @('-jar', ('"{0}"' -f $jar.FullName)) `
         -WorkingDirectory $serviceDirectory `
         -WindowStyle Hidden `
@@ -361,7 +432,7 @@ $expected = ($waves | ForEach-Object { $_.Services } | ForEach-Object { $_.Name 
 $deadline = (Get-Date).AddSeconds(90)
 while ((Get-Date) -lt $deadline) {
     try {
-        $registry = Invoke-RestMethod -Uri 'http://localhost:8080/eureka/apps' `
+        $registry = Invoke-RestMethod -Uri "http://localhost:$eurekaServerPort/eureka/apps" `
             -Headers @{ Accept = 'application/json' } -TimeoutSec 5
         $registered = @($registry.applications.application | ForEach-Object { $_.name })
         # identity-service registers under its Eureka id, not its module name.
@@ -384,12 +455,12 @@ if ($failed.Count -gt 0) {
     Write-Host 'All services healthy.' -ForegroundColor Green
 }
 Write-Host ''
-Write-Host '  Gateway      http://localhost:8090'
-Write-Host '  Swagger UI   http://localhost:8090/swagger-ui.html'
-Write-Host '  Eureka       http://localhost:8080'
+Write-Host "  Gateway      http://localhost:$apiGatewayPort"
+Write-Host "  Swagger UI   http://localhost:$apiGatewayPort/swagger-ui.html"
+Write-Host "  Eureka       http://localhost:$eurekaServerPort"
 Write-Host "  Logs         $logDirectory"
 Write-Host ''
-Write-Host '  Sign in:  POST http://localhost:8090/api/v1/auth/login'
+Write-Host "  Sign in:  POST http://localhost:$apiGatewayPort/api/v1/auth/login"
 Write-Host '            {"username":"teller1","password":"Password@123"}'
 Write-Host '            then send  Authorization: Bearer <accessToken>'
 

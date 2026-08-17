@@ -3,12 +3,14 @@ package com.moneybags.customer;
 import com.moneybags.customer.client.SecurityClient;
 import com.moneybags.customer.dto.CustomerOperations.*;
 import com.moneybags.customer.dto.CustomerRequest;
+import com.moneybags.customer.dto.ExternalKycModels.KycDecisionRequest;
 import com.moneybags.customer.entity.*;
 import com.moneybags.customer.enums.*;
 import com.moneybags.customer.exception.ConflictException;
 import com.moneybags.customer.repository.*;
 import com.moneybags.customer.service.CustomerOperationsService;
 import com.moneybags.customer.service.CustomerService;
+import com.moneybags.customer.service.ExternalKycSyncService;
 import com.moneybags.customer.service.KycDocumentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
+import java.time.Instant;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
@@ -38,6 +41,7 @@ class CustomerServiceIntegrationTest {
     @Autowired KycRejectionHistoryRepository rejectionHistory;
     @Autowired CustomerDomainEventRepository domainEvents;
     @Autowired KycDocumentService kycDocumentService;
+    @Autowired ExternalKycSyncService externalKycSyncService;
     @MockBean SecurityClient securityClient;
 
     @BeforeEach
@@ -139,6 +143,31 @@ class CustomerServiceIntegrationTest {
         assertThat(customers.findById(cif).orElseThrow().getKycStatus()).isEqualTo(KycStatus.VERIFIED);
         assertThat(domainEvents.findAll()).extracting(CustomerDomainEvent::getEventType)
                 .containsOnly("KycVerified");
+    }
+
+    @Test
+    void synchronizesExternalKycDecisionsIdempotentlyAndIgnoresStaleDecisions() {
+        String cif = createCustomer();
+        Instant rejectedAt = Instant.parse("2026-08-17T08:00:00Z");
+        KycDecisionRequest rejected = new KycDecisionRequest(
+                "kyc-session-1", "REJECTED", "EMP001", "image-mismatch", null, rejectedAt);
+
+        assertThat(externalKycSyncService.synchronize(cif, rejected).applied()).isTrue();
+        assertThat(externalKycSyncService.synchronize(cif, rejected).applied()).isFalse();
+        assertThat(customers.findById(cif).orElseThrow().getKycFailureCount()).isEqualTo(1);
+
+        KycDecisionRequest verified = new KycDecisionRequest(
+                "kyc-session-2", "VERIFIED", "EMP001", "manual-review", "Documents match",
+                rejectedAt.plusSeconds(60));
+        assertThat(externalKycSyncService.synchronize(cif, verified).applied()).isTrue();
+
+        KycDecisionRequest stale = new KycDecisionRequest(
+                "kyc-session-old", "REJECTED", "EMP002", "late-callback", null,
+                rejectedAt.minusSeconds(60));
+        assertThat(externalKycSyncService.synchronize(cif, stale).applied()).isFalse();
+        assertThat(customers.findById(cif).orElseThrow().getKycStatus()).isEqualTo(KycStatus.VERIFIED);
+        assertThat(domainEvents.findAll()).extracting(CustomerDomainEvent::getEventType)
+                .containsExactly("KycRejected", "KycVerified");
     }
 
     @Test

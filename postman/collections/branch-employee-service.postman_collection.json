@@ -186,6 +186,11 @@
       "type": "string"
     },
     {
+      "key": "documentType",
+      "value": "PAN",
+      "type": "string"
+    },
+    {
       "key": "empId",
       "value": "1002",
       "type": "string"
@@ -253,6 +258,11 @@
     {
       "key": "journalId",
       "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "kycSessionId",
+      "value": "kyc-session-000001",
       "type": "string"
     },
     {
@@ -338,6 +348,11 @@
     {
       "key": "scheduleId",
       "value": "schedule-000001",
+      "type": "string"
+    },
+    {
+      "key": "frameNumber",
+      "value": "1",
       "type": "string"
     },
     {

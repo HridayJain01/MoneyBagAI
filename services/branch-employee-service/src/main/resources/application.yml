@@ -1,14 +1,14 @@
 server:
-  port: 8081
+  port: ${BRANCH_SERVICE_PORT:8081}
   forward-headers-strategy: framework
 
 spring:
   application:
     name: branch-employee-service
   datasource:
-    url: ${BRANCH_DB_URL:jdbc:mysql://localhost:3306/moneybags_branch?createDatabaseIfNotExist=true&serverTimezone=UTC}
-    username: ${BRANCH_DB_USERNAME:root}
-    password: ${BRANCH_DB_PASSWORD:password}
+    url: ${BRANCH_DB_URL:jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/moneybags_branch?createDatabaseIfNotExist=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:password}
   jpa:
     hibernate:
       ddl-auto: validate

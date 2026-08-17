@@ -186,6 +186,11 @@
       "type": "string"
     },
     {
+      "key": "documentType",
+      "value": "PAN",
+      "type": "string"
+    },
+    {
       "key": "empId",
       "value": "1002",
       "type": "string"
@@ -253,6 +258,11 @@
     {
       "key": "journalId",
       "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "kycSessionId",
+      "value": "kyc-session-000001",
       "type": "string"
     },
     {
@@ -338,6 +348,11 @@
     {
       "key": "scheduleId",
       "value": "schedule-000001",
+      "type": "string"
+    },
+    {
+      "key": "frameNumber",
+      "value": "1",
       "type": "string"
     },
     {
@@ -559,7 +574,7 @@
                 "value": "{{correlationId}}"
               }
             ],
-            "url": "{{baseUrl}}/api/v1/reconciliation/exceptions?status=ACTIVE&page=0&size=25",
+            "url": "{{baseUrl}}/api/v1/reconciliation/exceptions?status=ACTIVE",
             "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/ReconciliationController.java.list"
           },
           "response": []
@@ -1388,7 +1403,7 @@
                 "value": "{{correlationId}}"
               }
             ],
-            "url": "{{baseUrl}}/api/v1/transactions?account=a0000000-0000-0000-0000-000000000101&reference=JE-POSTMAN-001&status=ACTIVE&rail=INTERNAL&transactionType=DEPOSIT&minAmount=0.01&maxAmount=100000.00&from=2026-08-01&to=2026-08-17&createdBy=101&page=0&size=25",
+            "url": "{{baseUrl}}/api/v1/transactions?account=a0000000-0000-0000-0000-000000000101&reference=JE-POSTMAN-001&status=ACTIVE&rail=INTERNAL&transactionType=DEPOSIT&minAmount=0.01&maxAmount=100000.00&from=2026-08-01&to=2026-08-17&createdBy=101",
             "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionQueryController.java.search"
           },
           "response": []
@@ -1538,7 +1553,7 @@
                 "value": "{{correlationId}}"
               }
             ],
-            "url": "{{baseUrl}}/api/v1/accounts/{{accountId}}/transactions?page=0&size=25",
+            "url": "{{baseUrl}}/api/v1/accounts/{{accountId}}/transactions",
             "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionQueryController.java.account"
           },
           "response": []
@@ -1598,7 +1613,7 @@
                 "value": "{{correlationId}}"
               }
             ],
-            "url": "{{baseUrl}}/api/v1/transactions/approvals?branch=BR001&minAmount=0.01&maxAmount=100000.00&rail=INTERNAL&page=0&size=25",
+            "url": "{{baseUrl}}/api/v1/transactions/approvals?branch=BR001&minAmount=0.01&maxAmount=100000.00&rail=INTERNAL",
             "description": "Generated from services/transaction-service/src/main/java/com/moneybags/transaction/controller/TransactionQueryController.java.approvals"
           },
           "response": []

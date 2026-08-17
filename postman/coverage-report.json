@@ -227,8 +227,8 @@
     "service": "customer-service",
     "port": 8082,
     "collection": "collections/customer-service.postman_collection.json",
-    "controllerCount": 7,
-    "requestCount": 27,
+    "controllerCount": 8,
+    "requestCount": 29,
     "controllers": [
       {
         "name": "CustomerAddressController",
@@ -273,6 +273,14 @@
         ]
       },
       {
+        "name": "InternalKycController",
+        "source": "services/customer-service/src/main/java/com/moneybags/customer/controller/InternalKycController.java",
+        "requests": [
+          "GET /internal/v1/customers/{cif}/kyc-context",
+          "PUT /internal/v1/customers/{cif}/kyc-decision"
+        ]
+      },
+      {
         "name": "KycDocumentController",
         "source": "services/customer-service/src/main/java/com/moneybags/customer/controller/KycDocumentController.java",
         "requests": [
@@ -313,25 +321,15 @@
     "service": "identity-service",
     "port": 8087,
     "collection": "collections/identity-service.postman_collection.json",
-    "controllerCount": 3,
-    "requestCount": 19,
+    "controllerCount": 2,
+    "requestCount": 15,
     "controllers": [
       {
         "name": "AuthController",
         "source": "services/identity-service/src/main/java/com/moneybags/identity/controller/AuthController.java",
         "requests": [
           "POST /api/v1/auth/login",
-          "POST /api/v1/auth/logout",
-          "POST /api/v1/auth/logout-all",
-          "GET /api/v1/auth/sessions",
-          "DELETE /api/v1/auth/sessions/{sessionId}"
-        ]
-      },
-      {
-        "name": "InternalSessionController",
-        "source": "services/identity-service/src/main/java/com/moneybags/identity/controller/InternalSessionController.java",
-        "requests": [
-          "POST /internal/v1/sessions/resolve"
+          "POST /api/v1/auth/logout"
         ]
       },
       {
@@ -393,6 +391,32 @@
     ]
   },
   {
+    "service": "kyc-service",
+    "port": 8093,
+    "collection": "collections/kyc-service.postman_collection.json",
+    "controllerCount": 1,
+    "requestCount": 11,
+    "controllers": [
+      {
+        "name": "KycController",
+        "source": "services/kyc-service/src/main/java/com/harshul/demo/kyc/controller/KycController.java",
+        "requests": [
+          "POST /api/v1/kyc/sessions",
+          "GET /api/v1/kyc/sessions/{kycSessionId}",
+          "POST /api/v1/kyc/sessions/{kycSessionId}/documents",
+          "GET /api/v1/kyc/customers/{cif}/sessions/pending",
+          "GET /api/v1/kyc/sessions/{kycSessionId}/documents/{documentType}",
+          "POST /api/v1/kyc/sessions/{kycSessionId}/frames",
+          "GET /api/v1/kyc/sessions/{kycSessionId}/frames",
+          "GET /api/v1/kyc/sessions/{kycSessionId}/frames/{frameNumber}",
+          "GET /api/v1/kyc/sessions/{kycSessionId}/result",
+          "POST /api/v1/kyc/sessions/{kycSessionId}/approve",
+          "POST /api/v1/kyc/sessions/{kycSessionId}/reject"
+        ]
+      }
+    ]
+  },
+  {
     "service": "notification-service",
     "port": 8089,
     "collection": "collections/notification-service.postman_collection.json",
@@ -403,7 +427,7 @@
         "name": "NotificationController",
         "source": "services/notification-service/src/main/java/com/moneybags/notification/controller/NotificationController.java",
         "requests": [
-          "POST /internal/v1/notifications",
+          "POST /api/v1/notifications",
           "GET /api/v1/notifications",
           "GET /api/v1/notifications/{notificationId}",
           "POST /api/v1/notifications/{notificationId}/retry",

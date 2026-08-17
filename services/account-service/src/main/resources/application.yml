@@ -1,14 +1,14 @@
 server:
-  port: 8083
+  port: ${ACCOUNT_SERVICE_PORT:8083}
   forward-headers-strategy: framework
 
 spring:
   application:
     name: account-service
   datasource:
-    url: ${ACCOUNT_DB_URL:jdbc:mysql://localhost:3306/moneybags_account?createDatabaseIfNotExist=true&serverTimezone=UTC}
-    username: ${ACCOUNT_DB_USERNAME:root}
-    password: ${ACCOUNT_DB_PASSWORD:password}
+    url: ${ACCOUNT_DB_URL:jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/moneybags_account?createDatabaseIfNotExist=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:password}
   jpa:
     hibernate:
       ddl-auto: update
@@ -21,16 +21,16 @@ spring:
 
 moneybags:
   account:
-    default-currency: INR
-    dormancy-days: 365
+    default-currency: ${DEFAULT_CURRENCY:INR}
+    dormancy-days: ${ACCOUNT_DORMANCY_DAYS:365}
     outbox:
-      enabled: true
-      batch-size: 50
-      max-attempts: 10
-      fixed-delay-ms: 5000
+      enabled: ${ACCOUNT_OUTBOX_ENABLED:true}
+      batch-size: ${ACCOUNT_OUTBOX_BATCH_SIZE:50}
+      max-attempts: ${ACCOUNT_OUTBOX_MAX_ATTEMPTS:10}
+      fixed-delay-ms: ${ACCOUNT_OUTBOX_DELAY_MS:5000}
     reconciliation:
-      enabled: true
-      fixed-delay-ms: 60000
+      enabled: ${ACCOUNT_RECONCILIATION_ENABLED:true}
+      fixed-delay-ms: ${ACCOUNT_RECONCILIATION_DELAY_MS:60000}
 
 eureka:
   client:

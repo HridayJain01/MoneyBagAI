@@ -1,14 +1,14 @@
 server:
-  port: 8089
+  port: ${NOTIFICATION_SERVICE_PORT:8089}
   forward-headers-strategy: framework
 
 spring:
   application:
     name: notification-service
   datasource:
-    url: ${NOTIFICATION_DB_URL:jdbc:mysql://localhost:3306/moneybags_notification?createDatabaseIfNotExist=true&serverTimezone=UTC}
-    username: ${NOTIFICATION_DB_USERNAME:root}
-    password: ${NOTIFICATION_DB_PASSWORD:password}
+    url: ${NOTIFICATION_DB_URL:jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/moneybags_notification?createDatabaseIfNotExist=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:password}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -38,3 +38,10 @@ springdoc:
     path: /api-docs
   swagger-ui:
     path: /swagger-ui.html
+    persist-authorization: true
+
+moneybags:
+  notification:
+    batch-size: ${NOTIFICATION_BATCH_SIZE:50}
+    max-attempts: ${NOTIFICATION_MAX_ATTEMPTS:5}
+    fixed-delay-ms: ${NOTIFICATION_DELAY_MS:5000}

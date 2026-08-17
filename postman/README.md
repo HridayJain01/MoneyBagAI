@@ -8,7 +8,7 @@ This directory contains one Postman Collection v2.1 file per runnable service. E
 |---|---:|---:|---:|---|
 | Eureka Server | 8080 | 0 | 0 | `collections/eureka-server.postman_collection.json` |
 | Branch Employee Service | 8081 | 3 | 22 | `collections/branch-employee-service.postman_collection.json` |
-| Customer Service | 8082 | 7 | 27 | `collections/customer-service.postman_collection.json` |
+| Customer Service | 8082 | 8 | 29 | `collections/customer-service.postman_collection.json` |
 | Account Service | 8083 | 2 | 34 | `collections/account-service.postman_collection.json` |
 | Transaction Service | 8084 | 5 | 33 | `collections/transaction-service.postman_collection.json` |
 | Ledger Service | 8085 | 3 | 10 | `collections/ledger-service.postman_collection.json` |
@@ -19,6 +19,7 @@ This directory contains one Postman Collection v2.1 file per runnable service. E
 | API Gateway | 8090 | 1 | 2 | `collections/api-gateway.postman_collection.json` |
 | Audit Service | 8091 | 1 | 6 | `collections/audit-service.postman_collection.json` |
 | Configuration Service | 8092 | 7 | 31 | `collections/configuration-service.postman_collection.json` |
+| KYC Service | 8093 | 1 | 11 | `collections/kyc-service.postman_collection.json` |
 | Legacy top-level Product Service | 8083 | 1 | 8 | `collections/legacy-product-service.postman_collection.json` |
 
 The Eureka collection contains operational requests even though Eureka does not declare an application controller. Every collection also includes `Service Operations` requests for health and generated OpenAPI discovery; those operational requests are not included in the controller-request counts above.
@@ -30,9 +31,10 @@ The legacy top-level product service and account-service both default to port 80
 1. Import one or more JSON files from `collections/` into Postman.
 2. Start the relevant services with the repository's `run-all.ps1`, or start one service independently.
 3. For direct service calls, leave each collection's `baseUrl` at its default local port.
-4. For public calls through the gateway, set `baseUrl` to `http://localhost:8090`. Keep `/internal/v1/...` calls pointed directly at their owning service because the gateway intentionally does not expose internal routes.
+4. For authenticated calls through the gateway, set `baseUrl` to `http://localhost:8090`. KYC routes should normally be tested this way so the gateway can validate the JWT and inject trusted actor headers.
 5. Run `Identity Service > AuthController > POST Login`. A successful response automatically stores its session/token in the collection's `sessionId` variable.
-6. Review the collection variables before running mutation requests. Seed-dependent IDs are examples and may need to be replaced with IDs returned by earlier requests.
+6. In the KYC collection, `POST Create Session` stores the returned KYC session in `kycSessionId`; select local files in the multipart document/frame requests before sending them.
+7. Review the collection variables before running mutation requests. Seed-dependent IDs are examples and may need to be replaced with IDs returned by earlier requests.
 
 Direct staff-facing requests include `X-Employee-Id`, `X-Branch-Code`, `X-Permissions`, and `X-Correlation-Id`. Postman generates correlation IDs before each request and initializes an idempotency key for APIs that require one.
 
