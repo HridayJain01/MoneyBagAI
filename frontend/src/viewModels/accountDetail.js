@@ -18,10 +18,11 @@ define([
   '../services/providers',
   '../services/format',
   '../services/http',
+  '../services/navigation',
   'ojs/ojtable',
   'ojs/ojchart',
   'ojs/ojbutton'
-], function (ko, endpoints, providers, fmt, http) {
+], function (ko, endpoints, providers, fmt, http, navigation) {
   'use strict';
 
   function AccountDetailViewModel(context) {

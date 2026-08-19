@@ -234,7 +234,7 @@ Read operations need `PRODUCT_READ`, writes need `PRODUCT_MANAGE`.
 
 | Method | Path | Purpose |
 |---|---|---|
-| GET | `/api/v1/products` | Catalogue — `?status=&type=` |
+| GET | `/api/v1/products` | Catalogue — `?status=&productType=` |
 | GET | `/api/v1/products/{productCode}` | Read by code (the code **is** the id) |
 | POST | `/api/v1/products` | Create → `201` |
 | PATCH | `/api/v1/products/{productCode}` | Update metadata |
@@ -346,8 +346,12 @@ transaction.
 | POST | `/api/v1/transactions/transfers/imps` | `IMPS` / `IMPS` |
 | POST | `/api/v1/transactions/transfers/upi` | `UPI` / `UPI` |
 | POST | `/api/v1/transactions/cheques` | `CHEQUE` / `CHEQUE` |
-| POST | `/api/v1/transactions/card-payments` | `CARD_PAYMENT` / `CARD` |
+| POST | `/api/v1/transactions/card-payments` | `CARD_PAYMENT` / `CARD` — **not callable, see below** |
 | POST | `/api/v1/transactions/product-purchases` | `PRODUCT_PURCHASE` |
+
+> **`/card-payments` cannot be called from a client.** It requires a `cardId`, and card
+> context is served only from `/internal/v1/cards/{cardId}/payment-context`, which the gateway
+> blocks with `403 INTERNAL_ROUTE_BLOCKED`. There is no public route that yields a card id.
 
 All except product-purchase take the same `CreateRequest`:
 
@@ -369,8 +373,24 @@ All except product-purchase take the same `CreateRequest`:
 ```
 
 Required: `amount` (> 0.0001), `currency` (exactly 3 uppercase letters), `paymentChannel`,
-`paymentMethod`. Which account fields you populate depends on the type — a deposit needs
-`destinationAccountId`, a withdrawal needs `sourceAccountId`, a transfer needs both.
+`paymentMethod`.
+
+**`paymentMethod` is not a free choice.** `validateShape` in `TransactionOrchestrator`
+requires `method.name() == rail.name()`, with exactly two exceptions: rail `INTERNAL` takes
+method `ACCOUNT`, and rail `CASH` takes method `CASH`. Each endpoint above hard-codes its own
+rail, so the method follows from the endpoint you called. Anything else is a
+`400 INVALID_PAYMENT_METHOD`.
+
+**Which account fields you populate depends on the type, and the validated side flips:**
+
+| Type | Server validates | Notes |
+|---|---|---|
+| `DEPOSIT`, `CHEQUE` | destination only | money arriving |
+| `WITHDRAWAL` | source only | |
+| `INTERNAL_TRANSFER` | source **and** destination | both must be ACTIVE |
+| `NEFT`, `RTGS`, `IMPS`, `UPI` | source only | destination is **unvalidated free text** — the money is leaving the bank |
+
+`INSUFFICIENT_FUNDS` is checked against `amount + feeAmount`, not `amount` alone.
 
 ### Acting on transactions
 

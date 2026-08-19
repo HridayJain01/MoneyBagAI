@@ -18,7 +18,13 @@ define([
 
     self.reference = ko.observable('');
     self.status = ko.observable('');
-    self.statusList = ['', 'PENDING', 'PENDING_APPROVAL', 'SETTLED', 'FAILED', 'REJECTED', 'REVERSED'];
+    // Every value in TransactionStatus. 'PENDING' was offered here and is NOT one of
+    // them — the param binds to the enum, so it 400s before reaching the query.
+    self.statusList = [
+      '', 'RECEIVED', 'VALIDATED', 'PENDING_APPROVAL', 'APPROVED', 'FUNDS_RESERVED',
+      'PROCESSING', 'PROJECTION_PENDING', 'SETTLED', 'COMPLETED',
+      'FAILED', 'REJECTED', 'CANCELLED', 'REVERSAL_PENDING', 'REVERSED'
+    ];
 
     self.provider = providers.pagedProvider({
       url: '/api/v1/transactions',

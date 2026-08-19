@@ -741,6 +741,15 @@ body {
   color: var(--mb-info);
 }
 
+/* fmt.toneFor returns 'warning' for statuses such as PENDING_APPROVAL, and the
+   transfers screen uses it for the approval-threshold notice. Without this rule
+   those banners fell back to the neutral .mb-banner base and read as ordinary. */
+.mb-banner--warning {
+  background-color: var(--mb-warning-soft);
+  border-color: rgba(183, 121, 31, 0.24);
+  color: var(--mb-warning);
+}
+
 .mb-banner__close {
   border: none;
   background: none;

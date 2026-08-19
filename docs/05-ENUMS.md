@@ -168,6 +168,11 @@ staff-created)
 Externally cleared types get a `clearing_instructions` row and complete asynchronously via
 a rail callback.
 
+> **Only one limit rule is seeded**: RTGS in INR, minimum ₹200 000, approval threshold
+> ₹1 000 000 (tested with `>=`). Every other rail returns `allowed: true` with all four
+> bounds null, which means **nothing but a large RTGS can ever reach `PENDING_APPROVAL`**.
+> Plan test data accordingly.
+
 **`TransactionStatus`** — 14 values
 
 | Value | Terminal | Meaning |
@@ -196,10 +201,26 @@ Terminal statuses accept no further action. Show a spinner and poll
 
 **`PaymentMethod`** — `CASH` `ACCOUNT` `NEFT` `RTGS` `IMPS` `UPI` `CHEQUE` `CARD`
 
-> `PaymentRail` and `PaymentMethod` have near-identical values but are separate fields with
-> separate meanings. Rail is *how the money moves between banks*; method is *what the payer
-> used*. For a branch cash deposit: rail `CASH`, method `CASH`. For an internal transfer:
-> rail `INTERNAL`, method `ACCOUNT`.
+> **`paymentMethod` is derived from the rail, not chosen.** `validateShape` in
+> `TransactionOrchestrator` requires `method.name() == rail.name()`, with exactly two
+> exceptions: rail `INTERNAL` takes method `ACCOUNT`, and rail `CASH` takes method `CASH`.
+> Every creation endpoint hard-codes its own rail, so the method follows from the endpoint.
+> Anything else is a `400 INVALID_PAYMENT_METHOD`.
+>
+> Conceptually rail is *how the money moves between banks* and method is *what the payer
+> used*, but the server does not let those vary independently. Do not build a
+> payment-method picker — there is nothing valid for a user to choose.
+
+| Endpoint | rail | paymentMethod |
+|---|---|---|
+| `/deposits`, `/withdrawals` | `CASH` | `CASH` |
+| `/transfers/internal` | `INTERNAL` | `ACCOUNT` |
+| `/transfers/neft` | `NEFT` | `NEFT` |
+| `/transfers/rtgs` | `RTGS` | `RTGS` |
+| `/transfers/imps` | `IMPS` | `IMPS` |
+| `/transfers/upi` | `UPI` | `UPI` |
+| `/cheques` | `CHEQUE` | `CHEQUE` |
+| `/card-payments` | `CARD` | `CARD` — **not callable, needs a blocked `cardId`** |
 
 **`LegRole`** — `SOURCE` `DESTINATION` `FEE` `COUNTERPARTY`
 

@@ -5,6 +5,12 @@
  * rejected with 403 INTERNAL_ROUTE_BLOCKED by design, so it is never called —
  * which is also why there is no card data in this console: linked cards are
  * reachable only through an internal route.
+ *
+ * This file is the map of the API surface. It is deliberately complete rather
+ * than minimal: a few bindings below have no caller yet, and are kept because
+ * the next person reading this should see the whole contract in one place.
+ * Where the backend disagrees with docs/04-API-REFERENCE.md, the comment records
+ * what the server actually does.
  */
 define(['./http'], function (api) {
   'use strict';
@@ -48,12 +54,28 @@ define(['./http'], function (api) {
       addresses: function (cifNo) {
         return api.get('/api/v1/customers/' + enc(cifNo) + '/addresses');
       },
-      beneficiaries: function (cifNo) {
-        return api.get('/api/v1/customers/' + enc(cifNo) + '/beneficiaries');
-      },
       kycDocuments: function (cifNo) {
         return api.get('/api/v1/customers/' + enc(cifNo) + '/kyc-documents');
+      },
+
+      /**
+       * The gate for account opening. Returns
+       *   { cifNo, eligible, customerStatus, kycStatus, riskClassification,
+       *     adult, residentAddressAvailable, reasons[] }
+       *
+       * Eligibility needs ACTIVE status AND verified KYC AND age >= 18 AND an
+       * Indian resident address. Render `reasons[]` — inferring the refusal from
+       * kycStatus alone is wrong three times out of four. Note the field is
+       * `customerStatus`, not `status`.
+       */
+      eligibility: function (cifNo) {
+        return api.get('/api/v1/customers/' + enc(cifNo) + '/eligibility');
       }
+
+      /* No `beneficiaries` binding. The tables are migrated and seeded and the
+         JPA entity exists, but no controller does, and transaction-service
+         dropped beneficiary_id in V2. External transfers carry an account number
+         directly. */
     },
 
     /* -------------------------------------------------------- accounts --- */
@@ -64,17 +86,46 @@ define(['./http'], function (api) {
       get: function (accountId) {
         return api.get('/api/v1/accounts/' + enc(accountId));
       },
+      /** Branch-scoped: 403 for an account outside the caller's own branch. */
+      byNumber: function (accountNumber) {
+        return api.get('/api/v1/accounts/by-number/' + enc(accountNumber));
+      },
       balance: function (accountId) {
         return api.get('/api/v1/accounts/' + enc(accountId) + '/balance');
       },
       balanceHistory: function (accountId, query) {
         return api.get('/api/v1/accounts/' + enc(accountId) + '/balance-history', { query: query });
       },
+
+      /* --- Applications ----------------------------------------------------
+         account-service declares no Idempotency-Key on any write. http.js sends
+         one regardless, which is harmless — but do not design around it. */
       applications: function (query) {
         return api.get('/api/v1/accounts/applications', { query: query });
       },
+      application: function (applicationId) {
+        return api.get('/api/v1/accounts/applications/' + enc(applicationId));
+      },
+      createApplication: function (body, key) {
+        return api.post('/api/v1/accounts/applications', { body: body, idempotencyKey: key });
+      },
+      /** `remarks` optional. Refused when the caller is the maker. */
+      approveApplication: function (applicationId, body, key) {
+        return api.post('/api/v1/accounts/applications/' + enc(applicationId) + '/approve',
+                        { body: body, idempotencyKey: key });
+      },
+      /** `reason` is @NotBlank on the server. */
+      rejectApplication: function (applicationId, body, key) {
+        return api.post('/api/v1/accounts/applications/' + enc(applicationId) + '/reject',
+                        { body: body, idempotencyKey: key });
+      },
+      /** Maker only — gated on identity, not on a permission. No body. */
+      cancelApplication: function (applicationId, key) {
+        return api.post('/api/v1/accounts/applications/' + enc(applicationId) + '/cancel',
+                        { idempotencyKey: key });
+      },
 
-      /* Servicing actions. All are writes and carry an intent-scoped key. */
+      /* --- Servicing. All writes, all carry an intent-scoped key. --------- */
       freeze: function (accountId, body, key) {
         return api.post('/api/v1/accounts/' + enc(accountId) + '/freeze', { body: body, idempotencyKey: key });
       },
@@ -86,6 +137,47 @@ define(['./http'], function (api) {
       },
       unblock: function (accountId, body, key) {
         return api.post('/api/v1/accounts/' + enc(accountId) + '/unblock', { body: body, idempotencyKey: key });
+      },
+      markDormant: function (accountId, body, key) {
+        return api.post('/api/v1/accounts/' + enc(accountId) + '/mark-dormant', { body: body, idempotencyKey: key });
+      },
+      reactivate: function (accountId, body, key) {
+        return api.post('/api/v1/accounts/' + enc(accountId) + '/reactivate', { body: body, idempotencyKey: key });
+      },
+      /** 422 BALANCE_NOT_SETTLED / HOLDS_OUTSTANDING unless both are exactly zero. */
+      close: function (accountId, body, key) {
+        return api.post('/api/v1/accounts/' + enc(accountId) + '/close', { body: body, idempotencyKey: key });
+      },
+
+      /* --- Bare Lists, not page envelopes. -------------------------------- */
+      statusHistory: function (accountId) {
+        return api.get('/api/v1/accounts/' + enc(accountId) + '/status-history');
+      },
+      holders: function (accountId) {
+        return api.get('/api/v1/accounts/' + enc(accountId) + '/holders');
+      },
+      /** { cifNo, holderRole } where holderRole is PRIMARY or JOINT. */
+      addHolder: function (accountId, body, key) {
+        return api.post('/api/v1/accounts/' + enc(accountId) + '/holders', { body: body, idempotencyKey: key });
+      },
+      holds: function (accountId) {
+        return api.get('/api/v1/accounts/' + enc(accountId) + '/holds');
+      },
+      /**
+       * { amount, reason, holdType } where holdType is LIEN or MANUAL.
+       * TRANSACTION holds are placed by transaction-service, never from here.
+       */
+      placeHold: function (accountId, body, key) {
+        return api.post('/api/v1/accounts/' + enc(accountId) + '/holds', { body: body, idempotencyKey: key });
+      },
+      limits: function (accountId) {
+        return api.get('/api/v1/accounts/' + enc(accountId) + '/limits');
+      },
+      setLimits: function (accountId, body, key) {
+        return api.put('/api/v1/accounts/' + enc(accountId) + '/limits', { body: body, idempotencyKey: key });
+      },
+      ownedProducts: function (accountId) {
+        return api.get('/api/v1/accounts/' + enc(accountId) + '/products');
       }
     },
 
@@ -95,8 +187,20 @@ define(['./http'], function (api) {
       search: function (query) {
         return api.get('/api/v1/transactions', { query: query });
       },
+      /** Deep view: legs, hold, journals with lines, clearing, rail details, history. */
       get: function (id) {
         return api.get('/api/v1/transactions/' + enc(id));
+      },
+      /**
+       * Lightweight { transactionId, transactionReference, status, updatedAt }.
+       * Poll THIS, never get() — the deep view is a great deal of payload to
+       * refetch on a timer just to read one field.
+       */
+      status: function (id) {
+        return api.get('/api/v1/transactions/' + enc(id) + '/status');
+      },
+      byReference: function (reference) {
+        return api.get('/api/v1/transactions/by-reference/' + enc(reference));
       },
       forAccount: function (accountId, query) {
         return api.get('/api/v1/accounts/' + enc(accountId) + '/transactions', { query: query });
@@ -111,6 +215,70 @@ define(['./http'], function (api) {
         return api.get('/api/v1/transactions/approvals', { query: query });
       },
 
+      /**
+       * Pre-flight limit check.
+       * { accountId, transactionType, rail, channel, currency, amount }
+       *
+       * Two things must match the server or the quote quietly lies:
+       *   - accountId is the DESTINATION for DEPOSIT and CHEQUE, the source for
+       *     everything else. That is the account the orchestrator itself quotes.
+       *   - amount must include the fee; the server validates amount + fee.
+       *
+       * Only ONE limit rule is seeded (RTGS/INR, min 200000, approval >= 1000000).
+       * Every other rail answers allowed:true with all bounds null, so a bounds
+       * panel is only worth rendering when something is non-null.
+       */
+      limitQuote: function (query) {
+        return api.get('/api/v1/transactions/limits/quote', { query: query });
+      },
+
+      /* --- Creation --------------------------------------------------------
+         All require an intent-scoped Idempotency-Key: the header is declared
+         without required=false, so a missing key is a 400 before any business
+         logic runs. All return 201.
+
+         paymentMethod is NOT a free choice. validateShape() requires
+         method.name() == rail.name(), with exactly two exceptions:
+         rail INTERNAL takes method ACCOUNT, rail CASH takes method CASH. Each
+         endpoint hard-codes its own rail, so the method follows from the
+         endpoint. services/txn.js owns that mapping — build bodies there. */
+      deposit: function (body, key, correlationId) {
+        return api.post('/api/v1/transactions/deposits',
+                        { body: body, idempotencyKey: key, correlationId: correlationId });
+      },
+      withdrawal: function (body, key, correlationId) {
+        return api.post('/api/v1/transactions/withdrawals',
+                        { body: body, idempotencyKey: key, correlationId: correlationId });
+      },
+      internalTransfer: function (body, key, correlationId) {
+        return api.post('/api/v1/transactions/transfers/internal',
+                        { body: body, idempotencyKey: key, correlationId: correlationId });
+      },
+      neft: function (body, key, correlationId) {
+        return api.post('/api/v1/transactions/transfers/neft',
+                        { body: body, idempotencyKey: key, correlationId: correlationId });
+      },
+      rtgs: function (body, key, correlationId) {
+        return api.post('/api/v1/transactions/transfers/rtgs',
+                        { body: body, idempotencyKey: key, correlationId: correlationId });
+      },
+      imps: function (body, key, correlationId) {
+        return api.post('/api/v1/transactions/transfers/imps',
+                        { body: body, idempotencyKey: key, correlationId: correlationId });
+      },
+      upi: function (body, key, correlationId) {
+        return api.post('/api/v1/transactions/transfers/upi',
+                        { body: body, idempotencyKey: key, correlationId: correlationId });
+      },
+      cheque: function (body, key, correlationId) {
+        return api.post('/api/v1/transactions/cheques',
+                        { body: body, idempotencyKey: key, correlationId: correlationId });
+      },
+
+      /* No cardPayment binding. CARD_PAYMENT needs a cardId, and card context is
+         served only from /internal/v1/cards/{cardId}/payment-context, which the
+         gateway blocks. A teller has no way to obtain one. */
+
       /** No request body — the endpoint takes only the idempotency key. */
       approve: function (id, key) {
         return api.post('/api/v1/transactions/' + enc(id) + '/approve', { idempotencyKey: key });
@@ -121,6 +289,14 @@ define(['./http'], function (api) {
       },
       cancel: function (id, body, key) {
         return api.post('/api/v1/transactions/' + enc(id) + '/cancel', { body: body, idempotencyKey: key });
+      },
+      /**
+       * 201 with a NEW linked transaction. The original is never mutated — it
+       * moves to REVERSED and keeps its own record. Navigate to the response
+       * rather than patching the view you are looking at.
+       */
+      reverse: function (id, body, key) {
+        return api.post('/api/v1/transactions/' + enc(id) + '/reversals', { body: body, idempotencyKey: key });
       }
     },
 
@@ -152,8 +328,17 @@ define(['./http'], function (api) {
 
     /* --------------------------------------------- products / branches --- */
     products: {
-      list: function () {
-        return api.get('/api/v1/products');
+      /**
+       * Bare List. Filters are `status` and `productType` — NOT `type`, which
+       * docs/04 gets wrong. ProductDetail carries requiresFunding,
+       * minOpeningDeposit, minBalance and tenureMonths, so the opening form can
+       * validate client-side without the blocked /internal effective-terms route.
+       */
+      list: function (query) {
+        return api.get('/api/v1/products', { query: query });
+      },
+      get: function (productCode) {
+        return api.get('/api/v1/products/' + enc(productCode));
       }
     },
 
@@ -173,6 +358,13 @@ define(['./http'], function (api) {
       },
       forAccount: function (accountId, query) {
         return api.get('/api/v1/audit-events/accounts/' + enc(accountId), { query: query });
+      },
+      forTransaction: function (transactionId, query) {
+        return api.get('/api/v1/audit-events/transactions/' + enc(transactionId), { query: query });
+      },
+      /** Reconstructs one user intent across every service it touched. */
+      trace: function (correlationId) {
+        return api.get('/api/v1/audit-events/trace/' + enc(correlationId));
       }
     },
 

@@ -86,7 +86,7 @@
     </div>
   </section>
 
-  <oj-dialog id="confirmDialog"
+  <oj-dialog id="approvalsConfirmDialog"
              dialog-title="[[dialogTitle]]"
              cancel-behavior="icon"
              initial-visibility="hide">
@@ -97,7 +97,7 @@
       <!-- /ko -->
     </div>
     <div slot="footer">
-      <oj-button chroming="outlined" on-oj-action="[[cancelDialog]]">Cancel</oj-button>
+      <oj-button chroming="outlined" on-oj-action="[[cancelConfirm]]">Cancel</oj-button>
       <oj-button chroming="callToAction" disabled="[[busy]]" on-oj-action="[[confirm]]">
         <span data-bind="text: confirmLabel"></span>
       </oj-button>

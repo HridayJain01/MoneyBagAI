@@ -126,17 +126,27 @@ if (-not $accountId) {
     Write-Host "  account $accountId" -ForegroundColor DarkGray
 
     # 3. Money movement. Each POST carries its own idempotency key.
+    #
+    # CreateRequest has no `accountId` field, and paymentChannel/paymentMethod are
+    # @NotNull -- the earlier bodies here 400d at validation before reaching any
+    # business logic, so this whole section only ever appeared to pass. Note also
+    # that paymentMethod is not free: the server requires it to match the rail
+    # (CASH for /deposits, ACCOUNT for /transfers/internal).
     Step 'deposit 5000' {
         Invoke-Api -Method POST -Path '/api/v1/transactions/deposits' -AccessToken $teller.accessToken `
             -ExtraHeaders @{ 'Idempotency-Key' = [guid]::NewGuid().ToString() } -Body @{
-                accountId = $accountId; amount = 5000; currency = 'INR'
+                destinationAccountId = $accountId; amount = 5000; currency = 'INR'
+                paymentChannel = 'BRANCH'; paymentMethod = 'CASH'
                 narration = 'Smoke test opening deposit'
             }
     } | Out-Null
 
     Step 'replaying the deposit does not double-post' {
         $key = [guid]::NewGuid().ToString()
-        $body = @{ accountId = $accountId; amount = 100; currency = 'INR'; narration = 'Idempotency probe' }
+        $body = @{
+            destinationAccountId = $accountId; amount = 100; currency = 'INR'
+            paymentChannel = 'BRANCH'; paymentMethod = 'CASH'; narration = 'Idempotency probe'
+        }
         $first  = Invoke-Api -Method POST -Path '/api/v1/transactions/deposits' -AccessToken $teller.accessToken `
             -ExtraHeaders @{ 'Idempotency-Key' = $key } -Body $body
         $second = Invoke-Api -Method POST -Path '/api/v1/transactions/deposits' -AccessToken $teller.accessToken `
@@ -163,7 +173,9 @@ if (-not $accountId) {
             -ExtraHeaders @{ 'Idempotency-Key' = [guid]::NewGuid().ToString() } -Body @{
                 sourceAccountId = $accountId
                 destinationAccountId = 'a0000000-0000-0000-0000-000000000103'
-                amount = 1000; currency = 'INR'; narration = 'Smoke test transfer'
+                amount = 1000; currency = 'INR'
+                paymentChannel = 'BRANCH'; paymentMethod = 'ACCOUNT'
+                narration = 'Smoke test transfer'
             }
     } | Out-Null
 

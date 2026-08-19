@@ -74,6 +74,40 @@ define(['./session'], function (session) {
     return uuid();
   }
 
+  /**
+   * Both keys for one user intent.
+   *
+   * The idempotency key belongs on the write alone; the correlation id belongs on
+   * every request the intent makes, so the whole sequence is traceable as a unit.
+   * Mint this when the user commits to an action, not when the screen loads.
+   */
+  function beginIntent() {
+    return { idempotencyKey: uuid(), correlationId: uuid() };
+  }
+
+  /**
+   * Splits a REQUEST_VALIDATION_FAILED message into { field: reason }.
+   *
+   * The server joins Bean Validation failures as "field: reason; field: reason",
+   * which is readable but not bindable. Returns null for any other error so a
+   * caller can fall back to a whole-form banner.
+   */
+  function fieldErrorsFor(error) {
+    if (!error || !error.isApiError || error.code !== 'REQUEST_VALIDATION_FAILED') {
+      return null;
+    }
+    var fields = {};
+    String(error.message || '')
+      .split('; ')
+      .forEach(function (part) {
+        var split = part.indexOf(': ');
+        if (split > 0) {
+          fields[part.slice(0, split).trim()] = part.slice(split + 2).trim();
+        }
+      });
+    return Object.keys(fields).length ? fields : null;
+  }
+
   function buildUrl(path, query) {
     if (!query) {
       return path;
@@ -154,6 +188,14 @@ define(['./session'], function (session) {
     var opts = options || {};
     var isWrite = method !== 'GET' && method !== 'HEAD';
     var headers = authHeaders(opts.headers);
+
+    // A user intent that spans several requests -- quote, then create, then poll --
+    // should carry ONE correlation id so /audit-events/trace/{id} can reconstruct
+    // it. authHeaders() mints a fresh one per call, which made that endpoint
+    // useless for anything multi-step; an explicit id overrides it.
+    if (opts.correlationId) {
+      headers['X-Correlation-Id'] = opts.correlationId;
+    }
 
     if (opts.body !== undefined) {
       headers['Content-Type'] = 'application/json';
@@ -243,6 +285,8 @@ define(['./session'], function (session) {
     buildUrl: buildUrl,
     authHeaders: authHeaders,
     beginCommand: beginCommand,
+    beginIntent: beginIntent,
+    fieldErrorsFor: fieldErrorsFor,
     uuid: uuid,
     onAuthExpired: onAuthExpired,
     messageFor: messageFor
