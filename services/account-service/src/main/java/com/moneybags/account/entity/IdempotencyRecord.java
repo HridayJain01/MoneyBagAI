@@ -6,7 +6,7 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity
-@Table(name = "idempotency_records")
+@Table(name = "account_idempotency_records")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -45,7 +45,7 @@ public class IdempotencyRecord {
     private Integer responseCode;
 
     @Lob
-    @Column(name = "response_body", columnDefinition = "TEXT")
+    @Column(name = "response_body")
     private String responseBody;
 
     @Column(name = "created_at", nullable = false)

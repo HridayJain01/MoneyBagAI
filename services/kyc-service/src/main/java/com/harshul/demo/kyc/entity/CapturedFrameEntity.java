@@ -28,6 +28,6 @@ public class CapturedFrameEntity extends AbstractEntity {
     private KycSessionEntity session;
 
     @Lob
-    @Column(name = "content", nullable = false, columnDefinition = "LONGBLOB")
+    @Column(name = "content", nullable = false)
     private byte[] content;
 }

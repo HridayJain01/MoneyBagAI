@@ -11,17 +11,18 @@ spring:
       max-request-size: ${KYC_MAX_REQUEST_SIZE:100MB}
   datasource:
     url: ${KYC_DB_URL:jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/moneybags_kyc?createDatabaseIfNotExist=true&serverTimezone=UTC}
+    driver-class-name: ${DB_DRIVER:com.mysql.cj.jdbc.Driver}
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:password}
   jpa:
     hibernate:
-      ddl-auto: validate
-    database-platform: org.hibernate.dialect.MySQLDialect
+      ddl-auto: ${JPA_DDL_AUTO:update}
+    database-platform: ${HIBERNATE_DIALECT:org.hibernate.dialect.MySQLDialect}
     open-in-view: false
     properties:
       hibernate.jdbc.time_zone: UTC
   flyway:
-    enabled: true
+    enabled: ${FLYWAY_ENABLED:true}
 
 eureka:
   client:

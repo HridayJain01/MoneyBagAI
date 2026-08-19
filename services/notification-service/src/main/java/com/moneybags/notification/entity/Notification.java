@@ -31,7 +31,7 @@ public class Notification {
     private String subject;
 
     @Lob
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false)
     private String body;
 
     @Column(nullable = false, length = 16)

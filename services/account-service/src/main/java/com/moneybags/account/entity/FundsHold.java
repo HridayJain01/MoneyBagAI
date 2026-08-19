@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity
-@Table(name = "funds_holds")
+@Table(name = "account_funds_holds")
 @Getter
 @Setter
 @NoArgsConstructor

@@ -28,8 +28,8 @@ class LedgerApiIntegrationTest {
 
     @BeforeEach
     void resetLedger() {
-        jdbc.update("DELETE FROM journal_lines");
-        jdbc.update("DELETE FROM journal_entries");
+        jdbc.update("DELETE FROM ledger_journal_lines");
+        jdbc.update("DELETE FROM ledger_journal_entries");
         jdbc.update("UPDATE ledger_accounts SET balance = 0, version = 0, active = TRUE");
         when(accountClient.context(anyString())).thenAnswer(invocation -> {
             String id = invocation.getArgument(0);

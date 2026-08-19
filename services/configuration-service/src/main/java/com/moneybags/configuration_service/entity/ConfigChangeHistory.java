@@ -26,11 +26,11 @@ public class ConfigChangeHistory {
     private String entityKey;
 
     @Lob
-    @Column(name = "old_value", columnDefinition = "TEXT")
+    @Column(name = "old_value")
     private String oldValue;
 
     @Lob
-    @Column(name = "new_value", columnDefinition = "TEXT")
+    @Column(name = "new_value")
     private String newValue;
 
     @Column(name = "changed_by")

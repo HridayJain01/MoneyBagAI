@@ -17,10 +17,10 @@ CREATE TABLE ledger_accounts (
     CONSTRAINT chk_ledger_accounts_side CHECK (normal_side IN ('DEBIT','CREDIT'))
 );
 
-CREATE TABLE journal_entries (
+CREATE TABLE ledger_journal_entries (
     id BIGINT NOT NULL AUTO_INCREMENT,
     journal_reference VARCHAR(100) NOT NULL,
-    transaction_id BIGINT,
+    transaction_id VARCHAR(64),
     journal_type VARCHAR(40) NOT NULL,
     description VARCHAR(500),
     status VARCHAR(16) NOT NULL,
@@ -35,12 +35,12 @@ CREATE TABLE journal_entries (
     PRIMARY KEY (id),
     CONSTRAINT uk_journal_entries_reference UNIQUE (journal_reference),
     CONSTRAINT uk_journal_entries_reversal UNIQUE (reversal_of_journal_id),
-    CONSTRAINT fk_journal_entries_reversal FOREIGN KEY (reversal_of_journal_id) REFERENCES journal_entries(id),
+    CONSTRAINT fk_journal_entries_reversal FOREIGN KEY (reversal_of_journal_id) REFERENCES ledger_journal_entries(id),
     CONSTRAINT chk_journal_entries_status CHECK (status IN ('DRAFT','POSTED','REVERSED')),
     CONSTRAINT chk_journal_entries_totals CHECK (total_debit > 0 AND total_debit = total_credit)
 );
 
-CREATE TABLE journal_lines (
+CREATE TABLE ledger_journal_lines (
     id BIGINT NOT NULL AUTO_INCREMENT,
     journal_entry_id BIGINT NOT NULL,
     line_number INTEGER NOT NULL,
@@ -52,13 +52,13 @@ CREATE TABLE journal_lines (
     description VARCHAR(500),
     created_at DATETIME(6) NOT NULL,
     PRIMARY KEY (id),
-    CONSTRAINT fk_journal_lines_entry FOREIGN KEY (journal_entry_id) REFERENCES journal_entries(id),
+    CONSTRAINT fk_journal_lines_entry FOREIGN KEY (journal_entry_id) REFERENCES ledger_journal_entries(id),
     CONSTRAINT fk_journal_lines_account FOREIGN KEY (ledger_account_id) REFERENCES ledger_accounts(id),
     CONSTRAINT uk_journal_lines_number UNIQUE (journal_entry_id, line_number),
     CONSTRAINT chk_journal_lines_amount CHECK (amount > 0),
     CONSTRAINT chk_journal_lines_side CHECK (side IN ('DEBIT','CREDIT'))
 );
 
-CREATE INDEX idx_journal_entries_transaction ON journal_entries(transaction_id, created_at);
-CREATE INDEX idx_journal_lines_customer_account ON journal_lines(customer_account_id, created_at);
-CREATE INDEX idx_journal_lines_ledger_code ON journal_lines(ledger_code, created_at);
+CREATE INDEX idx_journal_entries_transaction ON ledger_journal_entries(transaction_id, created_at);
+CREATE INDEX idx_journal_lines_customer_account ON ledger_journal_lines(customer_account_id, created_at);
+CREATE INDEX idx_journal_lines_ledger_code ON ledger_journal_lines(ledger_code, created_at);

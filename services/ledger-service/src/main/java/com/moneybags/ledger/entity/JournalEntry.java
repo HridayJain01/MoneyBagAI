@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Entity
-@Table(name = "journal_entries")
+@Table(name = "ledger_journal_entries")
 @Getter
 @NoArgsConstructor
 public class JournalEntry {

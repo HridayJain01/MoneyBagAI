@@ -60,6 +60,6 @@ public class AuditEvent {
     private Instant ingestedAt;
 
     @Lob
-    @Column(columnDefinition = "TEXT")
+    @Column
     private String payload;
 }

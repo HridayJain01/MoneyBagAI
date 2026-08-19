@@ -32,7 +32,7 @@ public class AccountOutbox {
     private String destination;
 
     @Lob
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false)
     private String payload;
 
     @Enumerated(EnumType.STRING)

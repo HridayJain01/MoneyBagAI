@@ -31,7 +31,7 @@ public class CustomerDomainEvent {
     private String eventType;
 
     @Lob
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false)
     private String payload;
 
     @Enumerated(EnumType.STRING)

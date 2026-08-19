@@ -22,7 +22,7 @@ public class AuditIngestFailure {
     private String sourceService;
 
     @Lob
-    @Column(name = "raw_payload", columnDefinition = "TEXT")
+    @Column(name = "raw_payload")
     private String rawPayload;
 
     @Column(name = "failure_reason", nullable = false, length = 500)

@@ -17,10 +17,10 @@ confused is the single easiest mistake to make in this codebase.
 
 | Table name | Schemas | Difference |
 |---|---|---|
-| `journal_entries`, `journal_lines` | `moneybags_transaction`, `moneybags_ledger` | Transaction's are `VARCHAR(36)` UUID keyed and scoped to one transaction; Ledger's are `BIGINT` auto-increment and are the actual general ledger |
-| `funds_holds` | `moneybags_account`, `moneybags_transaction` | Account's is the authoritative hold on the balance; Transaction's mirrors it with the external hold id |
-| `idempotency_records` | `moneybags_account`, `moneybags_transaction` | Same purpose, independent tables — account's stores `response_body`, transaction's stores `transaction_id` |
-| `kyc_documents` | `moneybags_customer`, `moneybags_kyc` | Customer's is legacy metadata + file path; KYC's holds the actual binary in a `LONGBLOB` |
+| `ledger_journal_entries`, `ledger_journal_lines`; `transaction_journal_entries`, `transaction_journal_lines` | Shared `bank_app` schema | Transaction's are `VARCHAR(36)` UUID keyed and scoped to one transaction; Ledger's are `BIGINT` auto-increment and are the actual general ledger |
+| `account_funds_holds`, `transaction_funds_holds` | Shared `bank_app` schema | Account's is the authoritative hold on the balance; Transaction's mirrors it with the external hold id |
+| `account_idempotency_records`, `transaction_idempotency_records` | Shared `bank_app` schema | Same purpose, independent tables — account's stores `response_body`, transaction's stores `transaction_id` |
+| `customer_kyc_documents`, `kyc_documents` | Shared `bank_app` schema | Customer's is legacy metadata + file path; KYC's holds the actual binary in a `LONGBLOB` |
 
 ---
 

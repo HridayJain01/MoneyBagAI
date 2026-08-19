@@ -26,7 +26,7 @@ public class ConfigEntry {
     private String configKey;
 
     @Lob
-    @Column(name = "config_value", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "config_value", nullable = false)
     private String configValue;
 
     @Column(name = "value_type", nullable = false, length = 20)
