@@ -1,9 +1,26 @@
 logs/
 .moneybags-pids/
 
-# Build output
+# Build output and packaged artifacts
+target/
 **/target/
-!**/src/**/target/
+*.jar
+*.war
+*.ear
+
+# Java and Maven generated files
+*.class
+*.log
+*.ctxt
+.classpath
+.project
+.settings/
+.factorypath
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
 
 # Local runtime data
 data/
