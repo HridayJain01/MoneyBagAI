@@ -27,7 +27,7 @@ param(
     [string]$MySqlHost = 'localhost',
     [int]$MySqlPort = 3306,
     [string]$MySqlUser = 'root',
-    [string]$MySqlPassword = 'jheel',
+    [string]$MySqlPassword = 'password',
     [int]$HealthTimeoutSeconds = 180
 )
 
