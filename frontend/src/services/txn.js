@@ -266,6 +266,13 @@ define(['./endpoints'], function (endpoints) {
   /**
    * Poll /status until terminal or the budget runs out.
    *
+   * `transactionId` must come from the CREATE response's `id` field -- not
+   * `transactionId`, which it does not have. The creation endpoints return the
+   * Transaction entity (id, reference, type, rail, channel, method) while /status
+   * and the search endpoints return TransactionView (transactionId,
+   * transactionReference). Reading the wrong one yields undefined and polls
+   * /transactions/undefined/status, which looks like a backend fault.
+   *
    * Resolves { status, view, exhausted, aborted }. Never rejects on abort — a
    * teardown is not an error. Pass an AbortSignal and abort it from the view
    * model's disconnected() hook: left running, the timer keeps firing after

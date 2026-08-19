@@ -132,9 +132,14 @@ deposit — routed at `tellerOps`.
   submit that silently returns the first transaction.
 - Nav: Workspace group, glyph `◧`, permission `TRANSACTION_CREATE`.
 
-**Most likely to go wrong:** the `paymentMethod`/rail pairing and which account field to
-send. Do not assemble the request body by hand — call `txn.bodyFor(entry, form)`, which
-already encodes both.
+**Most likely to go wrong — two things:**
+
+1. The `paymentMethod`/rail pairing and which account field to send. Do not assemble the
+   request body by hand: call `txn.bodyFor(entry, form)`, which encodes both.
+2. **The create response is a `Transaction` entity, not a `TransactionView`** — its id field
+   is `id`, not `transactionId` (§7). The result panel must read `id` from the create
+   response and then poll, where `/status` calls the same value `transactionId`. Getting
+   this wrong polls `/transactions/undefined/status` and looks like a backend fault.
 
 ## 6. Decisions log — APPEND-ONLY
 
@@ -169,6 +174,7 @@ wins** — the "Docs?" column says whether `docs/` has since been corrected.
 | `ApplicationStatus` has no `PENDING`. An invalid enum value returns **500**, not 400 | `ApplicationStatus.java` | yes |
 | Branch-scope asymmetry: `GET /accounts/by-number/{n}` enforces branch access, but `POST /transactions/deposits` does not | `AccountServicingService.java:44` | not documented |
 | `manager1` can reverse a BR001 transaction from BR002 because BRANCH_MANAGER holds `TRANSACTION_VIEW_ALL_BRANCHES`; `checker1` cannot | `RequestActor.java` | yes |
+| **Create and query return different shapes.** `POST /transactions/*` returns the `Transaction` entity — `id`, `reference`, `type`, `rail`, `channel`, `method`. `GET /{id}/status` and the search endpoints return `TransactionView` — `transactionId`, `transactionReference`. Reading `transactionId` off a create response yields `undefined` and polls `/transactions/undefined/status` | verified live 2026-08-19 | not documented |
 | Balance updates flow through an outbox on a ~5s cycle — a balance is never a receipt | `application.yml` `ACCOUNT_OUTBOX_DELAY_MS` | yes |
 | Two product services exist. `services/product-service` (`com.moneybags`) is the real one; root `product-service/` (`com.example`) is orphaned and not in the reactor | root `pom.xml` | not documented |
 
@@ -190,11 +196,24 @@ wins** — the "Docs?" column says whether `docs/` has since been corrected.
 
 | Phase | Login(s) | Steps | Expected | Last run | Result |
 |---|---|---|---|---|---|
-| 1 | `opsadmin` | `npm install`; `ojet build`; sign in; Accounts → open an account; Transactions with each status filter; Approvals | Build succeeds; account detail renders (previously threw); no filter 400s; approvals empty | 2026-08-19 | **build + syntax verified; browser pass still owed** |
+| 1 | `teller1` | `npm install`; `ojet build`; live API contract checks against the running stack (see below) | Build clean; every corrected contract behaves as predicted | 2026-08-19 | **PASS** |
+| 1 | `opsadmin` | Sign in; Accounts → open an account; Transactions with each status filter; Approvals | Account detail renders (previously threw); no filter 400s; approvals empty | — | **browser pass still owed** |
 
-Phase 1's browser pass needs the backend running (`./run-all.ps1`). What has been confirmed
-so far: `npm install` clean, `ojet build` exits 0, all changed JS parses, and
+**Live contract checks run against the stack on 2026-08-19, all as predicted:**
+
+| Check | Result |
+|---|---|
+| `limits/quote` RTGS ₹1,00,000 | `allowed:false`, `minAmount:200000`, `approvalThreshold:1000000`, reason "Amount is below the configured minimum" |
+| `limits/quote` DEPOSIT ₹5,000 | `allowed:true`, all four bounds `null` — confirms `quoteHasBounds` should suppress the panel |
+| Old smoke-test deposit body | **400** — confirms that section only ever appeared to pass |
+| Corrected deposit body | **201**, status `PROJECTION_PENDING`, settling to `COMPLETED` |
+| Deposit with `paymentMethod: ACCOUNT` on the CASH rail | **400 `INVALID_PAYMENT_METHOD`** — confirms the derivation rule |
+
+Also confirmed: `npm install` clean, `ojet build` exits 0, all changed JS parses,
 `smoke-test.ps1` parses.
+
+Still owed for Phase 1: the browser pass (sign in, open account detail, exercise the status
+filters). That needs `ojet serve` alongside the backend.
 
 ## 10. Running it right now
 
