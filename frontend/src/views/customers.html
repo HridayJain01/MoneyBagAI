@@ -8,7 +8,10 @@
         rather than paging.
       </p>
     </div>
+    <!-- ko if: canCreate --><button type="button" class="mb-action-button mb-action-button--primary" data-bind="click: beginCreate">New customer</button><!-- /ko -->
   </header>
+
+  <!-- ko if: hasBanner --><div data-bind="css: bannerClass" role="status"><div><strong data-bind="text: banner().title"></strong><span data-bind="text: banner().detail"></span></div><button type="button" class="mb-banner__close" data-bind="click: dismissBanner" aria-label="Dismiss">×</button></div><!-- /ko -->
 
   <section class="mb-card mb-card--flush">
     <div class="mb-card__bar">
@@ -63,4 +66,26 @@
       </li>
     </ul>
   </section>
+
+  <oj-dialog id="customerOnboardingDialog" dialog-title="Create customer" cancel-behavior="none" initial-visibility="hide">
+    <div slot="body" class="mb-stack mb-stack--tight">
+      <p class="mb-card__subtitle" style="margin:0">Creates a CUSTOMER login, CIF and current Indian residential address. KYC begins as PENDING.</p>
+      <!-- ko if: formError --><div class="mb-banner mb-banner--error" role="alert"><span data-bind="text: formError"></span></div><!-- /ko -->
+      <div class="mb-form-grid mb-form-grid--admin">
+        <div><label class="mb-label" for="customerFirstName">First name</label><input id="customerFirstName" class="mb-field mb-field--block" data-bind="textInput: formFirstName" /></div>
+        <div><label class="mb-label" for="customerLastName">Last name</label><input id="customerLastName" class="mb-field mb-field--block" data-bind="textInput: formLastName" /></div>
+        <div><label class="mb-label" for="customerDob">Date of birth</label><input id="customerDob" type="date" class="mb-field mb-field--block" data-bind="textInput: formDob" /></div>
+        <div><label class="mb-label" for="customerGender">Gender</label><select id="customerGender" class="mb-field mb-field--block" data-bind="value: formGender"><option value="">Choose…</option><option value="MALE">Male</option><option value="FEMALE">Female</option></select></div>
+        <div><label class="mb-label" for="customerMobile">Mobile</label><input id="customerMobile" inputmode="numeric" class="mb-field mb-field--block" data-bind="textInput: formMobile" /></div>
+        <div><label class="mb-label" for="customerPan">PAN</label><input id="customerPan" class="mb-field mb-field--block" placeholder="ABCDE1234F" data-bind="textInput: formPan" /></div>
+        <div><label class="mb-label" for="customerEmail">Email / login</label><input id="customerEmail" type="email" class="mb-field mb-field--block" data-bind="textInput: formEmail" /></div>
+        <div><label class="mb-label" for="customerPassword">Temporary password</label><input id="customerPassword" type="password" class="mb-field mb-field--block" autocomplete="new-password" data-bind="textInput: formPassword" /></div>
+        <div class="mb-form-span"><label class="mb-label" for="customerAddress">Residential address</label><input id="customerAddress" class="mb-field mb-field--block" data-bind="textInput: formAddress" /></div>
+        <div><label class="mb-label" for="customerCity">City</label><input id="customerCity" class="mb-field mb-field--block" data-bind="textInput: formCity" /></div>
+        <div><label class="mb-label" for="customerState">State</label><input id="customerState" class="mb-field mb-field--block" data-bind="textInput: formState" /></div>
+        <div><label class="mb-label" for="customerPincode">Pincode</label><input id="customerPincode" inputmode="numeric" class="mb-field mb-field--block" data-bind="textInput: formPincode" /></div>
+      </div>
+    </div>
+    <div slot="footer"><button type="button" class="mb-action-button mb-action-button--outlined" data-bind="click: cancelConfirm, disable: busy">Go back</button><button type="button" class="mb-action-button mb-action-button--primary" data-bind="click: confirmCreate, disable: busy"><span data-bind="text: confirmLabel"></span></button></div>
+  </oj-dialog>
 </div>

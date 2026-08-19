@@ -25,8 +25,49 @@ define(['./http'], function (api) {
       login: function (body) {
         return api.post('/api/v1/auth/login', { body: body });
       },
+      register: function (body, key) {
+        return api.post('/api/v1/auth/register', { body: body, idempotencyKey: key });
+      },
       logout: function () {
         return api.post('/api/v1/auth/logout');
+      }
+    },
+
+    /* ------------------------------------------ identity administration --- */
+    identity: {
+      users: function (query) {
+        return api.get('/api/v1/users', { query: query });
+      },
+      createUser: function (body, key) {
+        return api.post('/api/v1/users', { body: body, idempotencyKey: key });
+      },
+      roles: function () {
+        return api.get('/api/v1/roles');
+      },
+      permissions: function () {
+        return api.get('/api/v1/permissions');
+      },
+      createRole: function (body, key) {
+        return api.post('/api/v1/roles', { body: body, idempotencyKey: key });
+      },
+      updateRole: function (roleId, body, key) {
+        return api.put('/api/v1/roles/' + enc(roleId), { body: body, idempotencyKey: key });
+      },
+      replaceRolePermissions: function (roleId, permissionIds, key) {
+        return api.put('/api/v1/admin/role-permissions/' + enc(roleId), {
+          body: { permissionIds: permissionIds }, idempotencyKey: key
+        });
+      },
+      replaceUserRole: function (userId, role, key) {
+        return api.put('/api/v1/admin/users/' + enc(userId) + '/role', {
+          body: { role: role }, idempotencyKey: key
+        });
+      },
+      enableUser: function (userId, key) {
+        return api.post('/api/v1/users/' + enc(userId) + '/enable', { idempotencyKey: key });
+      },
+      disableUser: function (userId, key) {
+        return api.post('/api/v1/users/' + enc(userId) + '/disable', { idempotencyKey: key });
       }
     },
 
@@ -42,6 +83,9 @@ define(['./http'], function (api) {
       list: function () {
         return api.get('/api/v1/customers');
       },
+      create: function (body, key) {
+        return api.post('/api/v1/customers', { body: body, idempotencyKey: key });
+      },
       get: function (cifNo) {
         return api.get('/api/v1/customers/' + enc(cifNo));
       },
@@ -53,6 +97,9 @@ define(['./http'], function (api) {
       },
       addresses: function (cifNo) {
         return api.get('/api/v1/customers/' + enc(cifNo) + '/addresses');
+      },
+      addAddress: function (cifNo, body, key) {
+        return api.put('/api/v1/customers/' + enc(cifNo) + '/addresses', { body: body, idempotencyKey: key });
       },
       kycDocuments: function (cifNo) {
         return api.get('/api/v1/customers/' + enc(cifNo) + '/kyc-documents');
@@ -339,6 +386,21 @@ define(['./http'], function (api) {
       },
       get: function (productCode) {
         return api.get('/api/v1/products/' + enc(productCode));
+      },
+      versions: function (productCode) {
+        return api.get('/api/v1/products/' + enc(productCode) + '/versions');
+      },
+      create: function (body, key) {
+        return api.post('/api/v1/products', { body: body, idempotencyKey: key });
+      },
+      update: function (productCode, body, key) {
+        return api.patch('/api/v1/products/' + enc(productCode), { body: body, idempotencyKey: key });
+      },
+      activate: function (productCode, key) {
+        return api.post('/api/v1/products/' + enc(productCode) + '/activate', { idempotencyKey: key });
+      },
+      deactivate: function (productCode, key) {
+        return api.post('/api/v1/products/' + enc(productCode) + '/deactivate', { idempotencyKey: key });
       }
     },
 
@@ -346,8 +408,58 @@ define(['./http'], function (api) {
       list: function (query) {
         return api.get('/api/v1/branches', { query: query });
       },
+      create: function (body, key) {
+        return api.post('/api/v1/branches', { body: body, idempotencyKey: key });
+      },
+      update: function (branchId, body, key) {
+        return api.patch('/api/v1/branches/' + enc(branchId), { body: body, idempotencyKey: key });
+      },
+      activate: function (branchId, key) {
+        return api.post('/api/v1/branches/' + enc(branchId) + '/activate', { idempotencyKey: key });
+      },
+      deactivate: function (branchId, key) {
+        return api.post('/api/v1/branches/' + enc(branchId) + '/deactivate', { idempotencyKey: key });
+      },
+      workingHours: function (branchId) {
+        return api.get('/api/v1/branches/' + enc(branchId) + '/working-hours');
+      },
+      replaceWorkingHours: function (branchId, body, key) {
+        return api.put('/api/v1/branches/' + enc(branchId) + '/working-hours', { body: body, idempotencyKey: key });
+      },
+      holidays: function (branchId) {
+        return api.get('/api/v1/branches/' + enc(branchId) + '/holidays');
+      },
+      addHoliday: function (branchId, body, key) {
+        return api.post('/api/v1/branches/' + enc(branchId) + '/holidays', { body: body, idempotencyKey: key });
+      },
+      deleteHoliday: function (branchId, holidayId, key) {
+        return api.del('/api/v1/branches/' + enc(branchId) + '/holidays/' + enc(holidayId), { idempotencyKey: key });
+      },
       employees: function (query) {
         return api.get('/api/v1/employees', { query: query });
+      },
+      employee: function (employeeId) {
+        return api.get('/api/v1/employees/' + enc(employeeId));
+      },
+      createEmployee: function (body, key) {
+        return api.post('/api/v1/employees', { body: body, idempotencyKey: key });
+      },
+      updateEmployee: function (employeeId, body, key) {
+        return api.patch('/api/v1/employees/' + enc(employeeId), { body: body, idempotencyKey: key });
+      },
+      updateManager: function (employeeId, managerId, key) {
+        return api.put('/api/v1/employees/' + enc(employeeId) + '/manager', {
+          body: { reportingManagerId: managerId }, idempotencyKey: key
+        });
+      },
+      transferEmployee: function (employeeId, body, key) {
+        return api.post('/api/v1/employees/' + enc(employeeId) + '/transfer', { body: body, idempotencyKey: key });
+      },
+      approvalAuthority: function (employeeId) {
+        return api.get('/api/v1/employees/' + enc(employeeId) + '/approval-authority');
+      },
+      replaceApprovalAuthority: function (employeeId, body, key) {
+        return api.put('/api/v1/employees/' + enc(employeeId) + '/approval-authority', { body: body, idempotencyKey: key });
       }
     },
 
@@ -371,6 +483,9 @@ define(['./http'], function (api) {
     notifications: {
       list: function (query) {
         return api.get('/api/v1/notifications', { query: query });
+      },
+      templates: function () {
+        return api.get('/api/v1/notification-templates');
       }
     }
   };

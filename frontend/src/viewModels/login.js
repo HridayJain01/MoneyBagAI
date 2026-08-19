@@ -17,6 +17,8 @@ define([
 ], function (ko, endpoints, session, http) {
   'use strict';
 
+  var EMPLOYEE_ROLES = ['TELLER', 'CHECKER', 'BRANCH_MANAGER', 'OPS_ADMIN'];
+
   function LoginViewModel(context) {
     var self = this;
     var params = (context && context.params) || {};
@@ -51,10 +53,16 @@ define([
       endpoints.auth
         .login({ username: username, password: password })
         .then(function (result) {
+          var roles = result.roles || [];
+          if (!roles.some(function (role) { return EMPLOYEE_ROLES.indexOf(role) !== -1; })) {
+            self.error('This is the employee operations console. Customer logins must use the customer banking application.');
+            return endpoints.auth.logout().catch(function () {}).then(function () { return null; });
+          }
           session.setSession(result);
           if (typeof params.onSignedIn === 'function') {
             params.onSignedIn();
           }
+          return result;
         })
         .catch(function (err) {
           // A failed login is expected traffic, so it renders inline rather

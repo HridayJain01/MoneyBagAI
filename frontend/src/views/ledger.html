@@ -1,2 +1,40 @@
-<!-- Markup lives once, as the #mbGenericList template in index.html. -->
-<!-- ko template: { name: 'mbGenericList' } --><!-- /ko -->
+<div class="mb-stack">
+  <header class="mb-page-header">
+    <div><h1 class="mb-page-header__title">Ledger</h1><p class="mb-page-header__lede">Inspect general-ledger balances and the balanced journals behind every posting.</p></div>
+  </header>
+
+  <!-- ko if: error --><div class="mb-banner mb-banner--error" role="alert"><div><strong>Could not load ledger</strong><span data-bind="text: error"></span></div></div><!-- /ko -->
+
+  <div class="mb-grid mb-grid--4">
+    <article class="mb-card mb-stat"><span class="mb-stat__label">GL accounts</span><span class="mb-stat__value" data-bind="text: loading() ? '…' : accounts().length"></span><span class="mb-stat__hint">Configured accounts</span></article>
+    <article class="mb-card mb-stat"><span class="mb-stat__label">Asset accounts</span><span class="mb-stat__value" data-bind="text: loading() ? '…' : assetCount"></span><span class="mb-stat__hint">Debit-normal</span></article>
+    <article class="mb-card mb-stat"><span class="mb-stat__label">Liabilities</span><span class="mb-stat__value" data-bind="text: loading() ? '…' : liabilityCount"></span><span class="mb-stat__hint">Credit-normal</span></article>
+    <article class="mb-card mb-stat"><span class="mb-stat__label">Visible journals</span><span class="mb-stat__value" data-bind="text: loading() ? '…' : journals().length"></span><span class="mb-stat__hint">Newest first</span></article>
+  </div>
+
+  <section class="mb-card mb-card--flush">
+    <div class="mb-card__bar"><div><h2 class="mb-card__title">General-ledger accounts</h2><p class="mb-card__subtitle">Balances by account code and normal side.</p></div></div>
+    <!-- ko if: loading --><div class="mb-empty"><p class="mb-empty__body">Loading ledger accounts…</p></div><!-- /ko -->
+    <!-- ko if: !loading() && accounts().length -->
+    <div class="mb-scroll-x"><table class="mb-plain-table"><thead><tr><th>Code</th><th>Account</th><th>Type</th><th>Normal side</th><th>Balance</th><th>Status</th></tr></thead><tbody data-bind="foreach: accounts"><tr><td class="mb-mono" data-bind="text: code"></td><td data-bind="text: name"></td><td data-bind="text: typeDisplay"></td><td data-bind="text: sideDisplay"></td><td class="mb-money" data-bind="text: balanceDisplay"></td><td><span data-bind="css: statusClass, text: active ? 'ACTIVE' : 'INACTIVE'"></span></td></tr></tbody></table></div>
+    <!-- /ko -->
+  </section>
+
+  <section class="mb-card mb-card--flush">
+    <div class="mb-card__bar mb-card__bar--wrap"><div><h2 class="mb-card__title">Journal history</h2><p class="mb-card__subtitle">Filter by transaction or customer-account UUID.</p></div><div class="mb-filter-row"><input class="mb-field" aria-label="Transaction ID" placeholder="Transaction ID" data-bind="textInput: transactionId" /><input class="mb-field" aria-label="Customer account ID" placeholder="Customer account ID" data-bind="textInput: customerAccountId" /><button type="button" class="mb-action-button mb-action-button--primary" data-bind="click: applyFilters, disable: loading">Apply</button><button type="button" class="mb-action-button mb-action-button--outlined" data-bind="click: clearFilters, disable: loading">Clear</button></div></div>
+    <!-- ko if: !loading() && !journals().length --><div class="mb-empty"><p class="mb-empty__title">No journals match</p><p class="mb-empty__body">Try clearing one or both identifiers.</p></div><!-- /ko -->
+    <!-- ko if: journals().length -->
+    <div class="mb-scroll-x"><table class="mb-plain-table"><thead><tr><th>Reference</th><th>Type</th><th>Status</th><th>Amount</th><th>Created</th><th></th></tr></thead><tbody data-bind="foreach: journals"><tr><td class="mb-mono" data-bind="text: journalReference"></td><td data-bind="text: typeDisplay"></td><td><span data-bind="css: statusClass, text: status"></span></td><td class="mb-money" data-bind="text: amountDisplay"></td><td class="mb-muted" data-bind="text: createdDisplay"></td><td><button type="button" class="mb-table-link" data-bind="click: inspect">Inspect</button></td></tr></tbody></table></div>
+    <!-- /ko -->
+  </section>
+
+  <!-- ko with: selectedJournal -->
+  <section class="mb-card mb-detail-card">
+    <div class="mb-card__header"><div><span class="mb-label">Journal detail</span><h2 class="mb-detail-card__title mb-mono" data-bind="text: journalReference"></h2></div><button type="button" class="mb-action-button mb-action-button--outlined" data-bind="click: closeDetail">Close</button></div>
+    <div class="mb-grid mb-grid--3"><div class="mb-kv"><span class="mb-kv__k">Transaction</span><span class="mb-kv__v mb-mono" data-bind="text: transactionId || '—'"></span><span class="mb-kv__k">Type</span><span class="mb-kv__v" data-bind="text: typeDisplay"></span></div><div class="mb-kv"><span class="mb-kv__k">Debit</span><span class="mb-kv__v mb-money" data-bind="text: amountDisplay"></span><span class="mb-kv__k">Credit</span><span class="mb-kv__v mb-money" data-bind="text: amountDisplay"></span></div><div class="mb-kv"><span class="mb-kv__k">Balance check</span><span class="mb-kv__v"><span data-bind="css: balanced ? 'mb-pill mb-pill--success' : 'mb-pill mb-pill--danger', text: balanced ? 'BALANCED' : 'OUT OF BALANCE'"></span></span><span class="mb-kv__k">Posted</span><span class="mb-kv__v" data-bind="text: createdDisplay"></span></div></div>
+    <hr class="mb-divider" />
+    <h3 class="mb-card__title">Journal lines</h3>
+    <div class="mb-scroll-x"><table class="mb-plain-table"><thead><tr><th>#</th><th>Ledger account</th><th>Customer account</th><th>Side</th><th>Amount</th></tr></thead><tbody data-bind="foreach: lines"><tr><td data-bind="text: lineNumber"></td><td><span class="mb-mono" data-bind="text: ledgerCode"></span><div class="mb-muted" data-bind="text: ledgerAccountName"></div></td><td class="mb-mono" data-bind="text: customerAccountId || '—'"></td><td><span data-bind="css: sideClass, text: side"></span></td><td class="mb-money" data-bind="text: amountDisplay"></td></tr></tbody></table></div>
+  </section>
+  <!-- /ko -->
+</div>

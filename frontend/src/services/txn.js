@@ -13,10 +13,9 @@
  *    the user a payment-method picker would only let them break the request.
  *
  * 2. The validated account FLIPS. validateAccounts() resolves the DESTINATION
- *    for DEPOSIT and CHEQUE, and the SOURCE for everything else. Only
- *    INTERNAL_TRANSFER validates both. For NEFT/RTGS/IMPS/UPI the destination is
- *    an unvalidated free-form string — the money is leaving this bank, so there
- *    is nothing here to resolve it against.
+ *    for DEPOSIT and the SOURCE for withdrawal. INTERNAL_TRANSFER validates
+ *    both. External and instrument rails are intentionally absent from this
+ *    branch console.
  *
  * 3. The server quotes amount PLUS fee, against the account from rule 2. Quoting
  *    the bare amount, or against the other side, diverges silently: the quote
@@ -26,11 +25,9 @@
  *    Every other rail answers allowed:true with all four bounds null. A bounds
  *    panel is therefore worth rendering only when something in it is non-null.
  *
- * CARD_PAYMENT and PRODUCT_PURCHASE are deliberately absent from RAILS.
- * CARD_PAYMENT requires a cardId whose context is served only from
- * /internal/v1/cards/{cardId}/payment-context, which the gateway blocks — a
- * teller has no way to obtain one. PRODUCT_PURCHASE takes a different request
- * shape entirely and belongs with account opening, not with a rail selector.
+ * CHEQUE, NEFT, RTGS, IMPS, UPI, CARD_PAYMENT and PRODUCT_PURCHASE are
+ * deliberately absent from RAILS. The employee console supports cash counter
+ * work and same-bank account transfers only.
  */
 define(['./endpoints'], function (endpoints) {
   'use strict';
@@ -85,20 +82,6 @@ define(['./endpoints'], function (endpoints) {
       }
     },
     {
-      id: 'CHEQUE',
-      label: 'Cheque deposit',
-      group: 'teller',
-      transactionType: 'CHEQUE',
-      rail: 'CHEQUE',
-      paymentMethod: 'CHEQUE',
-      // Like a deposit, the money is arriving: the DESTINATION is validated.
-      needs: { source: false, destination: true, upiAddress: false, chequeNumber: true },
-      destinationIsExternal: false,
-      submit: function (body, key, correlationId) {
-        return endpoints.transactions.cheque(body, key, correlationId);
-      }
-    },
-    {
       id: 'INTERNAL',
       label: 'Internal transfer',
       group: 'transfer',
@@ -110,58 +93,6 @@ define(['./endpoints'], function (endpoints) {
       destinationIsExternal: false,
       submit: function (body, key, correlationId) {
         return endpoints.transactions.internalTransfer(body, key, correlationId);
-      }
-    },
-    {
-      id: 'NEFT',
-      label: 'NEFT',
-      group: 'transfer',
-      transactionType: 'NEFT',
-      rail: 'NEFT',
-      paymentMethod: 'NEFT',
-      needs: { source: true, destination: true, upiAddress: false, chequeNumber: false },
-      destinationIsExternal: true,
-      submit: function (body, key, correlationId) {
-        return endpoints.transactions.neft(body, key, correlationId);
-      }
-    },
-    {
-      id: 'RTGS',
-      label: 'RTGS',
-      group: 'transfer',
-      transactionType: 'RTGS',
-      rail: 'RTGS',
-      paymentMethod: 'RTGS',
-      needs: { source: true, destination: true, upiAddress: false, chequeNumber: false },
-      destinationIsExternal: true,
-      submit: function (body, key, correlationId) {
-        return endpoints.transactions.rtgs(body, key, correlationId);
-      }
-    },
-    {
-      id: 'IMPS',
-      label: 'IMPS',
-      group: 'transfer',
-      transactionType: 'IMPS',
-      rail: 'IMPS',
-      paymentMethod: 'IMPS',
-      needs: { source: true, destination: true, upiAddress: false, chequeNumber: false },
-      destinationIsExternal: true,
-      submit: function (body, key, correlationId) {
-        return endpoints.transactions.imps(body, key, correlationId);
-      }
-    },
-    {
-      id: 'UPI',
-      label: 'UPI',
-      group: 'transfer',
-      transactionType: 'UPI',
-      rail: 'UPI',
-      paymentMethod: 'UPI',
-      needs: { source: true, destination: true, upiAddress: true, chequeNumber: false },
-      destinationIsExternal: true,
-      submit: function (body, key, correlationId) {
-        return endpoints.transactions.upi(body, key, correlationId);
       }
     }
   ];
@@ -181,11 +112,11 @@ define(['./endpoints'], function (endpoints) {
 
   /**
    * The account the SERVER quotes and validates against — see rule 2 above.
-   * Deposits and cheques are quoted on the destination; everything else on the
+   * Deposits are quoted on the destination; everything else on the
    * source.
    */
   function quoteAccountFor(entry, form) {
-    var inbound = entry.transactionType === 'DEPOSIT' || entry.transactionType === 'CHEQUE';
+    var inbound = entry.transactionType === 'DEPOSIT';
     return inbound ? form.destinationAccountId : form.sourceAccountId;
   }
 

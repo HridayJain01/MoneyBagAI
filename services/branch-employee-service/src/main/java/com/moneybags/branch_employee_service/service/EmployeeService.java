@@ -131,6 +131,9 @@ public class EmployeeService {
         transfer.setRemarks(request.getRemarks());
         branchTransferRepository.save(transfer);
 
+        branchRepository.findById(updatedEmployee.getBranchId()).ifPresent(branch ->
+                identityClient.publishEmployment(updatedEmployee.getUserId(), updatedEmployee.getId(), branch.getBranchCode()));
+
         return updatedEmployee;
     }
 

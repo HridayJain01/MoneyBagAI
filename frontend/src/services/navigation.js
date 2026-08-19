@@ -23,33 +23,40 @@ define(['ojs/ojcorerouter', 'ojs/ojurlparamadapter', './session'], function (
   // the seeded values in the identity schema.
   var routes = [
     { path: '', redirect: 'overview' },
-    { path: 'overview', detail: { label: 'Overview' } },
-    { path: 'tellerOps', detail: { label: 'Teller operations', permission: 'TRANSACTION_CREATE' } },
-    { path: 'transfers', detail: { label: 'Transfers', permission: 'TRANSACTION_CREATE' } },
+    { path: 'overview', detail: { label: 'Overview', roles: ['TELLER', 'CHECKER', 'BRANCH_MANAGER', 'OPS_ADMIN'] } },
+    { path: 'tellerOps', detail: { label: 'Teller operations', permission: 'TRANSACTION_CREATE', roles: ['TELLER'] } },
+    { path: 'transfers', detail: { label: 'Internal transfers', permission: 'TRANSACTION_CREATE', roles: ['TELLER'] } },
     { path: 'approvals', detail: { label: 'Approvals', permission: 'TRANSACTION_APPROVE' } },
     { path: 'openAccount', detail: { label: 'Open account', permission: 'ACCOUNT_OPEN' } },
     { path: 'applications', detail: { label: 'Account applications', permission: 'ACCOUNT_VIEW' } },
     { path: 'customers', detail: { label: 'Customers', permission: 'CUSTOMER_READ' } },
-    { path: 'customerDetail', detail: { label: 'Customer' } },
+    { path: 'customerDetail', detail: { label: 'Customer', permission: 'CUSTOMER_READ' } },
     { path: 'accounts', detail: { label: 'Accounts', permission: 'ACCOUNT_VIEW' } },
-    { path: 'accountDetail', detail: { label: 'Account' } },
+    { path: 'accountDetail', detail: { label: 'Account', permission: 'ACCOUNT_VIEW' } },
     { path: 'transactions', detail: { label: 'Transactions', permission: 'TRANSACTION_VIEW' } },
     { path: 'transactionDetail', detail: { label: 'Transaction', permission: 'TRANSACTION_VIEW' } },
-    { path: 'ledger', detail: { label: 'Ledger' } },
+    { path: 'ledger', detail: { label: 'Ledger', roles: ['OPS_ADMIN'] } },
     { path: 'products', detail: { label: 'Products', permission: 'PRODUCT_READ' } },
-    { path: 'branches', detail: { label: 'Branches' } },
+    { path: 'branches', detail: { label: 'Branches & staff', roles: ['BRANCH_MANAGER', 'OPS_ADMIN'] } },
     { path: 'notifications', detail: { label: 'Notifications', permission: 'NOTIFICATION_MANAGE' } },
     { path: 'audit', detail: { label: 'Audit trail', permission: 'AUDIT_VIEW' } }
   ];
 
   var router = new CoreRouter(routes, { urlAdapter: new UrlParamAdapter() });
 
+  function isAllowed(detail) {
+    var required = detail && detail.permission;
+    var roles = (detail && detail.roles) || [];
+    return (!required || session.hasPermission(required)) &&
+      (!roles.length || roles.some(function (role) { return session.hasRole(role); }));
+  }
+
   // Client-side gate. Cosmetic only — the gateway is the real authority, so
   // every screen still handles a 403 from any call.
   router.beforeStateChange.subscribe(function (args) {
-    var required = args.state && args.state.detail && args.state.detail.permission;
-    if (required && !session.hasPermission(required)) {
-      args.accept(Promise.reject(new Error('Missing permission: ' + required)));
+    var detail = args.state && args.state.detail;
+    if (!isAllowed(detail)) {
+      args.accept(Promise.reject(new Error('This route is not available for the current role.')));
     }
   });
 
@@ -76,6 +83,10 @@ define(['ojs/ojcorerouter', 'ojs/ojurlparamadapter', './session'], function (
     router: router,
     go: go,
     param: param,
+    canAccessPath: function (path) {
+      var route = routes.find(function (candidate) { return candidate.path === path; });
+      return !!route && isAllowed(route.detail || {});
+    },
     openAccount: function (accountId) {
       return go('accountDetail', { id: accountId });
     },

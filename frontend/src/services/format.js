@@ -186,6 +186,8 @@ define([], function () {
       case 'SETTLED':
       case 'COMPLETED':
       case 'VERIFIED':
+      case 'POSTED':
+      case 'SENT':
         return 'success';
       case 'PENDING':
       case 'PENDING_APPROVAL':
@@ -199,6 +201,7 @@ define([], function () {
       case 'FROZEN':
       case 'CANCELLED':
       case 'REVERSED':
+      case 'SUPPRESSED':
         return 'info';
       default:
         return 'neutral';

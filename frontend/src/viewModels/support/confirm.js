@@ -23,9 +23,9 @@
  * only on success.
  *
  * Each screen keeps its OWN <oj-dialog> with a unique id rather than sharing
- * one. Legacy oj-dialog is addressed through its jQuery widget API: in JET 20
- * the custom-element bridge does not reliably retain DOM open()/close()
- * methods after the first transition. During an oj-module transition the
+ * one. JET 20 exposes open()/close() on the upgraded custom element; the
+ * jQuery widget bridge remains as a compatibility fallback for a dialog that
+ * has not completed that upgrade yet. During an oj-module transition the
  * outgoing view can still be in the DOM, so a shared id would resolve to
  * whichever copy the browser found first.
  */
@@ -44,22 +44,28 @@ define(['knockout', 'jquery', '../../services/http'], function (ko, $, http) {
       return dialogId ? document.getElementById(dialogId) : null;
     }
 
+    function invokeDialog(method) {
+      var element = dialogElement();
+      if (!element) {
+        return;
+      }
+      if (typeof element[method] === 'function') {
+        element[method]();
+        return;
+      }
+      $(element).ojDialog(method);
+    }
+
     /**
      * The user has committed. Mint the intent HERE — once — and open the dialog.
      */
     self.openConfirm = function (payload) {
       self.pending({ payload: payload, intent: http.beginIntent() });
-      var element = dialogElement();
-      if (element) {
-        $(element).ojDialog('open');
-      }
+      invokeDialog('open');
     };
 
     self.closeConfirm = function () {
-      var element = dialogElement();
-      if (element) {
-        $(element).ojDialog('close');
-      }
+      invokeDialog('close');
       self.pending(null);
     };
 

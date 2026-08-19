@@ -58,6 +58,37 @@ body {
     grid-template-columns: 1fr;
   }
 
+  .mb-nav {
+    position: static;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: var(--mb-space-2) var(--mb-space-3);
+    border-right: 0;
+    border-bottom: 1px solid var(--mb-hairline);
+  }
+
+  .mb-nav__brand {
+    flex: 0 0 auto;
+    padding: 0 var(--mb-space-3) 0 0;
+  }
+
+  .mb-nav > div:not(.mb-nav__brand) {
+    display: flex;
+    flex: 0 0 auto;
+  }
+
+  .mb-nav__section {
+    display: none;
+  }
+
+  .mb-nav__item {
+    width: auto;
+    white-space: nowrap;
+  }
+
   .mb-shell__content {
     padding: var(--mb-space-4) var(--mb-space-4) var(--mb-space-7);
   }
@@ -796,6 +827,23 @@ body {
   gap: var(--mb-space-4);
 }
 
+.mb-form-grid--admin {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-width: min(680px, 76vw);
+}
+
+.mb-form-span {
+  grid-column: 1 / -1;
+}
+
+.mb-check {
+  display: flex;
+  align-items: center;
+  gap: var(--mb-space-2);
+  color: var(--mb-ink-secondary);
+  font-size: 13px;
+}
+
 .mb-resolved {
   display: flex;
   align-items: center;
@@ -866,8 +914,8 @@ body {
 
 /* ------------------------------------------------------- plain tables ----- */
 
-/* Used by the generic list screens, where the column set is derived at runtime
-   and an oj-table would be more machinery than the page needs. */
+/* Used by the purpose-built operational explorers where the result sets are
+   bounded and explicit columns are clearer than a remote data provider. */
 .mb-scroll-x {
   overflow-x: auto;
 }
@@ -898,6 +946,190 @@ body {
 
 .mb-plain-table tr:last-child td {
   border-bottom: none;
+}
+
+/* ------------------------------------------- operational explorers ----- */
+
+.mb-card__bar--wrap {
+  flex-wrap: wrap;
+}
+
+.mb-card__bar--stack {
+  align-items: stretch;
+  flex-direction: column;
+}
+
+.mb-filter-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--mb-space-2);
+  flex-wrap: wrap;
+}
+
+.mb-filter-row .mb-field {
+  min-width: 150px;
+}
+
+.mb-detail-card {
+  scroll-margin-top: calc(var(--mb-topbar-height) + var(--mb-space-4));
+}
+
+.mb-detail-card__title {
+  margin: var(--mb-space-1) 0 0;
+  font-size: 20px;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.mb-section-gap {
+  margin-top: var(--mb-space-5);
+}
+
+.mb-empty--compact {
+  padding: var(--mb-space-4) 0;
+}
+
+.mb-table-link {
+  border: 0;
+  background: none;
+  color: var(--mb-accent-active);
+  padding: var(--mb-space-1);
+  font: inherit;
+  font-weight: var(--mb-weight-strong);
+  cursor: pointer;
+}
+
+.mb-table-link:hover {
+  text-decoration: underline;
+}
+
+.mb-table-id {
+  max-width: 240px;
+}
+
+.mb-compact-list {
+  margin-top: var(--mb-space-3);
+  border-top: 1px solid var(--mb-hairline);
+}
+
+.mb-compact-list__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mb-space-3);
+  padding: var(--mb-space-3) 0;
+  border-bottom: 1px solid var(--mb-hairline);
+  font-size: 13px;
+}
+
+.mb-message-preview,
+.mb-code-block {
+  margin: var(--mb-space-3) 0 0;
+  padding: var(--mb-space-4);
+  border: 1px solid var(--mb-hairline);
+  border-radius: var(--mb-radius-md);
+  background: var(--mb-surface-subtle);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.mb-code-block {
+  max-height: 360px;
+  overflow: auto;
+  font: 12px/1.6 var(--mb-font-num);
+}
+
+.mb-stat__value--word {
+  font-size: 24px;
+}
+
+.mb-tabs {
+  display: flex;
+  gap: var(--mb-space-2);
+  overflow-x: auto;
+  border-bottom: 1px solid var(--mb-hairline);
+}
+
+.mb-tabs button {
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--mb-ink-secondary);
+  font: inherit;
+  font-weight: var(--mb-weight-strong);
+  padding: var(--mb-space-3) var(--mb-space-4);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.mb-tabs button.is-active {
+  border-bottom-color: var(--mb-accent);
+  color: var(--mb-accent-active);
+}
+
+.mb-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mb-space-2);
+}
+
+.mb-permission-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--mb-space-2);
+  margin-top: var(--mb-space-2);
+  max-height: 300px;
+  overflow: auto;
+}
+
+.mb-permission-option {
+  align-items: flex-start;
+  border: 1px solid var(--mb-hairline);
+  border-radius: var(--mb-radius-md);
+  padding: var(--mb-space-3);
+}
+
+.mb-permission-option span {
+  display: grid;
+}
+
+.mb-permission-option small {
+  color: var(--mb-ink-muted);
+}
+
+.mb-hours-row {
+  display: grid;
+  grid-template-columns: 72px 96px minmax(110px, 1fr) minmax(110px, 1fr);
+  gap: var(--mb-space-2);
+}
+
+@media (max-width: 900px) {
+  .mb-filter-row {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .mb-filter-row .mb-field {
+    flex: 1 1 180px;
+  }
+
+  .mb-form-grid--admin {
+    grid-template-columns: 1fr;
+    min-width: 0;
+  }
+
+  .mb-form-span {
+    grid-column: auto;
+  }
+
+  .mb-permission-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mb-hours-row {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 /* --------------------------------------------- JET component adjustments --- */

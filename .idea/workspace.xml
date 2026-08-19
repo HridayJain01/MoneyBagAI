@@ -4,30 +4,41 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3ed1cd6b-f7be-4008-9942-5ef42f39a0a8" name="Changes" comment="Reference material added">
-      <change afterPath="$PROJECT_DIR$/frontend/TEST-FLOW.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/viewModels/applications.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/viewModels/openAccount.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/viewModels/tellerOps.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/viewModels/transactionDetail.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/viewModels/transfers.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/views/applications.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/views/openAccount.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/views/tellerOps.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/views/transactionDetail.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/views/transfers.html" afterDir="false" />
+    <list default="true" id="3ed1cd6b-f7be-4008-9942-5ef42f39a0a8" name="Changes" comment="UI integration has been completed">
+      <change afterPath="$PROJECT_DIR$/frontend/ojet-serve.err.log" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/ojet-serve.out.log" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/PROGRESS.md" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/PROGRESS.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/TEST-FLOW.md" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/TEST-FLOW.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/appController.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/appController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/main.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/endpoints.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/endpoints.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/format.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/format.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/services/navigation.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/navigation.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/txn.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/txn.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/styles/layout.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/styles/layout.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/accountDetail.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/accountDetail.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/customerDetail.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/customerDetail.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/overview.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/overview.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/audit.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/audit.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/branches.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/branches.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/customers.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/customers.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/genericList.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/ledger.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/ledger.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/login.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/login.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/notifications.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/notifications.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/products.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/products.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/support/confirm.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/support/confirm.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/transactions.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/transactions.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/accountDetail.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/accountDetail.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/approvals.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/approvals.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/transactions.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/transactions.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/audit.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/audit.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/branches.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/branches.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/customers.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/customers.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/ledger.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/ledger.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/notifications.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/notifications.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/products.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/products.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/tellerOps.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/tellerOps.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/transfers.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/transfers.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/BranchController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/BranchController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/EmployeeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/EmployeeController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/service/EmployeeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/service/EmployeeService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -269,6 +280,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Reference material added" />
-    <option name="LAST_COMMIT_MESSAGE" value="Reference material added" />
+    <MESSAGE value="UI integration has been completed" />
+    <option name="LAST_COMMIT_MESSAGE" value="UI integration has been completed" />
   </component>
 </project>

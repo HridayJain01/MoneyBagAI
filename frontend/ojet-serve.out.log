@@ -1,0 +1,1814 @@
+
+> moneybags-console@1.0.0 serve
+> ojet serve
+
+Build: true
+BuildType: dev
+Destination: undefined
+Destination target: undefined
+Livereload: true
+Watch files: true
+Livereload port: 35729
+Platform: web
+Port: 8000
+Theme: redwood
+Theme platform: web
+Theme version: 20.1.3
+Building app.
+Cleaning staging path.
+Running before_build hook.
+Copy files to staging directory.
+Copy finished.
+Copy library files to staging directory.
+Copy finished.
+Copy reference components to staging directory.
+Copy finished.
+Copy local web components
+Copy local web components skipped
+Optimizing svg into SVG sprites.
+Svg optimization task finished.
+Running before_injection hook.
+Running typescript injection tasks.
+Task typescript injection finished.
+Compiling sass...
+Warning: Sass compile skipped: sass (or node-sass) is not installed. To install it, run ojet add sass.
+Running theme injection task.
+Task index.html theme path injection finished.
+Running font injection task.
+Task index.html font path injection finished.
+Running theme copy task.
+Theme copy task finished.
+Task index.html script injection finished
+Running injection tasks.
+Task main.js paths injection finished.
+runAllComponentHooks 
+Running after_build hook.
+[moneybags] proxying /api -> http://127.0.0.1:8090
+[moneybags] history fallback enabled for client-side routes
+Starting web server.
+Connecting to http://localhost:8000
+Success: Server ready: http://localhost:8000
+Listening on 127.0.0.1:35729.
+Starting watcher.
+Watching files.
+Watching Interval: 1000.
+Running after_serve hook.
+Watcher: sass is ready.
+Watcher: sourceFiles is ready.
+Watcher: themes is ready.
+Added: staged-themes\redwood\web\oj-redwood-min.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\redwood\web\oj-redwood-notag-min.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\redwood\web\oj-redwood-notag.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\redwood\web\oj-redwood.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\alta\android\oj-alta-min.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\alta\android\oj-alta.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\alta\web\oj-alta-min.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\alta\web\oj-alta.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\alta\ios\oj-alta-min.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\alta\ios\oj-alta.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\alta\windows\oj-alta-min.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\alta\windows\oj-alta.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\stable\web\oj-stable-min.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\stable\web\oj-stable.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Changed: staged-themes\alta\web\images\spinner_00.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\status_confirmation.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\spinner_30.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\spinner_10.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\spinner_70.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\spinner_20.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\spinner_80.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\spinner_80.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\spinner_30.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\move_handle.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\radio_dis_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\radio_dis_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\cbsingle_hover_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\cbsingle_hover_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\spinner_50.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\radio_pressed_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\status_info.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\status_error.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\checkbox_dis_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\radio_ena_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\radio_pressed_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\radio_pressed_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\checkbox_pressed_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\checkbox_ena_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\status_warning.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\spinner_20.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\animated-overlay.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\spinner_60.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\checkbox_tristate_partial.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\checkbox_dis_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\checkbox_tristate_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\spinner_40.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\cbsingle_dis_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\checkbox_pressed_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\checkbox_ena_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\spinner_40.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\radio_ena_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\spinner_70.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\spinner_static.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\sprites\sprite.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\checkbox_tristate_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\radio_ena_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\radio_pressed_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\spinner_60.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\redwood\web\images\none.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\spinner_00.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\spinner_90.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\spinner_90.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\radio_ena_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\stable\web\images\none.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\spinner_10.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\spinner_50.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Changed: staged-themes\alta\ios\images\spinner_10.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\spinner_20.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\spinner_30.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\status_warning.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\spinner_40.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\spinner_70.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\status_info2.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\spinner_50.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\spinner_80.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\checkmark_blue.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\spinner_90.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\spinner_50.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\radio_ena_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\none.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\spinner_80.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\spinner_40.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\radio_dis_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\spinner_00.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\folder_open.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\status_error.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\spinner_90.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\person_avatar.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\spinner_60.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\status_warning2.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\move_handle.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\checkbox_dis_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\status_confirmation2.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\checkbox_ena_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\status_error2.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\cbsingle_dis_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\cbsingle_ena_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\cbsingle_pressed_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\checkbox_ena_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\folder_collapsed.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\checkmark_white.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\checkbox_tristate_partial.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\checkbox_dis_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\checkbox_ena_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\checkbox_tristate_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\sprites\sprite.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\cbsingle_pressed_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\radio_pressed_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\cbsingle_hover_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\radio_ena_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\cbsingle_hover_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\sprites\sprite.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\checkbox_tristate_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\cbsingle_hover_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\radio_ena_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\checkbox_ena_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\status_confirmation.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\checkbox_tristate_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\checkbox_dis_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\sprites\sprite.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\status_info.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\spinner_60.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\radio_dis_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\menuitemcheckbox_ena_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\radio_dis_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\move_handle.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\radio_dis_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\checkbox_tristate_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\radio_pressed_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\menuitemcheckbox_dis_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\checkbox_tristate_partial.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\spinner_30.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\checkbox_pressed_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\cbsingle_hover_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\checkbox_tristate_partial.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\move_handle.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\cbsingle_hover_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\cbsingle_dis_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\spinner_00.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\spinner_20.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\cbsingle_hover_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\checkbox_tristate_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\spinner_10.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\cbsingle_ena_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\menuitemcheckbox_dis_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\checkbox_ena_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\checkbox_tristate_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\radio_dis_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\menuitemcheckbox_ena_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\checkbox_dis_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\checkbox_pressed_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\checkbox_pressed_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\checkbox_pressed_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\checkbox_dis_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\group_avatar.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\sprites\sprite.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\spinner_70.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Changed: staged-themes\alta\common\images\document.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Theme copy task finished.
+Command copyThemes completed..
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\alta\android\oj-alta-min.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\alta\android\oj-alta.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\redwood\web\oj-redwood-min.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\redwood\web\oj-redwood-notag-min.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\redwood\web\oj-redwood-notag.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\redwood\web\oj-redwood.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\stable\web\oj-stable-min.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\stable\web\oj-stable.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\alta\ios\oj-alta-min.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\alta\ios\oj-alta.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\alta\windows\oj-alta-min.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\alta\windows\oj-alta.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\alta\web\oj-alta-min.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Added: staged-themes\alta\web\oj-alta.css
+Running before_watch hook.
+Running after_watch hook.
+Page reloaded resume watching.
+Changed: staged-themes\alta\android\images\spinner_70.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\sprites\sprite.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\spinner_30.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\spinner_10.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\spinner_10.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\document.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\status_warning.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\spinner_50.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\status_confirmation.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\spinner_10.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\spinner_40.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\spinner_70.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\spinner_30.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\spinner_20.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\spinner_70.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\checkmark_blue.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\spinner_80.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\spinner_50.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\spinner_90.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\spinner_80.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\none.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\spinner_80.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\spinner_40.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\radio_ena_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\spinner_50.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\folder_open.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\spinner_00.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\person_avatar.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\radio_dis_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\status_error.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\status_info2.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\spinner_90.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\status_warning2.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\spinner_00.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\status_error2.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\spinner_60.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\move_handle.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\move_handle.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\spinner_30.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\status_confirmation2.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\cbsingle_dis_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\spinner_50.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\checkbox_ena_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\radio_dis_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\cbsingle_pressed_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\spinner_20.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\folder_collapsed.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\checkmark_white.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\cbsingle_hover_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\checkbox_ena_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\checkbox_dis_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\status_info.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\cbsingle_hover_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\sprites\sprite.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\status_error.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\radio_dis_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\radio_pressed_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\cbsingle_ena_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\checkbox_tristate_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\checkbox_ena_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\sprites\sprite.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\radio_pressed_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\checkbox_tristate_partial.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\cbsingle_hover_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\cbsingle_hover_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\checkbox_ena_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\cbsingle_pressed_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\checkbox_dis_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\cbsingle_hover_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\checkbox_pressed_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\radio_ena_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\status_warning.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\checkbox_dis_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\checkbox_ena_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\radio_ena_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\status_confirmation.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\common\images\status_info.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\checkbox_tristate_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\radio_pressed_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\radio_dis_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\spinner_60.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\checkbox_tristate_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\spinner_20.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\animated-overlay.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\move_handle.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\sprites\sprite.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\menuitemcheckbox_ena_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\cbsingle_hover_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\checkbox_tristate_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\radio_pressed_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\checkbox_tristate_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\checkbox_dis_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\spinner_60.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\checkbox_tristate_partial.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\spinner_40.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\checkbox_tristate_partial.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\checkbox_tristate_partial.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\radio_dis_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\cbsingle_hover_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\cbsingle_dis_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\checkbox_pressed_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\spinner_20.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\menuitemcheckbox_dis_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\spinner_00.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\move_handle.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\spinner_40.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\radio_dis_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\checkbox_ena_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\spinner_70.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\cbsingle_hover_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\checkbox_tristate_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\checkbox_pressed_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\spinner_10.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\spinner_static.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\cbsingle_dis_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\radio_pressed_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\checkbox_tristate_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\checkbox_tristate_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\radio_pressed_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\ios\images\cbsingle_ena_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\android\images\menuitemcheckbox_ena_selected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\web\images\radio_ena_unselected.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.
+Changed: staged-themes\alta\windows\images\sprites\sprite.svg
+Running before_watch hook.
+Trigggering commands copyThemes.
+Running theme copy task.

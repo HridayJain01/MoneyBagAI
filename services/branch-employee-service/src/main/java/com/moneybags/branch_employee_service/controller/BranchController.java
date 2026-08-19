@@ -9,6 +9,7 @@ import com.moneybags.branch_employee_service.entity.BranchHoliday;
 import com.moneybags.branch_employee_service.entity.BranchWorkingHours;
 import com.moneybags.branch_employee_service.exception.NotFoundException;
 import com.moneybags.branch_employee_service.repository.BranchRepository;
+import com.moneybags.branch_employee_service.security.TrustedHeaderAuthorization;
 import com.moneybags.branch_employee_service.service.BranchService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -24,10 +25,13 @@ public class BranchController {
 
     private final BranchRepository branchRepository;
     private final BranchService branchService;
+    private final TrustedHeaderAuthorization authorization;
 
-    public BranchController(BranchRepository branchRepository, BranchService branchService) {
+    public BranchController(BranchRepository branchRepository, BranchService branchService,
+                            TrustedHeaderAuthorization authorization) {
         this.branchRepository = branchRepository;
         this.branchService = branchService;
+        this.authorization = authorization;
     }
 
     @GetMapping
@@ -42,23 +46,31 @@ public class BranchController {
     }
 
     @PostMapping
-    public ResponseEntity<Branch> create(@Valid @RequestBody CreateBranchRequest request) {
+    public ResponseEntity<Branch> create(@Valid @RequestBody CreateBranchRequest request,
+                                         @RequestHeader(value = "X-Permissions", required = false) String permissions) {
+        authorization.require(permissions, "BRANCH_MANAGE");
         Branch created = branchService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PatchMapping("/{id}")
-    public Branch update(@PathVariable Long id, @Valid @RequestBody UpdateBranchRequest request) {
+    public Branch update(@PathVariable Long id, @Valid @RequestBody UpdateBranchRequest request,
+                         @RequestHeader(value = "X-Permissions", required = false) String permissions) {
+        authorization.require(permissions, "BRANCH_MANAGE");
         return branchService.update(id, request);
     }
 
     @PostMapping("/{id}/activate")
-public Branch activate(@PathVariable Long id) {
+public Branch activate(@PathVariable Long id,
+                       @RequestHeader(value = "X-Permissions", required = false) String permissions) {
+    authorization.require(permissions, "BRANCH_MANAGE");
     return branchService.setStatus(id, "ACTIVE");
 }
 
 @PostMapping("/{id}/deactivate")
-public Branch deactivate(@PathVariable Long id) {
+public Branch deactivate(@PathVariable Long id,
+                         @RequestHeader(value = "X-Permissions", required = false) String permissions) {
+    authorization.require(permissions, "BRANCH_MANAGE");
     return branchService.setStatus(id, "INACTIVE");
 }
 
@@ -76,7 +88,9 @@ public Branch deactivate(@PathVariable Long id) {
     @PutMapping("/{id}/working-hours")
     public List<BranchWorkingHours> replaceWorkingHours(
             @PathVariable Long id,
-            @RequestBody List<@Valid WorkingHoursDayRequest> days) {
+            @RequestBody List<@Valid WorkingHoursDayRequest> days,
+            @RequestHeader(value = "X-Permissions", required = false) String permissions) {
+        authorization.require(permissions, "BRANCH_MANAGE");
         return branchService.replaceWorkingHours(id, days);
     }
 
@@ -88,13 +102,18 @@ public Branch deactivate(@PathVariable Long id) {
     @PostMapping("/{id}/holidays")
     public ResponseEntity<BranchHoliday> addHoliday(
             @PathVariable Long id,
-            @Valid @RequestBody CreateHolidayRequest request) {
+            @Valid @RequestBody CreateHolidayRequest request,
+            @RequestHeader(value = "X-Permissions", required = false) String permissions) {
+        authorization.require(permissions, "BRANCH_MANAGE");
         BranchHoliday created = branchService.addHoliday(id, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @DeleteMapping("/{id}/holidays/{holidayId}")
-    public ResponseEntity<Void> deleteHoliday(@PathVariable Long id, @PathVariable Long holidayId) {
+    public ResponseEntity<Void> deleteHoliday(
+            @PathVariable Long id, @PathVariable Long holidayId,
+            @RequestHeader(value = "X-Permissions", required = false) String permissions) {
+        authorization.require(permissions, "BRANCH_MANAGE");
         branchService.deleteHoliday(id, holidayId);
         return ResponseEntity.noContent().build();
     }

@@ -31,8 +31,10 @@ The app runs on <http://localhost:8000> and proxies `/api` to the gateway on
 variable.
 
 Seeded logins are in `docs/SEED_FIXTURES.md` (`teller1`, `checker1`, `manager1`,
-`opsadmin`). Each has a different permission set, which visibly changes the
-navigation — `checker1` sees no Customers entry, `opsadmin` sees everything.
+`opsadmin`). Each has a different permission set and role boundary. Only `teller1`
+sees Teller and Internal transfers; `checker1` sees Approvals; `manager1` gets the
+read-only branch/staff directory; `opsadmin` gets back-office administration but not
+teller-only routes. CUSTOMER identities are intentionally refused by this employee console.
 
 ### The proxy is not optional
 

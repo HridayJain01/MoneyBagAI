@@ -39,12 +39,36 @@ define([
       return !!s && !session.isExpired(s);
     });
 
-    session.subscribe(function (updated) {
-      self.sessionData(updated);
-    });
-
     // Path the user was heading for before being bounced to login.
     var intendedPath = null;
+
+    function syncRouteAfterSignIn() {
+      var target = intendedPath;
+      intendedPath = null;
+      if (target && target !== '/' && target.indexOf('/login') !== 0) {
+        window.history.pushState(null, '', target);
+      }
+      var requestedPath = new URLSearchParams(window.location.search).get('ojr') || 'overview';
+      if (!navigation.canAccessPath(requestedPath)) {
+        // The URL adapter can reject a protected route before authentication,
+        // which leaves CoreRouter with no state to transition away from. A
+        // same-origin replace gives the freshly stored session a clean sync.
+        window.location.replace('/?ojr=overview');
+        return;
+      }
+      // A route module may still be mounted from the previous login in this
+      // tab. Reload once so every permission flag and data request belongs to
+      // the newly authenticated identity. Reading the stored session during
+      // bootstrap does not notify subscribers, so this cannot loop.
+      window.location.reload();
+    }
+
+    session.subscribe(function (updated) {
+      self.sessionData(updated);
+      if (updated && !session.isExpired(updated)) {
+        syncRouteAfterSignIn();
+      }
+    });
 
     http.onAuthExpired(function () {
       intendedPath = window.location.pathname;
@@ -53,12 +77,6 @@ define([
 
     self.onSignedIn = function () {
       self.sessionData(session.getSession());
-      var target = intendedPath;
-      intendedPath = null;
-      if (target && target !== '/' && target.indexOf('/login') !== 0) {
-        window.history.pushState(null, '', target);
-      }
-      router.sync();
     };
 
     self.signOut = function () {
@@ -117,9 +135,9 @@ define([
       {
         title: 'Workspace',
         items: [
-          { path: 'overview', label: 'Overview', glyph: '◈' },
-          { path: 'tellerOps', label: 'Teller', glyph: '◧', permission: 'TRANSACTION_CREATE' },
-          { path: 'transfers', label: 'Transfers', glyph: '⇄', permission: 'TRANSACTION_CREATE' },
+          { path: 'overview', label: 'Overview', glyph: '◈', roles: ['TELLER', 'CHECKER', 'BRANCH_MANAGER', 'OPS_ADMIN'] },
+          { path: 'tellerOps', label: 'Teller', glyph: '◧', permission: 'TRANSACTION_CREATE', roles: ['TELLER'] },
+          { path: 'transfers', label: 'Internal transfers', glyph: '⇄', permission: 'TRANSACTION_CREATE', roles: ['TELLER'] },
           { path: 'approvals', label: 'Approvals', glyph: '✓', permission: 'TRANSACTION_APPROVE' },
           { path: 'applications', label: 'Applications', glyph: '▣', permission: 'ACCOUNT_VIEW' }
         ]
@@ -135,9 +153,9 @@ define([
       {
         title: 'Back office',
         items: [
-          { path: 'ledger', label: 'Ledger', glyph: '≡' },
+          { path: 'ledger', label: 'Ledger', glyph: '≡', roles: ['OPS_ADMIN'] },
           { path: 'products', label: 'Products', glyph: '◇', permission: 'PRODUCT_READ' },
-          { path: 'branches', label: 'Branches', glyph: '⌂' },
+          { path: 'branches', label: 'Branches & staff', glyph: '⌂', roles: ['BRANCH_MANAGER', 'OPS_ADMIN'] },
           { path: 'notifications', label: 'Notifications', glyph: '◔', permission: 'NOTIFICATION_MANAGE' },
           { path: 'audit', label: 'Audit trail', glyph: '◎', permission: 'AUDIT_VIEW' }
         ]
@@ -153,7 +171,9 @@ define([
         return {
           title: section.title,
           items: section.items.filter(function (item) {
-            return !item.permission || session.hasPermission(item.permission);
+            var permitted = !item.permission || session.hasPermission(item.permission);
+            var roleAllowed = !item.roles || item.roles.some(function (role) { return session.hasRole(role); });
+            return permitted && roleAllowed;
           })
         };
       }).filter(function (section) {

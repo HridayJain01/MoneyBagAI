@@ -3,7 +3,7 @@
     <div>
       <h1 class="mb-page-header__title">Transfers</h1>
       <p class="mb-page-header__lede">
-        Move money internally or over NEFT, RTGS, IMPS and UPI. Limits are checked before confirmation.
+        Move money between two Moneybags accounts. Both accounts are resolved before confirmation.
       </p>
     </div>
   </header>
@@ -19,9 +19,8 @@
   <div class="mb-grid mb-grid--split">
     <section class="mb-card mb-stack">
       <div>
-        <label class="mb-label" for="transferRail">Transfer type</label>
-        <select id="transferRail" class="mb-field mb-field--block"
-                data-bind="options: operations, optionsText: 'label', optionsValue: 'id', value: selectedId"></select>
+        <span class="mb-label">Transfer type</span>
+        <div class="mb-resolved"><strong>Internal account transfer</strong><span class="mb-muted">Same-bank only</span></div>
       </div>
 
       <div>
@@ -53,15 +52,10 @@
         <div class="mb-inline" style="margin-top:6px;flex-wrap:nowrap">
           <input id="transferDestination" class="mb-field" style="flex:1" inputmode="numeric"
                  data-bind="textInput: destinationNumber" />
-          <!-- ko if: isInternal -->
           <oj-button chroming="outlined" disabled="[[resolvingDestination]]" on-oj-action="[[resolveDestination]]">
             <span data-bind="text: resolvingDestination() ? 'Resolving…' : 'Resolve'"></span>
           </oj-button>
-          <!-- /ko -->
         </div>
-        <!-- ko ifnot: isInternal -->
-        <p class="mb-card__subtitle">External beneficiary account; it is validated by the destination rail, not Moneybags.</p>
-        <!-- /ko -->
       </div>
 
       <!-- ko if: destinationAccount -->
@@ -74,12 +68,6 @@
       </div>
       <!-- /ko -->
 
-      <!-- ko if: isUpi -->
-      <div>
-        <label class="mb-label" for="upiAddress">UPI address</label>
-        <input id="upiAddress" class="mb-field mb-field--block" placeholder="name@bank" data-bind="textInput: upiAddress" />
-      </div>
-      <!-- /ko -->
 
       <div class="mb-form-grid">
         <div>
@@ -116,11 +104,11 @@
     </section>
 
     <aside class="mb-card">
-      <div class="mb-card__header"><h2 class="mb-card__title">How destinations work</h2></div>
+      <div class="mb-card__header"><h2 class="mb-card__title">Internal transfer checklist</h2></div>
       <div class="mb-stack mb-stack--tight mb-secondary">
-        <span>Internal accounts are resolved and shown before review.</span>
-        <span>External account numbers remain free text by backend design.</span>
-        <span>RTGS below ₹2,00,000 is refused; at ₹10,00,000 or more it goes to a checker.</span>
+        <span>Resolve and verify both account names before review.</span>
+        <span>The source and destination must be different Moneybags accounts.</span>
+        <span>External bank, cheque, card and UPI rails are not offered in this console.</span>
       </div>
     </aside>
   </div>
