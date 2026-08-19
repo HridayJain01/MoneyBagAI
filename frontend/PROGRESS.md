@@ -1,6 +1,6 @@
 # Moneybags console — build progress
 
-Last updated: 2026-08-19 · after **Phase 1** · commit `ad8eca5` · branch `UI-TRIAL`
+Last updated: 2026-08-19 · **Phases 2–6 done; guided write suite documented** · uncommitted · branch `UI-TRIAL`
 
 ## 1. Read this first
 
@@ -27,12 +27,12 @@ and known defects are not silently relitigated by the next person or tool.
 | Phase | Scope | Status | Commit |
 |---|---|---|---|
 | 1 | Foundations, bug fixes, `txn.js`, support mixins | **DONE** | `ad8eca5` |
-| 2 | Teller operations (deposit, withdrawal, cheque) | NOT STARTED | — |
-| 3 | Transfers (internal, NEFT, RTGS, IMPS, UPI) | NOT STARTED | — |
-| 4 | Account opening + applications queue | NOT STARTED | — |
-| 5 | Account lifecycle, holds, status history | NOT STARTED | — |
-| 6 | Transaction detail, cancel, reversal | NOT STARTED | — |
-| 7 | Consolidation (optional) | NOT STARTED | — |
+| 2 | Teller operations (deposit, withdrawal, cheque) | **DONE** | — |
+| 3 | Transfers (internal, NEFT, RTGS, IMPS, UPI) | **DONE** | — |
+| 4 | Account opening + applications queue | **DONE** | — |
+| 5 | Account lifecycle, holds, status history | **DONE** | — |
+| 6 | Transaction detail, cancel, reversal | **DONE** | — |
+| 7 | Consolidation (optional) | **DONE for current scope** | — |
 
 ## 3. Screen inventory
 
@@ -44,18 +44,18 @@ and known defects are not silently relitigated by the next person or tool.
 | `customers` | `customers.js` | `customers.html` | Banking | `CUSTOMER_READ` | built |
 | `customerDetail` | `customerDetail.js` | `customerDetail.html` | — (route only) | — | built |
 | `accounts` | `accounts.js` | `accounts.html` | Banking | `ACCOUNT_VIEW` | built |
-| `accountDetail` | `accountDetail.js` | `accountDetail.html` | — (route only) | — | built |
+| `accountDetail` | `accountDetail.js` | `accountDetail.html` | — (route only) | — | built + servicing (P5) |
 | `transactions` | `transactions.js` | `transactions.html` | Banking | `TRANSACTION_VIEW` | built |
 | `ledger` | `ledger.js` | `ledger.html` | Back office | — | **placeholder** |
 | `products` | `products.js` | `products.html` | Back office | `PRODUCT_READ` | **placeholder** |
 | `branches` | `branches.js` | `branches.html` | Back office | — | **placeholder** |
 | `notifications` | `notifications.js` | `notifications.html` | Back office | `NOTIFICATION_MANAGE` | **placeholder** |
 | `audit` | `audit.js` | `audit.html` | Back office | `AUDIT_VIEW` | **placeholder** |
-| `tellerOps` | — | — | Workspace | `TRANSACTION_CREATE` | planned (P2) |
-| `transfers` | — | — | Workspace | `TRANSACTION_CREATE` | planned (P3) |
-| `openAccount` | — | — | — (route only) | — | planned (P4) |
-| `applications` | — | — | Workspace | `ACCOUNT_VIEW` | planned (P4) |
-| `transactionDetail` | — | — | — (route only) | — | planned (P6) |
+| `tellerOps` | `tellerOps.js` | `tellerOps.html` | Workspace | `TRANSACTION_CREATE` | built (P2) |
+| `transfers` | `transfers.js` | `transfers.html` | Workspace | `TRANSACTION_CREATE` | built (P3) |
+| `openAccount` | `openAccount.js` | `openAccount.html` | — (from Applications) | `ACCOUNT_OPEN` | built (P4) |
+| `applications` | `applications.js` | `applications.html` | Workspace | `ACCOUNT_VIEW` | built (P4) |
+| `transactionDetail` | `transactionDetail.js` | `transactionDetail.html` | — (route only) | `TRANSACTION_VIEW` | built (P6) |
 
 "placeholder" = a generic auto-column table via `genericList.js` + the inline
 `#mbGenericList` template in `index.html`. Read-only, deliberately shallow.
@@ -114,32 +114,41 @@ audit.forTransaction|audit.trace              GET  /audit-events/...
 Deliberately **not** wired: `transactions.cardPayment` (see §8), `customers.beneficiaries`
 (no controller).
 
-## 5. Next up: Phase 2 — Teller operations
+## 5. Current handoff: Phases 4–6 browser regression
 
-**Goal:** one screen with three counter operations — cash deposit, cash withdrawal, cheque
-deposit — routed at `tellerOps`.
+Phases 4–6 are implemented and compile. The remaining promotion gate is a signed-in browser
+pass across the new routes. Do not rebuild these screens from scratch.
 
-**Files:** create `src/viewModels/tellerOps.js` + `src/views/tellerOps.html`; modify
-`src/services/navigation.js` (route) and `src/appController.js` (`SECTIONS` nav item).
+**Phase 4 files:** `src/viewModels/openAccount.js`, `src/views/openAccount.html`,
+`src/viewModels/applications.js`, `src/views/applications.html`, plus routes and the
+Applications Workspace nav entry.
 
-**Decisions already made — do not re-open:**
-- Account entry is **resolve-then-confirm** (type a number → `accounts.byNumber`, show the
-  resolved account), not a dropdown. Tellers work from a number on a slip, and a dropdown of
-  every account is unpageable.
-- **No fee field.** No fee schedule exists server-side; a user-entered fee makes the quote
-  and the create disagree.
-- On 201 the form is **replaced** by a result panel. Leaving the form live invites a second
-  submit that silently returns the first transaction.
-- Nav: Workspace group, glyph `◧`, permission `TRANSACTION_CREATE`.
+**Phase 4 implemented flow:**
 
-**Most likely to go wrong — two things:**
+1. Maker enters CIF → `customers.eligibility(cif)`; render `reasons[]` and stop when denied.
+2. Load active products with `products.list({status:'ACTIVE'})` and use `productCode`.
+3. Fetch chosen product detail so `requiresFunding` and `minOpeningDeposit` can be explained
+   before creation.
+4. `accounts.createApplication(...)`; display the application reference and status.
+5. Checker queue uses status `PENDING_APPROVAL` — never `PENDING`.
+6. Approve/reject through the shared confirmation mixin. Reject reason is required; the
+   maker cannot approve their own application.
+7. On approval, navigate with `createdAccountId`. Funding-required products produce
+   `PENDING_ACTIVATION`, not `ACTIVE`.
 
-1. The `paymentMethod`/rail pairing and which account field to send. Do not assemble the
-   request body by hand: call `txn.bodyFor(entry, form)`, which encodes both.
-2. **The create response is a `Transaction` entity, not a `TransactionView`** — its id field
-   is `id`, not `transactionId` (§7). The result panel must read `id` from the create
-   response and then poll, where `/status` calls the same value `transactionId`. Getting
-   this wrong polls `/transactions/undefined/status` and looks like a backend fault.
+**Phase 5:** `accountDetail` now loads holders, active holds, status history, limits and
+owned products. `ACCOUNT_STATUS_MANAGE` gates lifecycle, joint-holder, hold and limit
+writes. Every mutation uses the shared confirmation discipline and refreshes live data.
+
+**Phase 6:** Transactions and account history now open `transactionDetail`. The deep view
+renders legs, funds hold, journal lines, clearing, rail details and status history. Cancel
+is limited to cancellable states plus maker/supervisor authority. Reversal is shown only
+for completed non-reversal transactions and navigates to the new compensating record.
+
+**Browser fixtures:** `CIF900101` is eligible; `CIF900102` proves denial. Seed account
+`a0000000-0000-0000-0000-000000000101` has holder/hold/limits/history/product data.
+Use `teller1` then `checker1` for a real maker-checker application, or `opsadmin` for a
+read-only route pass.
 
 ## 6. Decisions log — APPEND-ONLY
 
@@ -151,6 +160,16 @@ deposit — routed at `tellerOps`.
 | 004 | 1 | All 33 endpoint bindings land in Phase 1 | Spread them across the phases that use them | `endpoints.js` is the first file a handing-over agent reads; a complete commented map is worth more than a minimal diff |
 | 005 | 1 | Refactor `approvals.js` in Phase 1, before anything is built on the mixins | Refactor later, or leave it alone | It is the only known-good write flow, so it is the only honest regression test for the mixins |
 | 006 | 1 | `pollStatus` treats `PENDING_APPROVAL` as a stop condition | Poll until terminal only | `PENDING_APPROVAL` is non-terminal but stable — a checker may take hours. Polling it burns the budget and looks broken |
+| 007 | 2 | Counter account entry is resolve-then-confirm by account number | Load every account into a dropdown | The teller works from a slip and the account catalogue is unpageable; the resolved name/status is the safety check |
+| 008 | 2 | Replace the form with a receipt panel after a 201 | Leave the live form below a success banner | A live form invites an accidental second submit and makes idempotent replay look like a second success |
+| 009 | 3 | Resolve internal destinations only; external destinations remain free text | Look up every destination in account-service | The orchestrator validates external rails on the source side only; an external account cannot exist in Moneybags |
+| 010 | 2–3 | Dialog footer actions use native Knockout-bound buttons | `oj-button` action listeners inside the slotted legacy dialog footer | Browser testing showed the slotted action event was swallowed; native buttons keep the click handler and disabled state explicit |
+| 011 | 4 | Applications is the navigable workspace; Open account is reached from its primary CTA | Put two adjacent account-opening items in the nav | One queue serves both maker and checker, while the form is one action from that queue and can also receive a CIF route parameter |
+| 012 | 4 | Re-fetch the selected product detail before review | Trust the product list row indefinitely | Funding rules are financial terms; a fresh detail read keeps the visible minimum and `requiresFunding` flag current |
+| 013 | 5 | Extend Account detail with servicing evidence and controls | Create six shallow servicing routes | Holders, holds, limits, products and status changes all answer questions about the same account and need its balance/status context |
+| 014 | 5 | Gate every servicing write on `ACCOUNT_STATUS_MANAGE` | Invent narrower client permissions | The backend uses this one literal permission for lifecycle, holders, holds and limits; the UI must mirror the real authority model |
+| 015 | 6 | Render the full transaction evidence graph on one detail route | Separate legs/journals/clearing pages | These records explain one transaction and are already returned atomically by the deep endpoint |
+| 016 | 6 | Reversal navigates to the new compensating transaction | Patch the original row into a reversed-looking result | The backend creates a new linked transaction and deliberately preserves the original record |
 
 ## 7. Backend facts the UI depends on
 
@@ -191,13 +210,71 @@ wins** — the "Docs?" column says whether `docs/` has since been corrected.
 | Branch-scope asymmetry not "fixed" | P2 picker | deliberate | A BR001 teller can deposit into a BR002 account but cannot look it up. That is the server's behaviour; the UI surfaces the 403 honestly rather than hiding it |
 | No tests, no lint, no frontend CI | whole app | out of scope | Explicitly excluded from this build |
 | Stale comments | `before_serve.js` (claims `UrlPathParamAdapter`), `tokens.css`/`app.css` (nonexistent SCSS theme), `package.json` (says VDOM/Preact) | cosmetic | Noted so the next reader is not misled |
+| Overview fires four protected calls before login | `overview.js` | **fixed 2026-08-19** | ModuleRouterAdapter instantiates the route before the auth-gated module enters the DOM; loads now wait for an authenticated session |
+| Transaction status selector renders only an empty option | `transactions.html` | **fixed 2026-08-19** | JET's expression parser cannot parse regex literals; `replace(/_/g, ' ')` is now parser-safe `split('_').join(' ')` |
+| Customer completeness headline shows `7%` for a complete profile | `customerDetail.js` | **fixed 2026-08-19** | The view took the first numeric map value (`completedFields`) instead of the explicit `percentage` field |
+| Confirmation dialog footer actions do not fire reliably | `support/confirm.js`, three dialog views | **fixed in source; final reload regression pending** | Legacy dialog bridge plus slotted `oj-button` events were unreliable; widget open/close plus native KO-bound footer buttons are used now |
+| Referenced build plan is absent | `.claude/plans/peaceful-dancing-stardust.md` | documentation gap | `PROGRESS.md` referenced it, but `.claude/` is not present in this checkout; this file is now the authoritative continuation plan |
+| Application search has no explicit permission check in account-service | `AccountApplicationService.search` | backend gap, mirrored | The service branch-scopes the result but calls no `actor.require`; the UI uses `ACCOUNT_VIEW` as the conservative route/nav gate and still hides decision actions without `ACCOUNT_APPROVE` |
+| Applications “New application” did nothing | `views/applications.html` | **fixed 2026-08-19** | Live browser testing proved this JET action listener was swallowed; the primary CTA now uses the same native Knockout-bound button pattern as dialog actions |
+| Account servicing stopped after the first lifecycle button | `viewModels/accountDetail.js` | **fixed 2026-08-19** | JET treats a missing object property as an undefined-variable binding error; every lifecycle action now carries an explicit `danger` boolean |
 
 ## 9. Verification log
 
 | Phase | Login(s) | Steps | Expected | Last run | Result |
 |---|---|---|---|---|---|
 | 1 | `teller1` | `npm install`; `ojet build`; live API contract checks against the running stack (see below) | Build clean; every corrected contract behaves as predicted | 2026-08-19 | **PASS** |
-| 1 | `opsadmin` | Sign in; Accounts → open an account; Transactions with each status filter; Approvals | Account detail renders (previously threw); no filter 400s; approvals empty | — | **browser pass still owed** |
+| 1 | `opsadmin` | Sign in; Overview; Accounts → open an account; Transactions status options; Approvals | Overview refetches after login; account detail renders; all 14 enum values render; approvals empty | 2026-08-19 | **PASS** |
+| 2 | `opsadmin` | Teller → each operation; resolve `510000000101`; enter amount; review; cancel | Correct account side, cheque requirement, resolved card, limit check and confirmation | 2026-08-19 | **PASS through confirmation; final submit/result/poll pending** |
+| 3 | `opsadmin` | Internal transfer 101→102; RTGS ₹1,00,000; RTGS ₹10,00,000 | Internal confirmation; minimum refusal at ₹2,00,000; approval warning at threshold | 2026-08-19 | **PASS through confirmation; final submit/result/poll pending** |
+| regression | `opsadmin` | Customers search/detail/tabs; Accounts list/detail; Ledger; Products; Branches; Notifications; Audit | Every built read route renders live data or an honest empty state with no console errors | 2026-08-19 | **PASS** |
+| 4 | API contract (`opsadmin`) | Active products; eligible/ineligible CIF; applications envelope | Six products; `CIF900101=true`; `CIF900102=false`; queue returns envelope | 2026-08-19 | **PASS (API/build); browser pending** |
+| 5 | API contract (`opsadmin`) | Account holders, active holds, limits, status history, owned products | All five endpoint shapes match the servicing view model | 2026-08-19 | **PASS (API/build); browser pending** |
+| 6 | API contract (`opsadmin`) | Transaction search then deep detail | Legs, journals and history arrays present; route modules compile | 2026-08-19 | **PASS (API/build); browser pending** |
+| 4 | `opsadmin` browser | Applications; New application; both eligibility fixtures; six products; SAV/FD terms; FD minimum; review/cancel | Queue/statuses render; CTA routes; eligibility and funding rules match contract; confirmation closes without a write | 2026-08-19 | **PASS** |
+| 5 | `opsadmin` browser | Account 101; lifecycle/holder/hold/limit dialogs; servicing evidence | Details render with holders, holds, limits, history and products; all four write dialogs open and cancel cleanly | 2026-08-19 | **PASS** |
+| 6 | `opsadmin` browser | Transactions; open completed internal transfer; inspect legs/hold/journals/rail/history; reversal review | Deep evidence renders with no console error; reversal warns that it creates a compensating transaction | 2026-08-19 | **PASS** |
+| regression | `opsadmin` browser | Teller review; internal transfer; RTGS below minimum and at approval threshold; every nav route | Resolve/review dialogs and both RTGS branches correct; all nav routes load with no console errors | 2026-08-19 | **PASS** |
+
+### Checkpoint — 2026-08-19, uncommitted working tree
+
+**Delivered in this checkpoint:**
+
+- Fixed the JET expression-parser status dropdown failure.
+- Fixed Overview's pre-auth 401/stale-first-render bug.
+- Fixed customer completeness (`100%`, not `7%`) and the doubled `CIF` label.
+- Built Phase 2 Teller: deposit, withdrawal, cheque; resolve/review/confirm/result/poll.
+- Built Phase 3 Transfers: internal, NEFT, RTGS, IMPS, UPI; correct destination handling,
+  limit rendering, approval messaging, confirm/result/poll.
+- Reworked shared confirmation dialog control after live browser testing found the legacy
+  custom-element method/event path unreliable.
+
+**Build evidence:** `node --check` on the new/changed view models passes; `npm run build`
+has completed successfully after each material change. The Sass warning is pre-existing and
+expected because this app uses plain CSS.
+
+**Browser evidence:** Overview, Customers (all tabs), Accounts, Account detail, Transactions,
+Approvals, Teller variants, internal transfer review, both RTGS limit branches, and all five
+generic back-office routes were exercised against the live stack. Browser console stayed
+clean during the completed pass.
+
+**Do first when resuming:**
+
+1. Reload the app once so the latest native dialog-footer build is served.
+2. Re-run Teller review → **Go back** and Transfers review → **Go back**; confirm the modal
+   closes. This is the only fix in this checkpoint not yet browser-regressed after rebuild.
+3. With explicit approval for the browser-side financial action, submit a ₹1 deposit to
+   `510000000101`; confirm the result panel reads create response `id`/`reference` and polling
+   reaches `COMPLETED`.
+4. Submit an internal ₹1 transfer 101→102 and verify the same result/poll path.
+5. If those pass, mark Phases 2 and 3 DONE and begin Phase 4 from §5.
+
+### Checkpoint — 2026-08-19, user verification
+
+The user completed the final live workflow check and confirmed the Phase 2–3 paths are
+working. Teller and Transfers are therefore promoted from “built” to **DONE**. Continue
+with Phase 4; do not repeat the Phase 2–3 submit checks unless a later shared-layer change
+touches `txn.js`, `confirm.js`, `http.js`, or their views.
 
 **Live contract checks run against the stack on 2026-08-19, all as predicted:**
 
@@ -214,6 +291,56 @@ Also confirmed: `npm install` clean, `ojet build` exits 0, all changed JS parses
 
 Still owed for Phase 1: the browser pass (sign in, open account detail, exercise the status
 filters). That needs `ojet serve` alongside the backend.
+
+### Checkpoint — 2026-08-19, Phases 4–6 implementation
+
+**Delivered:**
+
+- Phase 4: eligibility-first account opening, active product selection, fresh product-rule
+  resolution, minimum-funding validation, retry-safe creation result, and a branch-scoped
+  application queue with approve/reject/cancel and maker–checker affordances.
+- Phase 5: account lifecycle controls plus holders, active holds, limits, status history,
+  and owned products on account detail. All writes are permission-gated and confirmed.
+- Phase 6: transaction-detail routing from both transaction tables; deep evidence for
+  legs/holds/journals/clearing/rail/history; permission- and state-aware cancel/reversal.
+- Consolidation: parser-safe status labels, native dialog actions, new route permissions,
+  and shared formatting/confirmation patterns preserved.
+
+**Evidence:** all changed view models pass `node --check`; `npm run build` completes. The
+live proxy returned the expected Phase 4–6 payload shapes: six active products,
+eligibility true/false for the two fixtures, account servicing arrays/limits, 15 current
+transactions, and a deep transaction with legs/journals/history. The dev server was
+restarted on `:8000` after the build cycle.
+
+**Remaining promotion gate:** sign into the browser and exercise the new routes. Browser
+policy requires action-time confirmation before entering the seeded password. For a
+non-mutating pass, use `opsadmin` and stop at every confirmation dialog. For a real
+maker-checker application, use separate `teller1`/`checker1` contexts as described below.
+
+### Checkpoint — 2026-08-19, Phases 4–6 browser-complete
+
+The signed-in `opsadmin` browser pass is complete. Two defects found only in the browser
+were fixed and re-tested: the Applications primary CTA now navigates, and explicit
+`danger:false` values prevent JET from aborting Account servicing bindings.
+
+Verified without committing new financial/account mutations:
+
+- both account-opening eligibility branches, all six products, current product terms,
+  `FD-12M` minimum enforcement (`4999` disabled, `5000` enabled), and confirmation copy;
+- application status selector and empty queue;
+- account header/balance/facts/transactions plus holders, holds, limits, status history,
+  owned products, and all servicing confirmation forms;
+- full completed-transaction evidence: two legs, consumed hold, two balanced journals,
+  rail details, status history, and reversal review;
+- Teller resolve/review, internal-transfer resolve/review, RTGS minimum refusal and the
+  `₹10,00,000` approval threshold;
+- Overview, Approvals, Customers, Ledger, Products, Branches, Notifications and Audit all
+  load with the correct page title/heading and no browser console errors.
+
+`frontend/TEST-FLOW.md` is the authoritative manual flow for the remaining deliberate
+write tests. It separates the safe smoke pass from account creation, financial posting,
+cancellation/reversal and persistent account-servicing mutations, and records the exact
+fixtures and expected outcomes.
 
 ## 10. Running it right now
 

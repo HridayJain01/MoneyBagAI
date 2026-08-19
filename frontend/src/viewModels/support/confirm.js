@@ -23,11 +23,13 @@
  * only on success.
  *
  * Each screen keeps its OWN <oj-dialog> with a unique id rather than sharing
- * one. Legacy oj-dialog is addressed by document.getElementById, and during an
- * oj-module transition the outgoing view can still be in the DOM — a shared id
- * would resolve to whichever copy the browser found first.
+ * one. Legacy oj-dialog is addressed through its jQuery widget API: in JET 20
+ * the custom-element bridge does not reliably retain DOM open()/close()
+ * methods after the first transition. During an oj-module transition the
+ * outgoing view can still be in the DOM, so a shared id would resolve to
+ * whichever copy the browser found first.
  */
-define(['knockout', '../../services/http'], function (ko, http) {
+define(['knockout', 'jquery', '../../services/http'], function (ko, $, http) {
   'use strict';
 
   function Confirm(options) {
@@ -49,14 +51,14 @@ define(['knockout', '../../services/http'], function (ko, http) {
       self.pending({ payload: payload, intent: http.beginIntent() });
       var element = dialogElement();
       if (element) {
-        element.open();
+        $(element).ojDialog('open');
       }
     };
 
     self.closeConfirm = function () {
       var element = dialogElement();
       if (element) {
-        element.close();
+        $(element).ojDialog('close');
       }
       self.pending(null);
     };

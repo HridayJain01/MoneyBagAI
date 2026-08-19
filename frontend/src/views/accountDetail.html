@@ -7,12 +7,22 @@
     </div>
     <div class="mb-page-header__actions">
       <span data-bind="css: statusClass, text: status"></span>
+      <!-- ko foreach: lifecycleActions -->
+      <button type="button" data-bind="text: label, click: function () { $parent.lifecycle($data); }, css: danger ? 'mb-action-button mb-action-button--danger' : 'mb-action-button mb-action-button--outlined'"></button>
+      <!-- /ko -->
     </div>
   </header>
 
   <!-- ko if: hasError -->
   <div class="mb-banner mb-banner--error" role="alert">
     <div><strong>Some data could not load</strong> <span data-bind="text: error"></span></div>
+  </div>
+  <!-- /ko -->
+
+  <!-- ko if: hasBanner -->
+  <div data-bind="css: bannerClass" role="status">
+    <div><strong data-bind="text: banner().title"></strong><span data-bind="text: banner().detail"></span></div>
+    <button type="button" class="mb-banner__close" data-bind="click: dismissBanner" aria-label="Dismiss">×</button>
   </div>
   <!-- /ko -->
 
@@ -142,7 +152,59 @@
           <span class="mb-muted" style="font-size:12px" data-bind="text: $data.fmtWhen(cell.row)"></span>
         </template>
 
+        <template slot="actionsTemplate" data-oj-as="cell">
+          <oj-button chroming="outlined" on-oj-action="[[function () { $data.openTransaction(cell.row); }]]">Open</oj-button>
+        </template>
+
       </oj-table>
     </div>
   </section>
+
+  <header class="mb-page-header" style="margin-top:8px">
+    <div><h2 class="mb-page-header__title" style="font-size:22px">Account servicing</h2><p class="mb-page-header__lede">Holders, active holds, limits, owned products, and lifecycle evidence.</p></div>
+  </header>
+
+  <div class="mb-grid mb-grid--3">
+    <section class="mb-card mb-card--flush">
+      <div class="mb-card__bar"><h3 class="mb-card__title">Holders</h3><!-- ko if: canManage --><oj-button chroming="outlined" on-oj-action="[[addHolder]]">Add joint holder</oj-button><!-- /ko --></div>
+      <!-- ko if: holders().length === 0 --><div class="mb-empty"><p class="mb-empty__title">No holders returned</p></div><!-- /ko -->
+      <ul class="mb-rows" data-bind="foreach: holders"><li class="mb-row"><div class="mb-row__body"><div class="mb-row__title mb-mono" data-bind="text: cifNo"></div><div class="mb-row__meta" data-bind="text: 'Sequence ' + holderSequence + ' · added ' + $parent.fmtDateTime(addedAt)"></div></div><span class="mb-pill mb-pill--accent" data-bind="text: holderRole"></span></li></ul>
+    </section>
+
+    <section class="mb-card mb-card--flush">
+      <div class="mb-card__bar"><h3 class="mb-card__title">Active holds</h3><!-- ko if: canManage --><oj-button chroming="outlined" on-oj-action="[[placeHold]]">Place hold</oj-button><!-- /ko --></div>
+      <!-- ko if: holds().length === 0 --><div class="mb-empty"><p class="mb-empty__title">No active holds</p></div><!-- /ko -->
+      <ul class="mb-rows" data-bind="foreach: holds"><li class="mb-row"><div class="mb-row__body"><div class="mb-row__title" data-bind="text: reason"></div><div class="mb-row__meta" data-bind="text: holdType + ' · ' + $parent.fmtDateTime(createdAt)"></div></div><span class="mb-money" data-bind="text: $parent.fmtMoney(amount, currency)"></span></li></ul>
+    </section>
+
+    <section class="mb-card">
+      <div class="mb-card__header"><h3 class="mb-card__title">Account limits</h3><!-- ko if: canManage --><oj-button chroming="outlined" on-oj-action="[[editLimits]]">Set limits</oj-button><!-- /ko --></div>
+      <!-- ko if: limits -->
+      <dl class="mb-kv"><dt class="mb-kv__k">Per transaction</dt><dd class="mb-kv__v mb-money" data-bind="text: fmtMoney(limits().perTransactionLimit)"></dd><dt class="mb-kv__k">Daily withdrawal</dt><dd class="mb-kv__v mb-money" data-bind="text: fmtMoney(limits().dailyWithdrawalLimit)"></dd><dt class="mb-kv__k">Updated</dt><dd class="mb-kv__v" data-bind="text: limits().updatedAt ? fmtDateTime(limits().updatedAt) : 'Product defaults'"></dd></dl>
+      <!-- /ko -->
+    </section>
+  </div>
+
+  <div class="mb-grid mb-grid--split">
+    <section class="mb-card mb-card--flush">
+      <div class="mb-card__bar"><h3 class="mb-card__title">Status history</h3></div>
+      <!-- ko if: statusHistory().length === 0 --><div class="mb-empty"><p class="mb-empty__title">No status changes</p></div><!-- /ko -->
+      <ul class="mb-rows" data-bind="foreach: statusHistory"><li class="mb-row"><div class="mb-row__body"><div class="mb-row__title"><span data-bind="text: fromStatus || 'NEW'"></span><span> → </span><span data-bind="text: toStatus"></span></div><div class="mb-row__meta" data-bind="text: (reason || source) + ' · ' + $parent.fmtDateTime(changedAt)"></div></div><span class="mb-mono mb-muted" data-bind="text: changedByEmployeeId || source"></span></li></ul>
+    </section>
+    <section class="mb-card mb-card--flush">
+      <div class="mb-card__bar"><h3 class="mb-card__title">Owned products</h3></div>
+      <!-- ko if: ownedProducts().length === 0 --><div class="mb-empty"><p class="mb-empty__title">No owned products</p></div><!-- /ko -->
+      <ul class="mb-rows" data-bind="foreach: ownedProducts"><li class="mb-row"><div class="mb-row__body"><div class="mb-row__title" data-bind="text: productName"></div><div class="mb-row__meta" data-bind="text: productCode + ' · ' + productType + ' · ' + acquisitionType"></div></div><span data-bind="css: 'mb-pill mb-pill--' + ($parent.statusClassFor({status: status}).split('--')[1]), text: status"></span></li></ul>
+    </section>
+  </div>
+
+  <oj-dialog id="accountServicingDialog" dialog-title="[[dialogTitle]]" cancel-behavior="none" initial-visibility="hide">
+    <div slot="body" class="mb-stack mb-stack--tight">
+      <!-- ko if: isLifecycle --><p style="margin:0">This changes the account status immediately. A history entry records the employee and reason.</p><div><label class="mb-label" for="servicingReason">Reason <span class="mb-muted">(optional)</span></label><input id="servicingReason" class="mb-field mb-field--block" maxlength="500" data-bind="textInput: reason" /></div><!-- /ko -->
+      <!-- ko if: isHolderAction --><div><label class="mb-label" for="holderCif">Customer CIF</label><input id="holderCif" class="mb-field mb-field--block" data-bind="textInput: holderCif" /></div><div><label class="mb-label" for="holderRole">Holder role</label><select id="holderRole" class="mb-field mb-field--block" data-bind="value: holderRole"><option value="JOINT">Joint</option><option value="PRIMARY">Primary</option></select></div><!-- /ko -->
+      <!-- ko if: isHoldAction --><div><label class="mb-label" for="holdAmount">Amount</label><input id="holdAmount" class="mb-field mb-field--block" inputmode="decimal" data-bind="textInput: holdAmount" /></div><div><label class="mb-label" for="holdReason">Reason</label><input id="holdReason" class="mb-field mb-field--block" maxlength="64" data-bind="textInput: holdReason" /></div><div><label class="mb-label" for="holdType">Hold type</label><select id="holdType" class="mb-field mb-field--block" data-bind="value: holdType"><option value="MANUAL">Manual</option><option value="LIEN">Lien</option></select></div><!-- /ko -->
+      <!-- ko if: isLimitsAction --><div><label class="mb-label" for="perTxnLimit">Per-transaction limit</label><input id="perTxnLimit" class="mb-field mb-field--block" inputmode="decimal" data-bind="textInput: perTransactionLimit" /></div><div><label class="mb-label" for="dailyLimit">Daily withdrawal limit</label><input id="dailyLimit" class="mb-field mb-field--block" inputmode="decimal" data-bind="textInput: dailyWithdrawalLimit" /></div><!-- /ko -->
+    </div>
+    <div slot="footer"><button type="button" class="mb-action-button mb-action-button--outlined" data-bind="click: cancelConfirm, disable: busy">Go back</button><button type="button" class="mb-action-button mb-action-button--primary" data-bind="click: confirmServicing, disable: busy"><span data-bind="text: confirmLabel"></span></button></div>
+  </oj-dialog>
 </div>

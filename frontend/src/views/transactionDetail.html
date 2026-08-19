@@ -1,0 +1,62 @@
+<div class="mb-stack">
+  <header class="mb-page-header">
+    <div><h1 class="mb-page-header__title" data-bind="text: reference"></h1><p class="mb-page-header__lede" data-bind="text: subtitle"></p></div>
+    <div class="mb-page-header__actions">
+      <!-- ko if: transaction --><span data-bind="css: statusClass, text: transaction().status"></span><!-- /ko -->
+      <!-- ko if: canCancel --><button type="button" class="mb-action-button mb-action-button--outlined" data-bind="click: cancelTransaction">Cancel</button><!-- /ko -->
+      <!-- ko if: canReverse --><button type="button" class="mb-action-button mb-action-button--danger" data-bind="click: reverseTransaction">Reverse</button><!-- /ko -->
+    </div>
+  </header>
+
+  <!-- ko if: hasBanner -->
+  <div data-bind="css: bannerClass" role="status"><div><strong data-bind="text: banner().title"></strong><span data-bind="text: banner().detail"></span></div><button type="button" class="mb-banner__close" data-bind="click: dismissBanner" aria-label="Dismiss">×</button></div>
+  <!-- /ko -->
+
+  <!-- ko if: loading --><section class="mb-card mb-empty"><p class="mb-empty__title">Loading transaction…</p></section><!-- /ko -->
+
+  <!-- ko if: transaction -->
+  <div class="mb-grid mb-grid--hero">
+    <section class="mb-hero">
+      <p class="mb-hero__label">Transaction amount</p><p class="mb-figure" data-bind="text: amountDisplay"></p>
+      <div class="mb-hero__foot"><div class="mb-hero__stat"><span class="mb-hero__stat-value" data-bind="text: feeDisplay"></span><span class="mb-hero__stat-label">Fee</span></div><div class="mb-hero__stat"><span class="mb-hero__stat-value" data-bind="text: transaction().branchCode"></span><span class="mb-hero__stat-label">Branch</span></div><div class="mb-hero__stat"><span class="mb-hero__stat-value" data-bind="text: fmtDateTime(transaction().createdAt)"></span><span class="mb-hero__stat-label">Created</span></div></div>
+    </section>
+    <section class="mb-card"><div class="mb-card__header"><h2 class="mb-card__title">Transaction</h2></div><dl class="mb-kv">
+      <dt class="mb-kv__k">Source account</dt><dd class="mb-kv__v mb-mono" data-bind="text: transaction().sourceAccountId || 'External / cash'"></dd>
+      <dt class="mb-kv__k">Destination</dt><dd class="mb-kv__v mb-mono" data-bind="text: transaction().destinationAccountId || 'External / cash'"></dd>
+      <dt class="mb-kv__k">Maker</dt><dd class="mb-kv__v mb-mono" data-bind="text: transaction().makerEmployeeId"></dd>
+      <dt class="mb-kv__k">Checker</dt><dd class="mb-kv__v mb-mono" data-bind="text: transaction().checkerEmployeeId || '—'"></dd>
+      <dt class="mb-kv__k">Narration</dt><dd class="mb-kv__v" data-bind="text: transaction().narration || '—'"></dd>
+      <dt class="mb-kv__k">Correlation</dt><dd class="mb-kv__v mb-mono" data-bind="text: transaction().correlationId || '—'"></dd>
+    </dl></section>
+  </div>
+
+  <!-- ko if: transaction().reversalOfTransactionId -->
+  <div class="mb-banner mb-banner--info"><div><strong>Compensating transaction</strong> This reverses an earlier transaction; the original record remains intact.</div><oj-button chroming="outlined" on-oj-action="[[function () { openLinkedTransaction(transaction().reversalOfTransactionId); }]]">Open original</oj-button></div>
+  <!-- /ko -->
+
+  <div class="mb-grid mb-grid--split">
+    <section class="mb-card mb-card--flush"><div class="mb-card__bar"><h2 class="mb-card__title">Transaction legs</h2></div><!-- ko if: !transaction().legs || transaction().legs.length === 0 --><div class="mb-empty"><p class="mb-empty__title">No legs recorded</p></div><!-- /ko --><ul class="mb-rows" data-bind="foreach: transaction().legs || []"><li class="mb-row"><span class="mb-glyph mb-glyph--neutral" data-bind="text: sequenceNo"></span><div class="mb-row__body"><div class="mb-row__title" data-bind="text: role + ' · ' + direction"></div><div class="mb-row__meta mb-mono" data-bind="text: accountId || description"></div></div><span class="mb-money" data-bind="text: $parent.fmtMoney(amount, currency)"></span></li></ul></section>
+    <section class="mb-card"><div class="mb-card__header"><h2 class="mb-card__title">Funds hold</h2></div><!-- ko if: transaction().hold --><dl class="mb-kv"><dt class="mb-kv__k">Status</dt><dd class="mb-kv__v"><span data-bind="css: toneClass(transaction().hold.status), text: transaction().hold.status"></span></dd><dt class="mb-kv__k">Amount</dt><dd class="mb-kv__v mb-money" data-bind="text: fmtMoney(transaction().hold.amount, transaction().hold.currency)"></dd><dt class="mb-kv__k">Account</dt><dd class="mb-kv__v mb-mono" data-bind="text: transaction().hold.accountId"></dd><dt class="mb-kv__k">External hold</dt><dd class="mb-kv__v mb-mono" data-bind="text: transaction().hold.externalHoldId"></dd></dl><!-- /ko --><!-- ko ifnot: transaction().hold --><div class="mb-empty"><p class="mb-empty__title">No funds hold</p><p class="mb-empty__body">Credits and cash deposits do not reserve source funds.</p></div><!-- /ko --></section>
+  </div>
+
+  <section class="mb-card mb-card--flush">
+    <div class="mb-card__bar"><div><h2 class="mb-card__title">Journals</h2><p class="mb-card__subtitle">Double-entry evidence produced by the transaction</p></div></div>
+    <!-- ko if: !transaction().journals || transaction().journals.length === 0 --><div class="mb-empty"><p class="mb-empty__title">No journals yet</p></div><!-- /ko -->
+    <div data-bind="foreach: transaction().journals || []" class="mb-stack" style="padding:16px">
+      <div class="mb-card"><div class="mb-card__header"><div><div class="mb-row__title mb-mono" data-bind="text: journalReference"></div><div class="mb-row__meta" data-bind="text: type"></div></div><span data-bind="css: $parent.toneClass(status), text: status"></span></div>
+        <div class="mb-scroll-x"><table class="mb-plain-table"><thead><tr><th>Line</th><th>Ledger account</th><th>Customer account</th><th>Debit</th><th>Credit</th><th>Description</th></tr></thead><tbody data-bind="foreach: lines"><tr><td data-bind="text: lineNo"></td><td class="mb-mono" data-bind="text: ledgerAccountCode"></td><td class="mb-mono" data-bind="text: accountId || '—'"></td><td class="mb-money" data-bind="text: $parents[1].fmtMoney(debit, $parents[1].transaction().currency)"></td><td class="mb-money" data-bind="text: $parents[1].fmtMoney(credit, $parents[1].transaction().currency)"></td><td data-bind="text: description"></td></tr></tbody></table></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="mb-grid mb-grid--split">
+    <section class="mb-card"><div class="mb-card__header"><h2 class="mb-card__title">Clearing and rail</h2></div><!-- ko if: transaction().clearing --><dl class="mb-kv"><dt class="mb-kv__k">Instruction</dt><dd class="mb-kv__v mb-mono" data-bind="text: transaction().clearing.instructionId"></dd><dt class="mb-kv__k">Status</dt><dd class="mb-kv__v" data-bind="text: transaction().clearing.status"></dd><dt class="mb-kv__k">External reference</dt><dd class="mb-kv__v mb-mono" data-bind="text: transaction().clearing.externalReference || '—'"></dd><dt class="mb-kv__k">Settlement date</dt><dd class="mb-kv__v" data-bind="text: transaction().clearing.settlementDate || '—'"></dd><dt class="mb-kv__k">Failure reason</dt><dd class="mb-kv__v" data-bind="text: transaction().clearing.failureReason || '—'"></dd></dl><!-- /ko --><!-- ko ifnot: transaction().clearing --><p class="mb-muted">This rail has no external clearing instruction.</p><!-- /ko --><hr class="mb-divider" /><dl class="mb-kv"><dt class="mb-kv__k">UPI address</dt><dd class="mb-kv__v" data-bind="text: transaction().railDetails && transaction().railDetails.upiAddress || '—'"></dd><dt class="mb-kv__k">Cheque number</dt><dd class="mb-kv__v" data-bind="text: transaction().railDetails && transaction().railDetails.chequeNumber || '—'"></dd><dt class="mb-kv__k">Client reference</dt><dd class="mb-kv__v" data-bind="text: transaction().railDetails && transaction().railDetails.clientReference || '—'"></dd></dl></section>
+    <section class="mb-card mb-card--flush"><div class="mb-card__bar"><h2 class="mb-card__title">Status history</h2></div><ul class="mb-rows" data-bind="foreach: transaction().history || []"><li class="mb-row"><div class="mb-row__body"><div class="mb-row__title"><span data-bind="text: fromStatus || 'NEW'"></span><span> → </span><span data-bind="text: toStatus"></span></div><div class="mb-row__meta" data-bind="text: (reason || actorSource) + ' · ' + $parent.fmtDateTime(occurredAt)"></div></div><span class="mb-mono mb-muted" data-bind="text: actorId"></span></li></ul></section>
+  </div>
+  <!-- /ko -->
+
+  <oj-dialog id="transactionActionDialog" dialog-title="[[dialogTitle]]" cancel-behavior="none" initial-visibility="hide">
+    <div slot="body" class="mb-stack mb-stack--tight"><p style="margin:0" data-bind="text: dialogSummary"></p><div><label class="mb-label" for="transactionActionReason">Reason</label><input id="transactionActionReason" class="mb-field mb-field--block" data-bind="textInput: reason" /></div><!-- ko if: confirmPayload() && confirmPayload().action === 'reverse' --><div class="mb-banner mb-banner--warning" style="margin:0"><div><strong>New financial transaction</strong> Reversal creates a linked compensating record; it does not overwrite the original.</div></div><!-- /ko --></div>
+    <div slot="footer"><button type="button" class="mb-action-button mb-action-button--outlined" data-bind="click: cancelConfirm, disable: busy">Go back</button><button type="button" class="mb-action-button mb-action-button--danger" data-bind="click: confirmAction, disable: busy"><span data-bind="text: confirmLabel"></span></button></div>
+  </oj-dialog>
+</div>

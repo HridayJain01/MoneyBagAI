@@ -1,0 +1,42 @@
+<div class="mb-stack">
+  <header class="mb-page-header">
+    <div><h1 class="mb-page-header__title">Account applications</h1><p class="mb-page-header__lede">Review account-opening requests and keep maker and checker responsibilities separate.</p></div>
+    <!-- ko if: canOpen --><button type="button" class="mb-action-button mb-action-button--primary" data-bind="click: startApplication">New application</button><!-- /ko -->
+  </header>
+
+  <!-- ko if: hasBanner -->
+  <div data-bind="css: bannerClass" role="status"><div><strong data-bind="text: banner().title"></strong><span data-bind="text: banner().detail"></span></div><button type="button" class="mb-banner__close" data-bind="click: dismissBanner" aria-label="Dismiss">×</button></div>
+  <!-- /ko -->
+
+  <section class="mb-card mb-card--flush">
+    <div class="mb-card__bar">
+      <h2 class="mb-card__title">Application queue</h2>
+      <div class="mb-inline" style="flex-wrap:nowrap">
+        <input class="mb-field" aria-label="Customer CIF" placeholder="Customer CIF" data-bind="textInput: cifNo" />
+        <select class="mb-field" aria-label="Status" data-bind="value: status, options: statusList, optionsText: function (v) { return v === '' ? 'All statuses' : v.split('_').join(' '); }"></select>
+        <oj-button chroming="outlined" on-oj-action="[[applyFilters]]">Apply</oj-button>
+      </div>
+    </div>
+    <div class="mb-table-host">
+      <oj-table aria-label="Account applications" data="[[provider]]" columns="[[columns]]" scroll-policy="loadMoreOnScroll" scroll-policy-options.fetch-size="25" selection-mode.row="none" selection-mode.column="none">
+        <template slot="referenceTemplate" data-oj-as="cell"><div><div class="mb-mono" style="font-size:12px" data-bind="text: cell.row.applicationReference"></div><div class="mb-muted" style="font-size:11px" data-bind="text: cell.row.accountName || 'Default account name'"></div></div></template>
+        <template slot="statusTemplate" data-oj-as="cell"><span data-bind="css: $data.statusClass(cell.row), text: cell.row.status.split('_').join(' ')"></span></template>
+        <template slot="createdTemplate" data-oj-as="cell"><span class="mb-muted" style="font-size:12px" data-bind="text: $data.fmtCreated(cell.row)"></span></template>
+        <template slot="actionsTemplate" data-oj-as="cell">
+          <!-- ko if: $data.hasActions(cell.row) -->
+          <div class="mb-inline" style="justify-content:flex-end;flex-wrap:nowrap">
+            <!-- ko if: $data.canDecide(cell.row) --><oj-button chroming="callToAction" on-oj-action="[[function () { $data.approveRow(cell.row); }]]">Approve</oj-button><oj-button chroming="outlined" on-oj-action="[[function () { $data.rejectRow(cell.row); }]]">Reject</oj-button><!-- /ko -->
+            <!-- ko if: $data.canCancel(cell.row) --><oj-button chroming="outlined" on-oj-action="[[function () { $data.cancelRow(cell.row); }]]">Cancel</oj-button><!-- /ko -->
+          </div>
+          <!-- /ko -->
+          <!-- ko if: !$data.hasActions(cell.row) --><span class="mb-muted" style="font-size:12px" data-bind="text: $data.isOwn(cell.row) && cell.row.status === 'PENDING_APPROVAL' ? 'Made by you' : '—'"></span><!-- /ko -->
+        </template>
+      </oj-table>
+    </div>
+  </section>
+
+  <oj-dialog id="applicationsConfirmDialog" dialog-title="[[dialogTitle]]" cancel-behavior="none" initial-visibility="hide">
+    <div slot="body" class="mb-stack mb-stack--tight"><p style="margin:0" data-bind="text: dialogSummary"></p><!-- ko if: needsReason --><div><label class="mb-label" for="applicationReason" data-bind="text: reasonLabel"></label><input id="applicationReason" class="mb-field mb-field--block" data-bind="textInput: reason" /></div><!-- /ko --></div>
+    <div slot="footer"><button type="button" class="mb-action-button mb-action-button--outlined" data-bind="click: cancelConfirm, disable: busy">Go back</button><button type="button" class="mb-action-button mb-action-button--primary" data-bind="click: confirm, disable: busy"><span data-bind="text: confirmLabel"></span></button></div>
+  </oj-dialog>
+</div>

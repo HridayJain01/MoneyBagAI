@@ -24,12 +24,17 @@ define(['ojs/ojcorerouter', 'ojs/ojurlparamadapter', './session'], function (
   var routes = [
     { path: '', redirect: 'overview' },
     { path: 'overview', detail: { label: 'Overview' } },
+    { path: 'tellerOps', detail: { label: 'Teller operations', permission: 'TRANSACTION_CREATE' } },
+    { path: 'transfers', detail: { label: 'Transfers', permission: 'TRANSACTION_CREATE' } },
     { path: 'approvals', detail: { label: 'Approvals', permission: 'TRANSACTION_APPROVE' } },
+    { path: 'openAccount', detail: { label: 'Open account', permission: 'ACCOUNT_OPEN' } },
+    { path: 'applications', detail: { label: 'Account applications', permission: 'ACCOUNT_VIEW' } },
     { path: 'customers', detail: { label: 'Customers', permission: 'CUSTOMER_READ' } },
     { path: 'customerDetail', detail: { label: 'Customer' } },
     { path: 'accounts', detail: { label: 'Accounts', permission: 'ACCOUNT_VIEW' } },
     { path: 'accountDetail', detail: { label: 'Account' } },
     { path: 'transactions', detail: { label: 'Transactions', permission: 'TRANSACTION_VIEW' } },
+    { path: 'transactionDetail', detail: { label: 'Transaction', permission: 'TRANSACTION_VIEW' } },
     { path: 'ledger', detail: { label: 'Ledger' } },
     { path: 'products', detail: { label: 'Products', permission: 'PRODUCT_READ' } },
     { path: 'branches', detail: { label: 'Branches' } },
@@ -76,6 +81,15 @@ define(['ojs/ojcorerouter', 'ojs/ojurlparamadapter', './session'], function (
     },
     openCustomer: function (cifNo) {
       return go('customerDetail', { cif: cifNo });
+    },
+    startAccountOpening: function (cifNo) {
+      return go('openAccount', cifNo ? { cif: cifNo } : {});
+    },
+    openApplications: function () {
+      return go('applications');
+    },
+    openTransaction: function (transactionId) {
+      return go('transactionDetail', { id: transactionId });
     }
   };
 });

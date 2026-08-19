@@ -4,9 +4,30 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3ed1cd6b-f7be-4008-9942-5ef42f39a0a8" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/run-all.ps1" beforeDir="false" afterPath="$PROJECT_DIR$/run-all.ps1" afterDir="false" />
+    <list default="true" id="3ed1cd6b-f7be-4008-9942-5ef42f39a0a8" name="Changes" comment="Reference material added">
+      <change afterPath="$PROJECT_DIR$/frontend/TEST-FLOW.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/viewModels/applications.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/viewModels/openAccount.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/viewModels/tellerOps.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/viewModels/transactionDetail.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/viewModels/transfers.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/views/applications.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/views/openAccount.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/views/tellerOps.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/views/transactionDetail.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/views/transfers.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/PROGRESS.md" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/PROGRESS.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/appController.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/appController.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/services/navigation.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/navigation.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/styles/layout.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/styles/layout.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/accountDetail.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/accountDetail.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/customerDetail.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/customerDetail.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/overview.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/overview.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/support/confirm.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/support/confirm.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/transactions.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/transactions.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/accountDetail.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/accountDetail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/approvals.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/approvals.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/transactions.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/transactions.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,12 +48,12 @@
     &quot;assignee&quot;: &quot;HridayJain01&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/jay-sharmaa/money-bag-mumbai.git&quot;,
-    &quot;accountId&quot;: &quot;b2b2f62a-e026-4f84-b710-d24caff7b01d&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/jay-sharmaa/money-bag-mumbai.git",
+    "accountId": "86834721-eef2-4527-b495-0efd36c950ce"
   }
-}</component>
+}]]></component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -74,7 +95,7 @@
     "Spring Boot.StatementReportingApplication.executor": "Run",
     "Spring Boot.TransactionServiceApplication.executor": "Run",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "UI-TRIAL",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/Hriday Jain/Documents/Projects/money-bag-mumbai",
     "nodejs_package_manager_path": "npm",
@@ -245,5 +266,9 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Reference material added" />
+    <option name="LAST_COMMIT_MESSAGE" value="Reference material added" />
   </component>
 </project>

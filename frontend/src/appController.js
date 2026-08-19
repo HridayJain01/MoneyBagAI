@@ -118,7 +118,10 @@ define([
         title: 'Workspace',
         items: [
           { path: 'overview', label: 'Overview', glyph: '◈' },
-          { path: 'approvals', label: 'Approvals', glyph: '✓', permission: 'TRANSACTION_APPROVE' }
+          { path: 'tellerOps', label: 'Teller', glyph: '◧', permission: 'TRANSACTION_CREATE' },
+          { path: 'transfers', label: 'Transfers', glyph: '⇄', permission: 'TRANSACTION_CREATE' },
+          { path: 'approvals', label: 'Approvals', glyph: '✓', permission: 'TRANSACTION_APPROVE' },
+          { path: 'applications', label: 'Applications', glyph: '▣', permission: 'ACCOUNT_VIEW' }
         ]
       },
       {

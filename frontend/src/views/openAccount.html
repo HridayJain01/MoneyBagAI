@@ -1,0 +1,112 @@
+<div class="mb-stack">
+  <header class="mb-page-header">
+    <div>
+      <h1 class="mb-page-header__title">Open account</h1>
+      <p class="mb-page-header__lede">Validate the customer first, choose an active product, then submit the request for checker approval.</p>
+    </div>
+    <oj-button chroming="outlined" on-oj-action="[[openQueue]]">Application queue</oj-button>
+  </header>
+
+  <!-- ko if: hasBanner -->
+  <div data-bind="css: bannerClass" role="status">
+    <div><strong data-bind="text: banner().title"></strong><span data-bind="text: banner().detail"></span></div>
+    <button type="button" class="mb-banner__close" data-bind="click: dismissBanner" aria-label="Dismiss">×</button>
+  </div>
+  <!-- /ko -->
+
+  <!-- ko ifnot: result -->
+  <div class="mb-grid mb-grid--split">
+    <section class="mb-card mb-stack">
+      <div>
+        <label class="mb-label" for="openingCif">Customer CIF</label>
+        <div class="mb-inline" style="margin-top:6px;flex-wrap:nowrap">
+          <input id="openingCif" class="mb-field" style="flex:1" placeholder="e.g. CIF900101" data-bind="textInput: cifNo" />
+          <oj-button chroming="outlined" disabled="[[checkingEligibility]]" on-oj-action="[[checkEligibility]]">
+            <span data-bind="text: checkingEligibility() ? 'Checking…' : 'Check eligibility'"></span>
+          </oj-button>
+        </div>
+      </div>
+
+      <!-- ko if: eligibility -->
+      <div data-bind="css: isEligible() ? 'mb-resolved' : 'mb-banner mb-banner--warning'">
+        <div>
+          <div class="mb-row__title" data-bind="text: isEligible() ? 'Eligible for account opening' : 'Eligibility requirements not met'"></div>
+          <div class="mb-row__meta">
+            <span data-bind="text: eligibility().customerStatus"></span><span> · KYC </span>
+            <span data-bind="text: eligibility().kycStatus"></span><span> · </span>
+            <span data-bind="text: eligibility().riskClassification"></span>
+          </div>
+          <!-- ko ifnot: isEligible -->
+          <ul style="margin:8px 0 0;padding-left:20px" data-bind="foreach: eligibility().reasons || []">
+            <li data-bind="text: $data"></li>
+          </ul>
+          <!-- /ko -->
+        </div>
+        <!-- ko if: isEligible --><span class="mb-pill mb-pill--success">Passed</span><!-- /ko -->
+      </div>
+      <!-- /ko -->
+
+      <!-- ko if: isEligible -->
+      <div>
+        <label class="mb-label" for="openingProduct">Active product</label>
+        <select id="openingProduct" class="mb-field mb-field--block"
+                data-bind="options: products, optionsText: 'productName', optionsValue: 'productCode', value: productCode, optionsCaption: loadingProducts() ? 'Loading products…' : 'Select a product'"></select>
+      </div>
+
+      <!-- ko if: product -->
+      <div class="mb-card mb-card--subtle mb-stack mb-stack--tight">
+        <div class="mb-row">
+          <div><div class="mb-row__title" data-bind="text: product().productName"></div><div class="mb-row__meta" data-bind="text: productSummary"></div></div>
+          <span class="mb-pill mb-pill--accent" data-bind="text: product().productCode"></span>
+        </div>
+        <div class="mb-kv">
+          <span class="mb-kv__k">Minimum balance</span><span class="mb-kv__v mb-money" data-bind="text: $data.product() ? $data.product().currency + ' ' + $data.product().minBalance : '—'"></span>
+          <span class="mb-kv__k">Opening minimum</span><span class="mb-kv__v mb-money" data-bind="text: $data.product() ? $data.product().currency + ' ' + $data.product().minOpeningDeposit : '—'"></span>
+          <span class="mb-kv__k">Funding</span><span class="mb-kv__v" data-bind="text: requiresFunding() ? 'Required before activation' : 'Not required at approval'"></span>
+        </div>
+      </div>
+
+      <div>
+        <label class="mb-label" for="openingName">Account name <span class="mb-muted">(optional)</span></label>
+        <input id="openingName" class="mb-field mb-field--block" maxlength="140" data-bind="textInput: accountName" />
+      </div>
+      <div>
+        <label class="mb-label" for="openingDeposit">Initial deposit</label>
+        <input id="openingDeposit" class="mb-field mb-field--block" inputmode="decimal" placeholder="0.00" data-bind="textInput: initialDeposit" />
+        <div class="mb-row__meta" style="margin-top:6px" data-bind="text: depositHint"></div>
+      </div>
+      <oj-button chroming="callToAction" disabled="[[!canReview()]]" on-oj-action="[[review]]">Review application</oj-button>
+      <!-- /ko -->
+      <!-- /ko -->
+    </section>
+
+    <aside class="mb-card mb-stack">
+      <div class="mb-card__header"><h2 class="mb-card__title">Opening controls</h2></div>
+      <div class="mb-stack mb-stack--tight mb-secondary">
+        <span>Eligibility comes from customer status, verified KYC, age, and resident address.</span>
+        <span>A different employee must approve the application.</span>
+        <span>Funded products remain pending activation until funding succeeds.</span>
+      </div>
+    </aside>
+  </div>
+  <!-- /ko -->
+
+  <!-- ko if: result -->
+  <section class="mb-card mb-result">
+    <span class="mb-glyph mb-glyph--credit" aria-hidden="true">✓</span>
+    <h2 style="margin:0">Application submitted</h2>
+    <div class="mb-mono" data-bind="text: result().applicationReference || result().applicationId"></div>
+    <span data-bind="css: resultStatusClass, text: result().status || 'PENDING_APPROVAL'"></span>
+    <p class="mb-muted" style="margin:0">A checker can now approve or reject this request.</p>
+    <!-- ko if: product() && product().requiresFunding -->
+    <p class="mb-banner mb-banner--info" style="margin:0">After approval, this funded account will remain pending activation until its opening deposit is completed.</p>
+    <!-- /ko -->
+    <div class="mb-inline"><oj-button chroming="outlined" on-oj-action="[[startAnother]]">Open another</oj-button><oj-button chroming="callToAction" on-oj-action="[[openQueue]]">View queue</oj-button></div>
+  </section>
+  <!-- /ko -->
+
+  <oj-dialog id="openAccountConfirmDialog" dialog-title="Confirm account application" cancel-behavior="none" initial-visibility="hide">
+    <div slot="body" class="mb-stack mb-stack--tight"><p style="margin:0" data-bind="text: dialogSummary"></p><div class="mb-banner mb-banner--info" style="margin:0"><div><strong>Maker–checker</strong> This creates an application, not an active account.</div></div></div>
+    <div slot="footer"><button type="button" class="mb-action-button mb-action-button--outlined" data-bind="click: cancelConfirm, disable: busy">Go back</button><button type="button" class="mb-action-button mb-action-button--primary" data-bind="click: confirm, disable: busy"><span data-bind="text: confirmLabel"></span></button></div>
+  </oj-dialog>
+</div>

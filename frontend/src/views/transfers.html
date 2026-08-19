@@ -1,0 +1,162 @@
+<div class="mb-stack">
+  <header class="mb-page-header">
+    <div>
+      <h1 class="mb-page-header__title">Transfers</h1>
+      <p class="mb-page-header__lede">
+        Move money internally or over NEFT, RTGS, IMPS and UPI. Limits are checked before confirmation.
+      </p>
+    </div>
+  </header>
+
+  <!-- ko if: hasBanner -->
+  <div data-bind="css: bannerClass" role="status">
+    <div><strong data-bind="text: banner().title"></strong> <span data-bind="text: banner().detail"></span></div>
+    <button type="button" class="mb-banner__close" data-bind="click: dismissBanner" aria-label="Dismiss">×</button>
+  </div>
+  <!-- /ko -->
+
+  <!-- ko ifnot: result -->
+  <div class="mb-grid mb-grid--split">
+    <section class="mb-card mb-stack">
+      <div>
+        <label class="mb-label" for="transferRail">Transfer type</label>
+        <select id="transferRail" class="mb-field mb-field--block"
+                data-bind="options: operations, optionsText: 'label', optionsValue: 'id', value: selectedId"></select>
+      </div>
+
+      <div>
+        <label class="mb-label" for="transferSource">Source account</label>
+        <div class="mb-inline" style="margin-top:6px;flex-wrap:nowrap">
+          <input id="transferSource" class="mb-field" style="flex:1" inputmode="numeric"
+                 placeholder="e.g. 510000000101" data-bind="textInput: sourceNumber" />
+          <oj-button chroming="outlined" disabled="[[resolvingSource]]" on-oj-action="[[resolveSource]]">
+            <span data-bind="text: resolvingSource() ? 'Resolving…' : 'Resolve'"></span>
+          </oj-button>
+        </div>
+      </div>
+
+      <!-- ko if: sourceAccount -->
+      <div class="mb-resolved">
+        <div>
+          <div class="mb-row__title" data-bind="text: sourceAccount().accountName"></div>
+          <div class="mb-row__meta"><span class="mb-mono" data-bind="text: sourceAccount().accountNumber"></span> · <span data-bind="text: sourceAccount().productCode"></span></div>
+        </div>
+        <div class="mb-row__end">
+          <span class="mb-money" data-bind="text: sourceAccount().currency + ' ' + sourceAccount().availableBalance"></span>
+          <span data-bind="css: sourceStatusClass, text: sourceAccount().status"></span>
+        </div>
+      </div>
+      <!-- /ko -->
+
+      <div>
+        <label class="mb-label" for="transferDestination" data-bind="text: destinationLabel"></label>
+        <div class="mb-inline" style="margin-top:6px;flex-wrap:nowrap">
+          <input id="transferDestination" class="mb-field" style="flex:1" inputmode="numeric"
+                 data-bind="textInput: destinationNumber" />
+          <!-- ko if: isInternal -->
+          <oj-button chroming="outlined" disabled="[[resolvingDestination]]" on-oj-action="[[resolveDestination]]">
+            <span data-bind="text: resolvingDestination() ? 'Resolving…' : 'Resolve'"></span>
+          </oj-button>
+          <!-- /ko -->
+        </div>
+        <!-- ko ifnot: isInternal -->
+        <p class="mb-card__subtitle">External beneficiary account; it is validated by the destination rail, not Moneybags.</p>
+        <!-- /ko -->
+      </div>
+
+      <!-- ko if: destinationAccount -->
+      <div class="mb-resolved">
+        <div>
+          <div class="mb-row__title" data-bind="text: destinationAccount().accountName"></div>
+          <div class="mb-row__meta"><span class="mb-mono" data-bind="text: destinationAccount().accountNumber"></span> · <span data-bind="text: destinationAccount().productCode"></span></div>
+        </div>
+        <span data-bind="css: destinationStatusClass, text: destinationAccount().status"></span>
+      </div>
+      <!-- /ko -->
+
+      <!-- ko if: isUpi -->
+      <div>
+        <label class="mb-label" for="upiAddress">UPI address</label>
+        <input id="upiAddress" class="mb-field mb-field--block" placeholder="name@bank" data-bind="textInput: upiAddress" />
+      </div>
+      <!-- /ko -->
+
+      <div class="mb-form-grid">
+        <div>
+          <label class="mb-label" for="transferAmount">Amount</label>
+          <input id="transferAmount" class="mb-field mb-field--block" inputmode="decimal" placeholder="0.00" data-bind="textInput: amount" />
+        </div>
+        <div>
+          <label class="mb-label" for="transferCurrency">Currency</label>
+          <input id="transferCurrency" class="mb-field mb-field--block" value="INR" readonly />
+        </div>
+      </div>
+
+      <div>
+        <label class="mb-label" for="transferNarration">Narration <span class="mb-muted">(optional)</span></label>
+        <input id="transferNarration" class="mb-field mb-field--block" maxlength="255" data-bind="textInput: narration" />
+      </div>
+
+      <!-- ko if: quoteVisible -->
+      <div data-bind="css: quoteClass">
+        <div style="width:100%">
+          <strong data-bind="text: quote().approvalRequired ? 'Approval required' : 'Configured limits'"></strong>
+          <span data-bind="text: quote().reason || (quote().approvalRequired ? 'A checker must approve this transfer.' : 'This amount is within the configured bounds.')"></span>
+          <dl class="mb-kv" style="margin-top:10px" data-bind="foreach: limitRows">
+            <dt class="mb-kv__k" data-bind="text: label"></dt>
+            <dd class="mb-kv__v mb-money" data-bind="text: value"></dd>
+          </dl>
+        </div>
+      </div>
+      <!-- /ko -->
+
+      <oj-button chroming="callToAction" disabled="[[!canReview()]]" on-oj-action="[[review]]">
+        <span data-bind="text: quoting() ? 'Checking limits…' : 'Review transfer'"></span>
+      </oj-button>
+    </section>
+
+    <aside class="mb-card">
+      <div class="mb-card__header"><h2 class="mb-card__title">How destinations work</h2></div>
+      <div class="mb-stack mb-stack--tight mb-secondary">
+        <span>Internal accounts are resolved and shown before review.</span>
+        <span>External account numbers remain free text by backend design.</span>
+        <span>RTGS below ₹2,00,000 is refused; at ₹10,00,000 or more it goes to a checker.</span>
+      </div>
+    </aside>
+  </div>
+  <!-- /ko -->
+
+  <!-- ko if: result -->
+  <section class="mb-card mb-result">
+    <span class="mb-glyph mb-glyph--debit" aria-hidden="true">↑</span>
+    <div class="mb-stack mb-stack--tight" style="align-items:center">
+      <h2 style="margin:0">Transfer accepted</h2>
+      <div class="mb-mono" data-bind="text: result().reference || result().id"></div>
+      <span data-bind="css: resultStatusClass, text: result().status || 'RECEIVED'"></span>
+      <div class="mb-figure mb-figure--sm" data-bind="text: resultAmount"></div>
+      <p class="mb-muted" style="margin:0" data-bind="text: result().sourceNumber + ' → ' + result().destinationNumber"></p>
+      <!-- ko if: polling --><p class="mb-muted" style="margin:0">Checking final status…</p><!-- /ko -->
+      <oj-button chroming="outlined" on-oj-action="[[startAnother]]">Start another</oj-button>
+    </div>
+  </section>
+  <!-- /ko -->
+
+  <oj-dialog id="transfersConfirmDialog" dialog-title="[[dialogTitle]]" cancel-behavior="none" initial-visibility="hide">
+    <div slot="body" class="mb-stack mb-stack--tight">
+      <p style="margin:0" data-bind="text: dialogSummary"></p>
+      <!-- ko if: confirmPayload() && confirmPayload().quote && confirmPayload().quote.approvalRequired -->
+      <div class="mb-banner mb-banner--warning" style="margin:0">
+        <div><strong>Approval required</strong> This transfer will wait for a checker.</div>
+      </div>
+      <!-- /ko -->
+    </div>
+    <div slot="footer">
+      <button type="button" class="mb-action-button mb-action-button--outlined"
+              data-bind="click: cancelConfirm, disable: busy">Go back</button>
+      <button type="button" class="mb-action-button mb-action-button--primary"
+              data-bind="click: confirm, disable: busy">
+        <span data-bind="text: confirmLabel"></span>
+      </button>
+    </div>
+  </oj-dialog>
+</div>

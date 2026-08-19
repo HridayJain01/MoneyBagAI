@@ -12,10 +12,17 @@
       <div class="mb-inline" style="flex-wrap:nowrap">
         <input class="mb-field" style="width:180px" aria-label="Reference" placeholder="Reference"
                data-bind="textInput: reference" />
+        <!--
+          No regex literal in here. JET replaces Knockout's binding parser with its own
+          (ojexpparser), which does not support them: v.replace(/_/g, ' ') fails with
+          "Unsupported expression type: undefined", the whole options binding throws, and
+          the dropdown silently renders a single empty entry. split/join is equivalent and
+          parses. This filter was unusable from the day it was written.
+        -->
         <select class="mb-field" aria-label="Status"
                 data-bind="value: status,
                            options: statusList,
-                           optionsText: function (v) { return v === '' ? 'All statuses' : v.replace(/_/g, ' '); }"></select>
+                           optionsText: function (v) { return v === '' ? 'All statuses' : v.split('_').join(' '); }"></select>
         <oj-button chroming="outlined" on-oj-action="[[applyFilters]]">Apply</oj-button>
       </div>
     </div>
@@ -47,6 +54,10 @@
 
         <template slot="whenTemplate" data-oj-as="cell">
           <span class="mb-muted" style="font-size:12px" data-bind="text: $data.fmtWhen(cell.row)"></span>
+        </template>
+
+        <template slot="actionsTemplate" data-oj-as="cell">
+          <oj-button chroming="outlined" on-oj-action="[[function () { $data.openTransaction(cell.row); }]]">Open</oj-button>
         </template>
 
       </oj-table>

@@ -45,7 +45,8 @@ define([
     });
 
     self.cifLabel = ko.pureComputed(function () {
-      return 'CIF ' + (cifNo || '—');
+      var value = cifNo || '—';
+      return String(value).indexOf('CIF') === 0 ? value : 'CIF ' + value;
     });
 
     self.profile = ko.observableArray([]);
@@ -153,16 +154,16 @@ define([
       });
       self.completenessRows(entries);
 
-      // Take the first numeric value as the headline percentage rather than
-      // assuming a particular key name.
-      var numbers = Object.keys(map || {})
-        .map(function (k) {
-          return map[k];
-        })
-        .filter(function (v) {
-          return typeof v === 'number';
-        });
-      self.completenessPct(numbers.length ? numbers[0] : null);
+      // The response's other numeric fields are counts. Prefer its explicit
+      // percentage; only derive it when talking to an older service version.
+      var percentage = map && map.percentage;
+      if (typeof percentage === 'number') {
+        self.completenessPct(percentage);
+      } else if (map && typeof map.completedFields === 'number' && typeof map.totalFields === 'number' && map.totalFields > 0) {
+        self.completenessPct(Math.round((map.completedFields / map.totalFields) * 100));
+      } else {
+        self.completenessPct(null);
+      }
     });
 
     var loadSummary = endpoints.customers.summary(cifNo).then(function (map) {

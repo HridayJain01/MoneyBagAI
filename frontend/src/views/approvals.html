@@ -88,7 +88,7 @@
 
   <oj-dialog id="approvalsConfirmDialog"
              dialog-title="[[dialogTitle]]"
-             cancel-behavior="icon"
+             cancel-behavior="none"
              initial-visibility="hide">
     <div slot="body" class="mb-stack mb-stack--tight">
       <p style="margin:0" data-bind="text: dialogSummary"></p>
@@ -97,10 +97,12 @@
       <!-- /ko -->
     </div>
     <div slot="footer">
-      <oj-button chroming="outlined" on-oj-action="[[cancelConfirm]]">Cancel</oj-button>
-      <oj-button chroming="callToAction" disabled="[[busy]]" on-oj-action="[[confirm]]">
+      <button type="button" class="mb-action-button mb-action-button--outlined"
+              data-bind="click: cancelConfirm, disable: busy">Cancel</button>
+      <button type="button" class="mb-action-button mb-action-button--primary"
+              data-bind="click: confirm, disable: busy">
         <span data-bind="text: confirmLabel"></span>
-      </oj-button>
+      </button>
     </div>
   </oj-dialog>
 

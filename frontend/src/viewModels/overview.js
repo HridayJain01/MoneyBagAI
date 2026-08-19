@@ -14,11 +14,12 @@ define([
   '../services/endpoints',
   '../services/format',
   '../services/http',
+  '../services/session',
   '../services/navigation',
   'ojs/ojarraydataprovider',
   'ojs/ojchart',
   'ojs/ojbutton'
-], function (ko, endpoints, fmt, http, navigation, ArrayDataProvider) {
+], function (ko, endpoints, fmt, http, session, navigation, ArrayDataProvider) {
   'use strict';
 
   var QUEUE_SAMPLE = 100;
@@ -162,11 +163,42 @@ define([
       });
     }
 
-    Promise.all([guard(loadQueue()), guard(loadToday()), guard(loadRecent()), guard(loadApplications())]).then(
-      function () {
-        self.loading(false);
+    // ModuleRouterAdapter can instantiate the current route before the auth-gated
+    // <oj-module> enters the DOM. Firing these protected requests immediately
+    // therefore produces four 401s on the login screen and leaves Overview stale
+    // after sign-in. Start once a real session exists, whether it was restored at
+    // startup or published by login.js a moment later.
+    var started = false;
+    var unsubscribe = null;
+
+    function start() {
+      if (started || !session.isAuthenticated()) {
+        return;
       }
-    );
+      started = true;
+      if (unsubscribe) {
+        unsubscribe();
+        unsubscribe = null;
+      }
+      Promise.all([guard(loadQueue()), guard(loadToday()), guard(loadRecent()), guard(loadApplications())]).then(
+        function () {
+          self.loading(false);
+        }
+      );
+    }
+
+    if (session.isAuthenticated()) {
+      start();
+    } else {
+      unsubscribe = session.subscribe(start);
+    }
+
+    self.disconnected = function () {
+      if (unsubscribe) {
+        unsubscribe();
+        unsubscribe = null;
+      }
+    };
 
     self.recentProvider = new ArrayDataProvider(self.recent, { keyAttributes: 'id' });
   }

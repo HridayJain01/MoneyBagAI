@@ -8,9 +8,10 @@ define([
   'knockout',
   '../services/providers',
   '../services/format',
+  '../services/navigation',
   'ojs/ojtable',
   'ojs/ojbutton'
-], function (ko, providers, fmt) {
+], function (ko, providers, fmt, navigation) {
   'use strict';
 
   function TransactionsViewModel() {
@@ -46,7 +47,8 @@ define([
       { headerText: 'Rail', field: 'rail' },
       { headerText: 'Status', field: 'status', template: 'statusTemplate' },
       { headerText: 'Amount', field: 'amount', template: 'amountTemplate' },
-      { headerText: 'Created', field: 'createdAt', template: 'whenTemplate' }
+      { headerText: 'Created', field: 'createdAt', template: 'whenTemplate' },
+      { headerText: '', template: 'actionsTemplate', sortable: 'disabled' }
     ];
 
     self.applyFilters = function () {
@@ -68,6 +70,9 @@ define([
     };
     self.statusClassFor = function (row) {
       return 'mb-pill mb-pill--' + fmt.toneFor(row.status);
+    };
+    self.openTransaction = function (row) {
+      navigation.openTransaction(row.transactionId);
     };
   }
 
