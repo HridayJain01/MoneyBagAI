@@ -14,12 +14,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -41,10 +43,8 @@ class KycServiceImplTests {
     }
 
     @Test
-    void manualDecisionCanBeReadAndUpdated() {
-        KycSessionResponse session = kycService.createSession(
-                new CreateKycSessionRequest("CIF900101", "account-opening", DocumentType.AADHAAR)
-        );
+    void manualDecisionRequiresTellerSubmissionAndStoresCheckerDecision() throws Exception {
+        KycSessionResponse session = createSubmittedSession("CIF900101", DocumentType.AADHAAR);
 
         kycService.approve(
                 session.getSessionId(),
@@ -56,15 +56,20 @@ class KycServiceImplTests {
         assertThat(approvedResult.decision()).isEqualTo("Approved manually");
         assertThat(approvedResult.verified()).isTrue();
 
+        KycSessionResponse rejectedSession = createSubmittedSession("CIF900103", DocumentType.PAN);
         kycService.reject(
-                session.getSessionId(),
+                rejectedSession.getSessionId(),
                 "reviewer-2",
                 new ManualDecisionRequest("bad-match", "Rejected manually")
         );
 
-        KycVerificationResultResponse rejectedResult = kycService.getResult(session.getSessionId());
+        KycVerificationResultResponse rejectedResult = kycService.getResult(rejectedSession.getSessionId());
         assertThat(rejectedResult.decision()).isEqualTo("Rejected manually");
         assertThat(rejectedResult.verified()).isFalse();
+
+        assertThat(kycService.findSessions("CIF900101"))
+                .extracting(KycSessionResponse::getSessionId)
+                .contains(session.getSessionId());
     }
 
     @Test
@@ -85,27 +90,47 @@ class KycServiceImplTests {
         assertThat(storedDocument.getOriginalFileName()).isEqualTo("pan.pdf");
         assertThat(storedDocument.getContent()).isEqualTo("pdf-content".getBytes());
 
-        MockMultipartFile frameOne = new MockMultipartFile(
-                "frames",
-                "frame-1.jpg",
-                "image/jpeg",
-                "frame-one".getBytes()
-        );
-        MockMultipartFile frameTwo = new MockMultipartFile(
-                "frames",
-                "frame-2.jpg",
-                "image/jpeg",
-                "frame-two".getBytes()
-        );
-        kycService.processFrames(session.getSessionId(), List.of(frameOne, frameTwo));
+        kycService.processFrames(session.getSessionId(), frames());
 
         List<CapturedFrameResponse> frames = kycService.getFrames(session.getSessionId());
         assertThat(frames)
                 .extracting(CapturedFrameResponse::frameNumber)
-                .containsExactly(1, 2);
+                .containsExactly(1, 2, 3, 4, 5);
 
         CapturedFrameEntity storedFrame = kycService.getFrame(session.getSessionId(), 2);
         assertThat(storedFrame.getOriginalFileName()).isEqualTo("frame-2.jpg");
         assertThat(storedFrame.getContent()).isEqualTo("frame-two".getBytes());
+    }
+
+    @Test
+    void checkerCannotDecideBeforeTellerSubmits() {
+        KycSessionResponse session = kycService.createSession(
+                new CreateKycSessionRequest("CIF900104", "account-opening", DocumentType.AADHAAR));
+
+        assertThatThrownBy(() -> kycService.approve(session.getSessionId(), "reviewer-1",
+                new ManualDecisionRequest("documents-ok", "Approved manually")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("teller must submit");
+    }
+
+    private KycSessionResponse createSubmittedSession(String cifNo, DocumentType documentType) throws Exception {
+        KycSessionResponse session = kycService.createSession(
+                new CreateKycSessionRequest(cifNo, "account-opening", documentType));
+        kycService.uploadDocument(session.getSessionId(), documentType,
+                new MockMultipartFile("file", "proof.pdf", "application/pdf", "pdf-content".getBytes()));
+        kycService.processFrames(session.getSessionId(), frames());
+        KycSessionResponse submitted = kycService.submitForReview(session.getSessionId());
+        assertThat(submitted.getStatus().name()).isEqualTo("VERIFICATION_IN_PROGRESS");
+        return submitted;
+    }
+
+    private List<MultipartFile> frames() {
+        return List.of(
+                frame(1, "frame-one"), frame(2, "frame-two"), frame(3, "frame-three"),
+                frame(4, "frame-four"), frame(5, "frame-five"));
+    }
+
+    private MockMultipartFile frame(int number, String content) {
+        return new MockMultipartFile("frames", "frame-" + number + ".jpg", "image/jpeg", content.getBytes());
     }
 }

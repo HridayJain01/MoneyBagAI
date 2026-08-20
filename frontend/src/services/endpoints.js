@@ -125,6 +125,13 @@ define(['./http'], function (api) {
          directly. */
     },
 
+    /* ------------------------------------------------------------- KYC --- */
+    kyc: {
+      pendingSessions: function (cifNo) {
+        return api.get('/api/v1/kyc/customers/' + enc(cifNo) + '/sessions/pending');
+      }
+    },
+
     /* -------------------------------------------------------- accounts --- */
     accounts: {
       search: function (query) {

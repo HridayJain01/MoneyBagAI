@@ -10,6 +10,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Set;
 
 @Component
 public class KycAuthorizationFilter extends OncePerRequestFilter {
@@ -28,15 +29,23 @@ public class KycAuthorizationFilter extends OncePerRequestFilter {
             return;
         }
 
+        String path = request.getRequestURI();
+        boolean checkerDecision = path.matches(".*/sessions/[^/]+/(approve|reject)$");
+        boolean tellerWrite = "POST".equalsIgnoreCase(request.getMethod());
+        Set<String> accepted = checkerDecision
+                ? Set.of("KYC_VERIFY")
+                : tellerWrite ? Set.of("CUSTOMER_UPDATE") : Set.of("CUSTOMER_UPDATE", "KYC_VERIFY");
+
         String permissions = request.getHeader("X-Permissions");
         boolean allowed = permissions != null && Arrays.stream(permissions.split(","))
                 .map(String::trim)
-                .anyMatch("KYC_VERIFY"::equals);
+                .anyMatch(accepted::contains);
         if (!allowed) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            String required = checkerDecision ? "KYC_VERIFY" : tellerWrite ? "CUSTOMER_UPDATE" : "CUSTOMER_UPDATE or KYC_VERIFY";
             response.getWriter().write("{\"code\":\"KYC_PERMISSION_REQUIRED\","
-                    + "\"message\":\"KYC_VERIFY permission is required\"}");
+                    + "\"message\":\"" + required + " permission is required\"}");
             return;
         }
         filterChain.doFilter(request, response);

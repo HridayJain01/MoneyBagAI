@@ -41,7 +41,8 @@ public class DatabaseStorageService implements FileStorageService{
     @Override
     public CapturedFrameEntity storeFrame(String sessionId, MultipartFile file, int frameNumber) throws IOException {
         var session = sessionRepository.findById(sessionId).orElseThrow(()->new RuntimeException("error at store frame"));
-        var frame = new CapturedFrameEntity();
+        var frame = capturedFrameRepository.findBySessionIdAndFrameNumber(sessionId, frameNumber)
+                .orElseGet(CapturedFrameEntity::new);
         frame.setFrameNumber(frameNumber);
         frame.setSession(session);
         frame.setOriginalFileName(file.getOriginalFilename());
@@ -102,11 +103,19 @@ public class DatabaseStorageService implements FileStorageService{
     @Override public KycSessionEntity getSession(KycSessionEntity sesssion)
     {return sessionRepository.findById(sesssion.getId()).orElseThrow(()->new RuntimeException("session with this id not exist"));}
 
+    @Override public List<KycSessionEntity> findSessions(String cifNo) {
+        return sessionRepository.findAllByCifNoOrderByCreatedAtDesc(cifNo);
+    }
+
     @Override public List<KycSessionEntity> findPendingSessions(String cifNo) {
         return sessionRepository.findByCifNoAndStatusInOrderByCreatedAtDesc(
                 cifNo,
                 List.of(KycSessionStatus.CREATED, KycSessionStatus.DOCUMENT_UPLOADED,
                         KycSessionStatus.FRAME_CAPTURED, KycSessionStatus.VERIFICATION_IN_PROGRESS));
+    }
+
+    @Override public List<KycSessionEntity> findSessions(String cifNo) {
+        return sessionRepository.findByCifNoOrderByCreatedAtDesc(cifNo);
     }
 
     @Override public KycSessionEntity updateSession(KycSessionEntity session)

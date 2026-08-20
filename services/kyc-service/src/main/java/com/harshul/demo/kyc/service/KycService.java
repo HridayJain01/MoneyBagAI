@@ -14,7 +14,9 @@ public interface KycService {
     KycSessionResponse createSession(CreateKycSessionRequest request);
 
     KycSessionResponse getSession(String sessionId);
+    List<KycSessionResponse> findSessions(String cifNo);
     List<KycSessionResponse> findPendingSessions(String cifNo);
+    KycSessionResponse submitForReview(String sessionId) throws IOException;
 
     KycDocumentResponse uploadDocument(
             String sessionId,

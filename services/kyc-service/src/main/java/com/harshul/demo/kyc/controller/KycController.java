@@ -63,10 +63,30 @@ public class KycController {
         return ResponseEntity.ok(kycService.findPendingSessions(cif));
     }
 
+    @GetMapping("/customers/{cif}/sessions")
+    public ResponseEntity<List<KycSessionResponse>> getSessions(@PathVariable String cif) {
+        return ResponseEntity.ok(kycService.findSessions(cif));
+    }
+
+    @PostMapping("/sessions/{kycSessionId}/submit")
+    public ResponseEntity<KycSessionResponse> submitForReview(
+            @PathVariable String kycSessionId
+    ) throws IOException {
+        return ResponseEntity.ok(kycService.submitForReview(kycSessionId));
+    }
+
+    @GetMapping("/customers/{cif}/sessions")
+    public ResponseEntity<List<KycSessionResponse>> getSessions(@PathVariable String cif) {
+        return ResponseEntity.ok(kycService.findSessions(cif));
+    }
+
     @GetMapping("/sessions/{kycSessionId}/documents/{documentType}")
     public ResponseEntity<byte[]> getDocument(
             @PathVariable String kycSessionId,
-            @PathVariable String documentType
+            @PathVariable String documentType,
+            @RequestParam(defaultValue = "false") boolean inline
+            @PathVariable String documentType,
+            @RequestParam(name = "inline", defaultValue = "false") boolean inline
     ) throws IOException {
         DocumentType type = DocumentType.valueOf(documentType.toUpperCase());
         KycDocumentEntity document = kycService.getDocument(kycSessionId, type);
@@ -77,7 +97,7 @@ public class KycController {
                 ))
                 .header(
                         HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" + document.getOriginalFileName() + "\""
+                        (inline ? "inline" : "attachment") + "; filename=\"" + document.getOriginalFileName() + "\""
                 )
                 .body(document.getContent());
     }

@@ -86,6 +86,10 @@ public class KycServiceImpl implements KycService {
         target.setId(sessionId);
 
         KycSessionEntity session = storageService.getSession(target);
+        if (session.getStatus() != KycSessionStatus.CREATED
+                && session.getStatus() != KycSessionStatus.DOCUMENT_UPLOADED) {
+            throw new IllegalArgumentException("Evidence cannot be changed after KYC submission.");
+        }
         DocumentType type = documentType;
         KycDocumentEntity document = storageService.storeDocument(sessionId, type, file);
 
@@ -104,9 +108,27 @@ public class KycServiceImpl implements KycService {
     }
 
     @Override
+    public List<KycSessionResponse> findSessions(String cifNo) {
+        customerKycClient.context(cifNo);
+        return mapSessions(storageService.findSessions(cifNo));
+    }
+
+    @Override
     public List<KycSessionResponse> findPendingSessions(String cifNo) {
         customerKycClient.context(cifNo);
-        return storageService.findPendingSessions(cifNo).stream().map(session -> new KycSessionResponse(
+        return mapSessions(storageService.findPendingSessions(cifNo));
+    }
+
+    private List<KycSessionResponse> mapSessions(List<KycSessionEntity> sessions) {
+        return sessions.stream().map(session -> new KycSessionResponse(
+                session.getId(), session.getCifNo(), session.getPurpose(), session.getDocumentType(),
+                session.getStatus(), session.getCreatedAt(), session.getUpdatedAt())).toList();
+    }
+
+    @Override
+    public List<KycSessionResponse> findSessions(String cifNo) {
+        customerKycClient.context(cifNo);
+        return storageService.findSessions(cifNo).stream().map(session -> new KycSessionResponse(
                 session.getId(), session.getCifNo(), session.getPurpose(), session.getDocumentType(),
                 session.getStatus(), session.getCreatedAt(), session.getUpdatedAt())).toList();
     }
@@ -126,8 +148,13 @@ public class KycServiceImpl implements KycService {
         target.setId(sessionId);
         KycSessionEntity session = storageService.getSession(target);
 
-        if (frames == null || frames.isEmpty()) {
-            throw new IllegalArgumentException("No frames uploaded.");
+        if (session.getStatus() != KycSessionStatus.DOCUMENT_UPLOADED
+                && session.getStatus() != KycSessionStatus.FRAME_CAPTURED) {
+            throw new IllegalArgumentException("Upload the identity proof before capturing frames, and do not change evidence after submission.");
+        }
+
+        if (frames == null || frames.size() != 5) {
+            throw new IllegalArgumentException("Exactly 5 frames are required.");
         }
 
         int index = 1;
@@ -146,6 +173,29 @@ public class KycServiceImpl implements KycService {
         session.setStatus(KycSessionStatus.FRAME_CAPTURED);
         storageService.updateSession(session);
         return response;
+    }
+
+    @Override
+    public KycSessionResponse submitForReview(String sessionId) throws IOException {
+        KycSessionEntity target = new KycSessionEntity();
+        target.setId(sessionId);
+        KycSessionEntity session = storageService.getSession(target);
+
+        if (session.getStatus() == KycSessionStatus.VERIFICATION_IN_PROGRESS) {
+            return getSession(sessionId);
+        }
+        if (session.getStatus() != KycSessionStatus.FRAME_CAPTURED) {
+            throw new IllegalArgumentException("Capture exactly 5 frames before submitting for review.");
+        }
+
+        storageService.getDocument(sessionId, session.getDocumentType());
+        if (storageService.getFrames(sessionId).size() != 5) {
+            throw new IllegalArgumentException("Exactly 5 frames are required before submission.");
+        }
+
+        session.setStatus(KycSessionStatus.VERIFICATION_IN_PROGRESS);
+        storageService.updateSession(session);
+        return getSession(sessionId);
     }
 
     @Override
@@ -205,6 +255,7 @@ public class KycServiceImpl implements KycService {
         target.setId(sessionId);
 
         KycSessionEntity session = storageService.getSession(target);
+        requireSubmitted(session);
         session.setStatus(KycSessionStatus.VERIFIED);
         storageService.updateSession(session);
 
@@ -232,6 +283,7 @@ public class KycServiceImpl implements KycService {
         KycSessionEntity target = new KycSessionEntity();
         target.setId(sessionId);
         KycSessionEntity session = storageService.getSession(target);
+        requireSubmitted(session);
 
 
         KycVerificationEntity result = new KycVerificationEntity();
@@ -260,6 +312,12 @@ public class KycServiceImpl implements KycService {
         customerKycClient.synchronizeDecision(session.getCifNo(),
                 new CustomerKycClient.KycDecisionSyncRequest(
                         session.getId(), status, reviewerId, request.reason(), request.remarks(), decidedAt));
+    }
+
+    private void requireSubmitted(KycSessionEntity session) {
+        if (session.getStatus() != KycSessionStatus.VERIFICATION_IN_PROGRESS) {
+            throw new IllegalArgumentException("The teller must submit this KYC session before a checker can decide it.");
+        }
     }
 
     private String decisionDetail(ManualDecisionRequest request, String fallback) {
