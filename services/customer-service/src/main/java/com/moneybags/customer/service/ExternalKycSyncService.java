@@ -4,6 +4,7 @@ import com.moneybags.customer.dto.ExternalKycModels.KycContext;
 import com.moneybags.customer.dto.ExternalKycModels.KycDecisionRequest;
 import com.moneybags.customer.dto.ExternalKycModels.KycDecisionResult;
 import com.moneybags.customer.entity.Customer;
+import com.moneybags.customer.enums.CustomerStatus;
 import com.moneybags.customer.enums.KycStatus;
 import com.moneybags.customer.exception.ResourceNotFoundException;
 import com.moneybags.customer.repository.CustomerRepository;
@@ -52,6 +53,14 @@ public class ExternalKycSyncService {
         }
 
         customer.setKycStatus(requestedStatus);
+        if (requestedStatus == KycStatus.VERIFIED
+                && customer.getStatus() != CustomerStatus.BLOCKED
+                && customer.getStatus() != CustomerStatus.DECEASED) {
+            customer.setStatus(CustomerStatus.ACTIVE);
+        } else if (requestedStatus == KycStatus.REJECTED
+                && customer.getStatus() == CustomerStatus.ACTIVE) {
+            customer.setStatus(CustomerStatus.INACTIVE);
+        }
         customer.setExternalKycSessionId(request.sessionId());
         customer.setExternalKycDecision(requestedStatus.name());
         customer.setExternalKycDecidedAt(decidedAt);

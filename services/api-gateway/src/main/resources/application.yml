@@ -58,6 +58,15 @@ spring:
           predicates:
             - Path=/api/v1/kyc/**
 
+        # Serve the KYC portal through the authenticated gateway. Its relative
+        # API calls then receive the same access-token cookie and actor headers.
+        - id: kyc-service-ui
+          uri: lb://kyc-service
+          predicates:
+            - Path=/kyc-ui/**
+          filters:
+            - StripPrefix=1
+
         - id: branch-employee-service
           uri: lb://branch-employee-service
           predicates:

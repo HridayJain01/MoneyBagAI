@@ -8,7 +8,7 @@
 'use strict';
 
 /**
- * Proxies /api to the Moneybags API gateway during `ojet serve`.
+ * Proxies /api and /kyc-ui to the Moneybags API gateway during `ojet serve`.
  *
  * This is not a convenience: the gateway ships no CORS configuration at all,
  * so a browser calling http://localhost:8090 directly from the dev server
@@ -55,7 +55,8 @@ module.exports = function (configObj) {
         // The gateway rejects /internal/** with 403 by design. Excluding it
         // here makes a stray call obvious in development rather than looking
         // like a permissions bug.
-        pathFilter: (path) => path.startsWith('/api/') && !path.startsWith('/api/internal'),
+        pathFilter: (path) =>
+          (path.startsWith('/api/') && !path.startsWith('/api/internal')) || path.startsWith('/kyc-ui/'),
         on: {
           error(err, req, res) {
             console.error(`[moneybags] proxy error for ${req.url}: ${err.message}`);
@@ -88,13 +89,13 @@ module.exports = function (configObj) {
       const path = req.url.split('?')[0];
       const looksLikeFile = path.lastIndexOf('.') > path.lastIndexOf('/');
 
-      if (accepts.includes('text/html') && !looksLikeFile && !path.startsWith('/api/')) {
+      if (accepts.includes('text/html') && !looksLikeFile && !path.startsWith('/api/') && !path.startsWith('/kyc-ui/')) {
         req.url = '/index.html';
       }
       return next();
     });
 
-    console.log(`[moneybags] proxying /api -> ${GATEWAY}`);
+    console.log(`[moneybags] proxying /api and /kyc-ui -> ${GATEWAY}`);
     console.log('[moneybags] history fallback enabled for client-side routes');
     configObj.express = app;
     resolve(configObj);

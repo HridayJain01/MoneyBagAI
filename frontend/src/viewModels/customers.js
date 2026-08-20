@@ -36,6 +36,8 @@ define([
     self.rows = ko.observableArray([]);
     self.totalFound = ko.observable(0);
     self.canCreate = session.hasPermission('CUSTOMER_UPDATE');
+    self.isTeller = session.hasRole('TELLER');
+    self.isChecker = session.hasRole('CHECKER') && session.hasPermission('KYC_VERIFY');
     self.formFirstName = ko.observable('');
     self.formLastName = ko.observable('');
     self.formDob = ko.observable('');
@@ -94,11 +96,11 @@ define([
         .then(function (result) {
           var list = Array.isArray(result) ? result : [];
           self.totalFound(list.length);
-          self.rows(
+          return Promise.all(
             list.slice(0, MAX_ROWS).map(function (c) {
               var name = fmt.fullName(c.firstName, c.lastName);
               var meta = [c.cifNo, c.mobile, c.email].filter(Boolean).join(' · ');
-              return {
+              var row = {
                 cifNo: c.cifNo,
                 name: name,
                 initials: session.initials(name),
@@ -106,10 +108,44 @@ define([
                 status: c.status,
                 statusClass: 'mb-pill mb-pill--' + fmt.toneFor(c.status),
                 kycStatus: c.kycStatus,
-                kycClass: 'mb-pill mb-pill--' + fmt.toneFor(c.kycStatus)
+                kycClass: 'mb-pill mb-pill--' + fmt.toneFor(c.kycStatus),
+                kycWorkflowLabel: '',
+                showTellerKycAction: false,
+                showReviewKycAction: false,
+                tellerKycLabel: 'Start KYC'
               };
+              if (c.kycStatus !== 'PENDING' || (!self.isTeller && !self.isChecker)) {
+                return row;
+              }
+              return endpoints.kyc.pendingSessions(c.cifNo).then(function (sessions) {
+                var pending = Array.isArray(sessions) ? sessions : [];
+                var submitted = pending.find(function (item) {
+                  return item.status === 'VERIFICATION_IN_PROGRESS';
+                });
+                if (self.isTeller) {
+                  if (submitted) {
+                    row.kycWorkflowLabel = 'Submitted for Checker approval';
+                  } else {
+                    row.showTellerKycAction = true;
+                    row.tellerKycLabel = pending.length ? 'Continue KYC' : 'Start KYC';
+                  }
+                }
+                if (self.isChecker) {
+                  row.kycWorkflowLabel = submitted
+                    ? 'Submitted by Teller · awaiting review'
+                    : 'KYC pending · not submitted by Teller';
+                  row.showReviewKycAction = !!submitted;
+                  row.reviewSessionId = submitted ? submitted.sessionId : null;
+                }
+                return row;
+              }).catch(function () {
+                row.kycWorkflowLabel = 'KYC workflow status unavailable';
+                return row;
+              });
             })
-          );
+          ).then(function (rows) {
+            self.rows(rows);
+          });
         })
         .catch(function (err) {
           if (!err || !err.isSessionExpired) {
@@ -137,6 +173,21 @@ define([
     // root, which is not the app controller inside a foreach template.
     self.openCustomer = function (cifNo) {
       navigation.openCustomer(cifNo);
+    };
+
+    function returnToCustomers() {
+      return window.location.pathname + window.location.search;
+    }
+
+    self.openTellerKyc = function (cifNo) {
+      window.location.assign('/kyc-ui/?cif=' + encodeURIComponent(cifNo) +
+        '&returnTo=' + encodeURIComponent(returnToCustomers()));
+    };
+
+    self.openKycReview = function (row) {
+      window.location.assign('/kyc-ui/reviewer.html?cif=' + encodeURIComponent(row.cifNo) +
+        '&sessionId=' + encodeURIComponent(row.reviewSessionId) +
+        '&returnTo=' + encodeURIComponent(returnToCustomers()));
     };
 
     function resetOnboarding() {
@@ -175,7 +226,7 @@ define([
       if (password.length < 8) { throw new Error('Temporary password must contain at least 8 characters.'); }
       return {
         registration: { firstName: firstName, lastName: lastName, email: email, password: password, dob: dob, gender: gender, mobile: mobile },
-        customer: { firstName: firstName, lastName: lastName, dob: dob, gender: gender, mobile: mobile, email: email, panNo: pan, status: 'ACTIVE', kycStatus: 'PENDING' },
+        customer: { firstName: firstName, lastName: lastName, dob: dob, gender: gender, mobile: mobile, email: email, panNo: pan, status: 'INACTIVE', kycStatus: 'PENDING' },
         address: { addressType: 'RESIDENTIAL', line1: value(self.formAddress, 'Address'), city: value(self.formCity, 'City'), state: value(self.formState, 'State'), pincode: value(self.formPincode, 'Pincode'), country: 'India', isCurrent: true }
       };
     }
