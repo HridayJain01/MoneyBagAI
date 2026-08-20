@@ -56,7 +56,7 @@ public class AccountApplication {
 
     /** Product terms as resolved at submission, serialised as JSON. */
     @Lob
-    @Column(name = "product_snapshot", columnDefinition = "TEXT")
+    @Column(name = "product_snapshot")
     private String productSnapshot;
 
     /** UNIQUE: one application can never produce two accounts, even under a retry. */

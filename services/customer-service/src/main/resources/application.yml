@@ -15,15 +15,21 @@ spring:
     # scratch work) -- Flyway refuses to migrate a non-empty schema that has no history
     # table, so customer-service could not have started against it.
     url: ${CUSTOMER_DB_URL:jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/moneybags_customer?createDatabaseIfNotExist=true&serverTimezone=UTC}
+    driver-class-name: ${DB_DRIVER:com.mysql.cj.jdbc.Driver}
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:password}
   jpa:
+    defer-datasource-initialization: true
     hibernate:
-      ddl-auto: validate
-    database-platform: org.hibernate.dialect.MySQLDialect
+      ddl-auto: ${JPA_DDL_AUTO:update}
+    database-platform: ${HIBERNATE_DIALECT:org.hibernate.dialect.MySQLDialect}
     open-in-view: false
   flyway:
-    enabled: true
+    enabled: ${FLYWAY_ENABLED:true}
+  sql:
+    init:
+      mode: ${SQL_INIT_MODE:never}
+      platform: ${SQL_INIT_PLATFORM:oracle}
 eureka:
   client:
     service-url:

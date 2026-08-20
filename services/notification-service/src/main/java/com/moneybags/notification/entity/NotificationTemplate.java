@@ -21,7 +21,7 @@ public class NotificationTemplate {
     private String subjectTemplate;
 
     @Lob
-    @Column(name = "body_template", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "body_template", nullable = false)
     private String bodyTemplate;
 
     @Column(nullable = false, length = 10)

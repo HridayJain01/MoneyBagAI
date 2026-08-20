@@ -112,7 +112,7 @@ CREATE TABLE account_approvals (
     CONSTRAINT chk_approval_decision CHECK (decision IN ('APPROVED','REJECTED'))
 ) ENGINE = InnoDB;
 
-CREATE TABLE funds_holds (
+CREATE TABLE account_funds_holds (
     hold_id        VARCHAR(36)   NOT NULL,
     account_id     VARCHAR(36)   NOT NULL,
     transaction_id VARCHAR(36)   NULL,
@@ -209,7 +209,7 @@ CREATE TABLE projection_inbox (
     KEY idx_projection_account (account_id, applied_at)
 ) ENGINE = InnoDB;
 
-CREATE TABLE idempotency_records (
+CREATE TABLE account_idempotency_records (
     idempotency_id  VARCHAR(36)  NOT NULL,
     caller_scope    VARCHAR(128) NOT NULL,
     operation       VARCHAR(80)  NOT NULL,

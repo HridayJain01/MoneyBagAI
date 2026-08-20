@@ -50,7 +50,7 @@ CREATE TABLE transaction_rail_details (
     CONSTRAINT fk_rail_details_transaction FOREIGN KEY (transaction_id) REFERENCES transactions(transaction_id)
 );
 
-CREATE TABLE idempotency_records (
+CREATE TABLE transaction_idempotency_records (
     idempotency_id VARCHAR(36) NOT NULL,
     caller_scope VARCHAR(128) NOT NULL,
     operation VARCHAR(80) NOT NULL,
@@ -84,7 +84,7 @@ CREATE TABLE transaction_legs (
     CONSTRAINT chk_legs_direction CHECK (direction IN ('DEBIT', 'CREDIT'))
 );
 
-CREATE TABLE funds_holds (
+CREATE TABLE transaction_funds_holds (
     hold_id VARCHAR(36) NOT NULL,
     transaction_id VARCHAR(36) NOT NULL,
     account_id VARCHAR(64) NOT NULL,
@@ -103,7 +103,7 @@ CREATE TABLE funds_holds (
     CONSTRAINT chk_holds_amount CHECK (amount > 0)
 );
 
-CREATE TABLE journal_entries (
+CREATE TABLE transaction_journal_entries (
     journal_id VARCHAR(36) NOT NULL,
     transaction_id VARCHAR(36) NOT NULL,
     journal_reference VARCHAR(64) NOT NULL,
@@ -120,7 +120,7 @@ CREATE TABLE journal_entries (
     CONSTRAINT chk_journal_balanced CHECK (total_debit = total_credit AND total_debit > 0)
 );
 
-CREATE TABLE journal_lines (
+CREATE TABLE transaction_journal_lines (
     journal_line_id VARCHAR(36) NOT NULL,
     journal_id VARCHAR(36) NOT NULL,
     line_no INT NOT NULL,
@@ -132,7 +132,7 @@ CREATE TABLE journal_lines (
     created_at TIMESTAMP(6) NOT NULL,
     PRIMARY KEY (journal_line_id),
     CONSTRAINT uk_journal_line_no UNIQUE (journal_id, line_no),
-    CONSTRAINT fk_lines_journal FOREIGN KEY (journal_id) REFERENCES journal_entries(journal_id),
+    CONSTRAINT fk_lines_journal FOREIGN KEY (journal_id) REFERENCES transaction_journal_entries(journal_id),
     CONSTRAINT chk_journal_line_side CHECK ((debit > 0 AND credit = 0) OR (credit > 0 AND debit = 0))
 );
 

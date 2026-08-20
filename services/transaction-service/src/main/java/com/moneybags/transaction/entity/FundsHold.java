@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
-@Entity @Table(name = "funds_holds")
+@Entity @Table(name = "transaction_funds_holds")
 @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
 public class FundsHold {
     @Id @Column(name = "hold_id", length = 36) private String id;

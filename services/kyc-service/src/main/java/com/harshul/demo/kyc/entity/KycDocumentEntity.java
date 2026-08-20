@@ -30,6 +30,6 @@ public class KycDocumentEntity extends AbstractEntity {
     private long size;
 
     @Lob
-    @Column(name = "content", nullable = false, columnDefinition = "LONGBLOB")
+    @Column(name = "content", nullable = false)
     private byte[] content;
 }

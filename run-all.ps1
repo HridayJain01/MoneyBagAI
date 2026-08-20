@@ -104,6 +104,20 @@ if (-not $PSBoundParameters.ContainsKey('MySqlUser') -and $env:DB_USERNAME) {
 if (-not $PSBoundParameters.ContainsKey('MySqlPassword') -and $env:DB_PASSWORD) {
     $MySqlPassword = $env:DB_PASSWORD
 }
+$usingOracle = $env:DB_URL -like 'jdbc:oracle:*'
+
+# A single Oracle schema uses one connection URL for every persistence service.
+# Keep legacy per-service MySQL URLs from overriding a newly supplied Oracle URL.
+if ($usingOracle) {
+    @(
+        'AUTH_DB_URL', 'IDENTITY_DB_URL', 'CUSTOMER_DB_URL', 'BRANCH_DB_URL',
+        'CONFIG_DB_URL', 'PRODUCT_DB_URL', 'ACCOUNT_DB_URL', 'TRANSACTION_DB_URL',
+        'LEDGER_DB_URL', 'STATEMENT_DB_URL', 'NOTIFICATION_DB_URL', 'AUDIT_DB_URL',
+        'KYC_DB_URL'
+    ) | ForEach-Object {
+        [Environment]::SetEnvironmentVariable($_, $env:DB_URL, 'Process')
+    }
+}
 
 function Get-EnvironmentPort {
     param([string]$Name, [int]$Default)
@@ -249,10 +263,14 @@ if (-not (Get-Command mvn.cmd -ErrorAction SilentlyContinue)) {
 }
 Write-Host '  Maven found' -ForegroundColor Green
 
-if (-not (Test-TcpPort -TargetHost $MySqlHost -Port $MySqlPort)) {
+if (-not $usingOracle -and -not (Test-TcpPort -TargetHost $MySqlHost -Port $MySqlPort)) {
     throw "MySQL is not reachable on ${MySqlHost}:${MySqlPort}. Start the MySQL service and retry."
 }
-Write-Host "  MySQL reachable on ${MySqlHost}:${MySqlPort}" -ForegroundColor Green
+if ($usingOracle) {
+    Write-Host "  Oracle configured via DB_URL=$env:DB_URL" -ForegroundColor Green
+} else {
+    Write-Host "  MySQL reachable on ${MySqlHost}:${MySqlPort}" -ForegroundColor Green
+}
 
 # Java's NIO selector opens its internal pipe over an AF_UNIX socket. If that is broken
 # on this machine, every Tomcat and Netty server fails with "Unable to establish loopback
@@ -292,8 +310,14 @@ Write-Host '  NIO loopback OK' -ForegroundColor Green
 # ---------------------------------------------------------------- Phase 1
 Write-Phase 'Phase 1: schema bootstrap'
 
-$mysql = Find-MySqlClient
-if ($mysql) {
+if ($usingOracle) {
+    if ($Reset) {
+        throw "-Reset is only implemented for the MySQL schema bootstrap path. For Oracle, drop/recreate the BANK_APP schema manually if needed."
+    }
+    Write-Host '  Oracle mode: skipping MySQL schema bootstrap; Hibernate will create/update tables via JPA_DDL_AUTO' -ForegroundColor Green
+} else {
+    $mysql = Find-MySqlClient
+    if ($mysql) {
     if ($Reset) {
         Write-Host '  -Reset: dropping and recreating all moneybags_* schemas' -ForegroundColor Yellow
         foreach ($schema in $schemas) {
@@ -305,10 +329,11 @@ if ($mysql) {
             "CREATE DATABASE IF NOT EXISTS ``$schema`` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" | Out-Null
     }
     Write-Host "  $($schemas.Count) schemas ready" -ForegroundColor Green
-} else {
+    } else {
     # Not fatal: every JDBC URL also carries createDatabaseIfNotExist=true.
     Write-Host '  mysql.exe not found; relying on createDatabaseIfNotExist in the JDBC URLs' -ForegroundColor Yellow
     if ($Reset) { throw "-Reset needs the mysql client. Add MySQL's bin directory to PATH." }
+    }
 }
 
 # ---------------------------------------------------------------- Phase 2

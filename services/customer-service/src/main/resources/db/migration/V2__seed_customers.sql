@@ -24,7 +24,7 @@ INSERT INTO customer_addresses (cif_no, address_type, line1, city, state, pincod
     ('CIF900102', 'PERMANENT',   '77 Blue Ridge Society',    'Pune',      'Maharashtra', '411057', 'India', TRUE);
 
 -- Only hashes and storage references are stored; raw document numbers never are.
-INSERT INTO kyc_documents (cif_no, doc_type, doc_number, document_number_hash, expiry_date,
+INSERT INTO customer_kyc_documents (cif_no, doc_type, doc_number, document_number_hash, expiry_date,
                            file_path, verify_status, verified_by_emp_id, submitted_at, verified_at) VALUES
     ('CIF900101', 'PAN_CARD',     'XXXXX1234F', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
      NULL, '/docs/kyc/cif900101_pan.pdf',     'VERIFIED', 1002, NOW(6), NOW(6)),

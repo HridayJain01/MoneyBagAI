@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "kyc_documents")
+@Table(name = "customer_kyc_documents")
 @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
 public class KycDocument {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

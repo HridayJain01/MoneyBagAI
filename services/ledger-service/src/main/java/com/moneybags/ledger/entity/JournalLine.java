@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity
-@Table(name = "journal_lines")
+@Table(name = "ledger_journal_lines")
 @Getter
 @NoArgsConstructor
 public class JournalLine {

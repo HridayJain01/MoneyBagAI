@@ -6,7 +6,7 @@ import lombok.*;
 import java.time.Instant;
 import java.util.UUID;
 
-@Entity @Table(name = "idempotency_records")
+@Entity @Table(name = "transaction_idempotency_records")
 @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
 public class IdempotencyRecord {
     @Id @Column(name = "idempotency_id", length = 36) private String id;

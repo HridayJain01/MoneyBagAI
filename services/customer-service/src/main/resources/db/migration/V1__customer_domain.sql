@@ -40,7 +40,7 @@ CREATE TABLE customer_addresses (
         FOREIGN KEY (cif_no) REFERENCES customers(cif_no)
 );
 
-CREATE TABLE kyc_documents (
+CREATE TABLE customer_kyc_documents (
     doc_id BIGINT NOT NULL AUTO_INCREMENT,
     cif_no VARCHAR(30) NOT NULL,
     doc_type VARCHAR(50) NOT NULL,
@@ -56,9 +56,9 @@ CREATE TABLE kyc_documents (
     verified_at DATETIME(6),
     expiry_alerted_at DATETIME(6),
     PRIMARY KEY (doc_id),
-    KEY idx_kyc_documents_cif (cif_no),
-    KEY idx_kyc_documents_status (verify_status),
-    CONSTRAINT fk_kyc_documents_customer
+    KEY idx_customer_kyc_documents_cif (cif_no),
+    KEY idx_customer_kyc_documents_status (verify_status),
+    CONSTRAINT fk_customer_kyc_documents_customer
         FOREIGN KEY (cif_no) REFERENCES customers(cif_no)
 );
 
@@ -73,7 +73,7 @@ CREATE TABLE kyc_rejection_history (
     PRIMARY KEY (rejection_id),
     KEY idx_kyc_rejection_cif (cif_no),
     CONSTRAINT fk_kyc_rejection_document
-        FOREIGN KEY (doc_id) REFERENCES kyc_documents(doc_id)
+        FOREIGN KEY (doc_id) REFERENCES customer_kyc_documents(doc_id)
 );
 
 CREATE TABLE beneficiaries (

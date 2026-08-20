@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
-@Entity @Table(name = "journal_lines")
+@Entity @Table(name = "transaction_journal_lines")
 @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
 public class JournalLine {
     @Id @Column(name = "journal_line_id", length = 36) private String id;

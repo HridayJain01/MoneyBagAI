@@ -23,7 +23,7 @@ public class FeatureFlag {
     private String description;
 
     @Lob
-    @Column(name = "targeting_rule", columnDefinition = "TEXT")
+    @Column(name = "targeting_rule")
     private String targetingRule;
 
     @Column(name = "updated_at")

@@ -20,7 +20,7 @@ INSERT INTO customer_addresses (
     (2002, 'CIF900101', 'RESIDENTIAL', 'Flat 202, Green Acres', 'Bengaluru', 'Karnataka', '560038', 'India', TRUE),
     (2003, 'CIF900102', 'PERMANENT', '77 Blue Ridge Society', 'Pune', 'Maharashtra', '411057', 'India', TRUE);
 
-INSERT INTO kyc_documents (
+INSERT INTO customer_kyc_documents (
     doc_id, cif_no, doc_type, doc_number, document_number_hash, expiry_date,
     file_path, verify_status, assigned_to_emp_id, verified_by_emp_id,
     rejection_reason, submitted_at, verified_at, expiry_alerted_at
@@ -40,5 +40,5 @@ INSERT INTO beneficiaries (
      DATEADD('HOUR', -48, CURRENT_TIMESTAMP), DATEADD('HOUR', -24, CURRENT_TIMESTAMP));
 
 ALTER TABLE customer_addresses ALTER COLUMN address_id RESTART WITH 2100;
-ALTER TABLE kyc_documents ALTER COLUMN doc_id RESTART WITH 3100;
+ALTER TABLE customer_kyc_documents ALTER COLUMN doc_id RESTART WITH 3100;
 ALTER TABLE beneficiaries ALTER COLUMN beneficiary_id RESTART WITH 4100;
