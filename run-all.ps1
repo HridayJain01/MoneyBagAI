@@ -106,6 +106,19 @@ if (-not $PSBoundParameters.ContainsKey('MySqlPassword') -and $env:DB_PASSWORD) 
 }
 $usingOracle = $env:DB_URL -like 'jdbc:oracle:*'
 
+# A single Oracle schema uses one connection URL for every persistence service.
+# Keep legacy per-service MySQL URLs from overriding a newly supplied Oracle URL.
+if ($usingOracle) {
+    @(
+        'AUTH_DB_URL', 'IDENTITY_DB_URL', 'CUSTOMER_DB_URL', 'BRANCH_DB_URL',
+        'CONFIG_DB_URL', 'PRODUCT_DB_URL', 'ACCOUNT_DB_URL', 'TRANSACTION_DB_URL',
+        'LEDGER_DB_URL', 'STATEMENT_DB_URL', 'NOTIFICATION_DB_URL', 'AUDIT_DB_URL',
+        'KYC_DB_URL'
+    ) | ForEach-Object {
+        [Environment]::SetEnvironmentVariable($_, $env:DB_URL, 'Process')
+    }
+}
+
 function Get-EnvironmentPort {
     param([string]$Name, [int]$Default)
     $value = [Environment]::GetEnvironmentVariable($Name, 'Process')
