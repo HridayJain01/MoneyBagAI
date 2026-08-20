@@ -13,7 +13,8 @@ import lombok.*;
 public class Permission {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "identity_permission_sequence", sequenceName = "identity_permission_seq", initialValue = 100, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "identity_permission_sequence")
     @Column(name = "permission_id")
     private Long permissionId;
 

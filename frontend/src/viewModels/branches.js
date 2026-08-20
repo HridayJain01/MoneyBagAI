@@ -285,9 +285,13 @@ define([
       if (!branch) { throw new Error('Choose a valid branch.'); }
       var password = textValue(self.formPassword, 'Temporary password');
       if (password.length < 8) { throw new Error('Temporary password must contain at least 8 characters.'); }
+      var employeeCode = textValue(self.formEmployeeCode, 'Employee code').toUpperCase();
+      if (self.employees().some(function (employee) { return String(employee.employeeCode || '').toUpperCase() === employeeCode; })) {
+        throw new Error('Employee code ' + employeeCode + ' is already in use.');
+      }
       return {
         user: { username: textValue(self.formUsername, 'Username'), email: textValue(self.formEmail, 'Email'), password: password, fullName: textValue(self.formFullName, 'Full name'), mobile: self.formMobile().trim() || null, branchCode: branch.branchCode, roles: [self.formRoleName()] },
-        employee: { employeeCode: textValue(self.formEmployeeCode, 'Employee code'), dob: self.formEmployeeDob() || null, branchId: branchId, designation: textValue(self.formDesignation, 'Designation'), reportingManagerId: optionalId(self.formManagerId), joiningDate: self.formJoiningDate() || null }
+        employee: { employeeCode: employeeCode, dob: self.formEmployeeDob() || null, branchId: branchId, designation: textValue(self.formDesignation, 'Designation'), reportingManagerId: optionalId(self.formManagerId), joiningDate: self.formJoiningDate() || null }
       };
     }
     function authorityBody() {
