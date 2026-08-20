@@ -26,15 +26,17 @@ define([
 
   function CustomersViewModel() {
     var self = this;
+    var initialQuery = new URLSearchParams(window.location.search).get('q') || '';
 
     Banner.call(self);
     Confirm.call(self, { dialogId: 'customerOnboardingDialog' });
 
-    self.term = ko.observable('');
-    self.submitted = ko.observable('');
+    self.term = ko.observable(initialQuery);
+    self.submitted = ko.observable(initialQuery);
     self.loading = ko.observable(true);
     self.error = ko.observable(null);
     self.rows = ko.observableArray([]);
+    self.quickFilter = ko.observable('all');
     self.totalFound = ko.observable(0);
     self.canCreate = session.hasPermission('CUSTOMER_UPDATE');
     self.isTeller = session.hasRole('TELLER');
@@ -90,6 +92,33 @@ define([
       return self.submitted() ? 'Try a different search term.' : 'No customers exist yet.';
     });
 
+    self.activeCount = ko.pureComputed(function () {
+      return self.rows().filter(function (row) { return row.status === 'ACTIVE'; }).length;
+    });
+
+    self.kycDueCount = ko.pureComputed(function () {
+      return self.rows().filter(function (row) { return row.kycStatus !== 'VERIFIED'; }).length;
+    });
+
+    self.displayRows = ko.pureComputed(function () {
+      var filter = self.quickFilter();
+      if (filter === 'active') {
+        return self.rows().filter(function (row) { return row.status === 'ACTIVE'; });
+      }
+      if (filter === 'kyc') {
+        return self.rows().filter(function (row) { return row.kycStatus !== 'VERIFIED'; });
+      }
+      return self.rows();
+    });
+
+    self.filteredEmpty = ko.pureComputed(function () {
+      return !self.loading() && !self.hasError() && self.displayRows().length === 0;
+    });
+
+    self.showAllCustomers = function () { self.quickFilter('all'); };
+    self.showActiveCustomers = function () { self.quickFilter('active'); };
+    self.showKycDue = function () { self.quickFilter('kyc'); };
+
     function load() {
       self.loading(true);
       self.error(null);
@@ -114,6 +143,9 @@ define([
                 statusClass: 'mb-pill mb-pill--' + fmt.toneFor(c.status),
                 kycStatus: c.kycStatus,
                 kycClass: 'mb-pill mb-pill--' + fmt.toneFor(c.kycStatus),
+                riskLevel: c.riskClassification || 'LOW',
+                riskClass: 'mb-risk mb-risk--' + String(c.riskClassification || 'LOW').toLowerCase(),
+                relationshipCount: c.relationshipCount || c.accountCount || 1,
                 kycWorkflowLabel: '',
                 showTellerKycAction: false,
                 showReviewKycAction: false,
@@ -164,6 +196,7 @@ define([
 
     self.search = function () {
       self.submitted(self.term());
+      self.quickFilter('all');
       load();
     };
 

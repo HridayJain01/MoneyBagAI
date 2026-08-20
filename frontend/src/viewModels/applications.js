@@ -26,6 +26,16 @@ define([
     self.status = ko.observable('PENDING_APPROVAL');
     self.cifNo = ko.observable('');
     self.statusList = STATUSES;
+    self.activeFilter = ko.observable('review');
+    self.applicationFilters = [
+      { key: 'all', label: 'All', status: '' },
+      { key: 'new', label: 'New', status: 'SUBMITTED' },
+      { key: 'review', label: 'In Review', status: 'PENDING_APPROVAL' },
+      { key: 'documents', label: 'Needs Documents', status: 'DRAFT' }
+    ];
+    self.pendingReview = ko.observable(null);
+    self.approvedToday = ko.observable(null);
+    self.slaAttention = ko.observable(null);
     self.reason = ko.observable('');
     self.canOpen = session.hasPermission('ACCOUNT_OPEN') && !session.hasRole('CHECKER');
     self.canApprove = session.hasPermission('ACCOUNT_APPROVE');
@@ -53,6 +63,38 @@ define([
     self.applyFilters = function () {
       providers.refreshProvider(self.provider);
     };
+
+    self.selectFilter = function (filter) {
+      self.activeFilter(filter.key);
+      self.status(filter.status);
+      self.applyFilters();
+    };
+
+    function loadMetrics() {
+      var today = new Date();
+      today.setHours(0, 0, 0, 0);
+      var attentionBefore = Date.now() - (24 * 60 * 60 * 1000);
+      return Promise.all([
+        endpoints.accounts.applications({ status: 'PENDING_APPROVAL', page: 0, size: 100 }),
+        endpoints.accounts.applications({ status: 'APPROVED', page: 0, size: 100 })
+      ]).then(function (results) {
+        var pendingEnvelope = results[0] || {};
+        var approvedEnvelope = results[1] || {};
+        var pendingItems = pendingEnvelope.items || [];
+        var approvedItems = approvedEnvelope.items || [];
+        self.pendingReview(pendingEnvelope.totalItems || 0);
+        self.slaAttention(pendingItems.filter(function (row) {
+          return row.createdAt && new Date(row.createdAt).getTime() < attentionBefore;
+        }).length);
+        self.approvedToday(approvedItems.filter(function (row) {
+          return row.updatedAt && new Date(row.updatedAt).getTime() >= today.getTime();
+        }).length);
+      }).catch(function () {
+        self.pendingReview(0);
+        self.approvedToday(0);
+        self.slaAttention(0);
+      });
+    }
 
     self.startApplication = function () {
       navigation.startAccountOpening();
@@ -153,10 +195,13 @@ define([
         var accountNote = result && result.createdAccountId ? ' Account ' + result.createdAccountId + ' was created.' : '';
         self.notify('success', 'Application ' + action, payload.row.applicationReference + ' was ' + action + '.' + accountNote);
         providers.refreshProvider(self.provider);
+        loadMetrics();
       }).catch(function (error) {
         self.failed('Application action failed', error);
       });
     };
+
+    loadMetrics();
   }
 
   return ApplicationsViewModel;

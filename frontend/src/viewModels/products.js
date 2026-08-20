@@ -98,12 +98,19 @@ define([
 
     function decorate(row) {
       row.typeDisplay = fmt.humanize(row.productType);
+      row.productIcon = row.productType === 'SAVINGS' ? '◒' : row.productType === 'CURRENT' ? '⇄' : row.productType === 'TERM_DEPOSIT' ? '◆' : '◫';
+      row.productAccent = 'mb-product-card--' + String(row.productType || 'deposit').toLowerCase();
       row.rateDisplay = Number(row.interestRate || 0).toFixed(2) + '%';
       row.minimumDisplay = fmt.money(row.minOpeningDeposit, row.currency);
       row.balanceDisplay = fmt.money(row.minBalance, row.currency);
       row.withdrawalDisplay = fmt.money(row.maxWithdrawalPerDay, row.currency);
       row.statusClass = 'mb-pill mb-pill--' + fmt.toneFor(row.status);
       row.fundingDisplay = row.requiresFunding ? 'Required' : 'Optional';
+      row.transactionDisplay = row.productType === 'CURRENT'
+        ? (row.freeTxnPerMonth || 0) + ' free transactions / month'
+        : row.productType === 'SAVINGS'
+          ? 'Everyday branch and digital access'
+          : (row.tenureMonths ? row.tenureMonths + '-month fixed tenure' : 'Deposit product');
       row.tenureDisplay = row.tenureMonths ? row.tenureMonths + ' months' : 'No fixed tenure';
       row.effectiveDisplay = fmt.dateOnly(row.effectiveFrom) + (row.effectiveTo ? ' – ' + fmt.dateOnly(row.effectiveTo) : ' onward');
       row.charges = (row.charges || []).map(function (charge) {

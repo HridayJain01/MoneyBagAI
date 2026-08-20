@@ -26,6 +26,7 @@ define([
 
   function OverviewViewModel() {
     var self = this;
+    var identity = session.getSession() || {};
     var isTeller = session.hasRole('TELLER');
     var isChecker = session.hasRole('CHECKER');
     var isManager = session.hasRole('BRANCH_MANAGER');
@@ -36,6 +37,7 @@ define([
     self.showApplications = (isChecker || isManager) && session.hasPermission('ACCOUNT_VIEW');
     self.showRoleHome = !self.showQueue && !self.showGlobalTransactions && !self.showApplications;
     self.isTeller = isTeller;
+    self.isChecker = isChecker;
     self.isAdmin = isAdmin;
     self.roleTitle = isTeller ? 'Teller workspace' : isAdmin ? 'Administration workspace' : 'Branch workspace';
     self.roleMessage = isTeller
@@ -59,6 +61,35 @@ define([
     self.recent = ko.observableArray([]);
     self.railSeries = ko.observableArray([]);
     self.railGroups = ko.observableArray(['Pending']);
+
+    self.cashPositionAmount = ko.observable(null);
+    self.cashPositionDisplay = ko.pureComputed(function () {
+      return fmt.money(self.cashPositionAmount(), 'INR');
+    });
+    self.branchDetail = ko.observable(identity.branchCode ? 'Branch ' + identity.branchCode : '—');
+    self.cashVariance = ko.observable('₹0.00');
+    self.cashVarianceTone = ko.observable('Always zero');
+    self.lastUpdated = ko.observable('—');
+    self.kycPendingCount = ko.observable(null);
+
+    self.transactionsTodayDisplay = ko.pureComputed(function () {
+      return self.todayCount() === null ? '—' : self.todayCount();
+    });
+    self.pendingReviewDisplay = ko.pureComputed(function () {
+      return self.kycPendingCount() === null ? '—' : self.kycPendingCount();
+    });
+    self.pendingReviewHint = ko.pureComputed(function () {
+      if (isTeller) {
+        return 'KYC waiting for teller submission';
+      }
+      if (isChecker) {
+        return 'KYC submitted for checker review';
+      }
+      return 'No role-specific KYC queue';
+    });
+    self.dashboardRecent = ko.pureComputed(function () {
+      return self.recent();
+    });
 
     self.heroValue = ko.pureComputed(function () {
       return fmt.amount(self.queueValue());
@@ -96,6 +127,9 @@ define([
       navigation.go('approvals');
     };
     self.goTo = function (path) { navigation.go(path); };
+    self.newSelfTransfer = function () { navigation.go('tellerOps'); };
+    self.newInternalTransfer = function () { navigation.go('transfers'); };
+    self.findCustomer = function () { navigation.go('customers'); };
 
     function loadQueue() {
       return endpoints.transactions.approvals({ page: 0, size: QUEUE_SAMPLE }).then(function (page) {
@@ -130,16 +164,23 @@ define([
       });
     }
 
+    function tellerScopedQuery(query) {
+      if (isTeller && identity.employeeId) {
+        query.createdBy = identity.employeeId;
+      }
+      return query;
+    }
+
     function loadToday() {
       return endpoints.transactions
-        .search({ from: fmt.startOfTodayIso(), to: fmt.endOfTodayIso(), page: 0, size: 1 })
+        .search(tellerScopedQuery({ from: fmt.startOfTodayIso(), to: fmt.endOfTodayIso(), page: 0, size: 1 }))
         .then(function (page) {
-          self.todayCount((page && page.totalElements) || 0);
+          self.todayCount(page && typeof page.totalElements === 'number' ? page.totalElements : null);
         });
     }
 
     function loadRecent() {
-      return endpoints.transactions.search({ page: 0, size: 8 }).then(function (page) {
+      return endpoints.transactions.search(tellerScopedQuery({ page: 0, size: 8 })).then(function (page) {
         var rows = (page && page.content) || [];
         self.recent(
           rows.map(function (tx) {
@@ -154,10 +195,75 @@ define([
               statusTone: 'mb-pill mb-pill--' + fmt.toneFor(tx.status),
               glyphClass: 'mb-glyph mb-glyph--' + dir,
               moneyClass: 'mb-money mb-money--' + dir,
-              arrow: dir === 'credit' ? '↓' : '↑'
+              arrow: dir === 'credit' ? '↓' : '↑',
+              customer: tx.customerName || tx.cifNo || tx.accountName || 'Branch customer',
+              rail: fmt.humanize(tx.rail || tx.type || 'transaction')
             };
           })
         );
+      });
+    }
+
+    function collectTransactions(query) {
+      var rows = [];
+      function fetchPage(pageNumber) {
+        var pageQuery = Object.assign({}, query, { page: pageNumber, size: 100 });
+        return endpoints.transactions.search(pageQuery).then(function (page) {
+          var content = (page && page.content) || [];
+          rows = rows.concat(content);
+          var totalPages = page && typeof page.totalPages === 'number' ? page.totalPages : 0;
+          return pageNumber + 1 < totalPages ? fetchPage(pageNumber + 1) : rows;
+        });
+      }
+      return fetchPage(0);
+    }
+
+    function loadCashPosition() {
+      if (!isTeller || !identity.employeeId) {
+        return Promise.resolve();
+      }
+      return collectTransactions({
+        from: fmt.startOfTodayIso(),
+        to: fmt.endOfTodayIso(),
+        createdBy: identity.employeeId,
+        rail: 'CASH',
+        transactionType: 'DEPOSIT',
+        status: 'COMPLETED'
+      }).then(function (rows) {
+        if (!rows.length) {
+          self.cashPositionAmount(null);
+          self.lastUpdated('—');
+          return;
+        }
+        self.cashPositionAmount(rows.reduce(function (sum, tx) {
+          return sum + Number(tx.amount || 0);
+        }, 0));
+        var latest = rows.reduce(function (current, tx) {
+          var timestamp = tx.completedAt || tx.updatedAt || tx.createdAt;
+          return !current || new Date(timestamp) > new Date(current) ? timestamp : current;
+        }, null);
+        self.lastUpdated(latest ? fmt.dateTime(latest) : '—');
+      });
+    }
+
+    function loadKycPending() {
+      if (!isTeller && !isChecker) {
+        return Promise.resolve();
+      }
+      return endpoints.customers.list().then(function (customers) {
+        var pendingCustomers = (customers || []).filter(function (customer) {
+          return customer.kycStatus === 'PENDING';
+        });
+        return Promise.all(pendingCustomers.map(function (customer) {
+          return endpoints.kyc.pendingSessions(customer.cifNo).then(function (sessions) {
+            var submitted = (sessions || []).some(function (item) {
+              return item.status === 'VERIFICATION_IN_PROGRESS';
+            });
+            return isChecker ? submitted : !submitted;
+          });
+        }));
+      }).then(function (matches) {
+        self.kycPendingCount(matches.filter(Boolean).length);
       });
     }
 
@@ -199,11 +305,12 @@ define([
         unsubscribe = null;
       }
       var calls = [];
-      if (self.showQueue) { calls.push(guard(loadQueue())); }
-      if (self.showGlobalTransactions) {
+      if (session.hasPermission('TRANSACTION_VIEW')) {
         calls.push(guard(loadToday()));
         calls.push(guard(loadRecent()));
       }
+      if (isTeller) { calls.push(guard(loadCashPosition())); }
+      if (isTeller || isChecker) { calls.push(guard(loadKycPending())); }
       if (self.showApplications) { calls.push(guard(loadApplications())); }
       Promise.all(calls).then(
         function () {

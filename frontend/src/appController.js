@@ -124,6 +124,44 @@ define([
             return (state && state.detail && state.detail.label) || 'Overview';
         });
 
+        var PAGE_SUBTITLES = {
+            overview: 'Your branch activity, priorities and cash position at a glance.',
+            applications: 'Review account applications and keep every case moving.',
+            customers: 'Find customers, review KYC and manage relationships.',
+            products: 'Explore product terms, eligibility and opening requirements.',
+            openAccount: 'Capture customer choices and prepare a new account application.',
+            tellerOps: 'Complete secure counter transactions for branch customers.',
+            transfers: 'Move funds safely between Moneybags accounts.',
+            approvals: 'Review queued transactions with maker-checker control.',
+            accounts: 'Search accounts, balances and servicing details.',
+            customerDetail: 'Review the customer profile, KYC and relationship details.',
+            transactions: 'Monitor transaction activity across the branch.',
+            transactionDetail: 'Inspect the complete transaction lifecycle and audit trail.',
+            ledger: 'Review journals, postings and account balances.',
+            branches: 'Manage branches, employees and operational access.',
+            notifications: 'Stay on top of service and operational alerts.',
+            audit: 'Trace sensitive actions across the banking console.'
+        };
+
+        self.pageSubtitle = ko.pureComputed(function () {
+            return PAGE_SUBTITLES[self.activePath()] || 'Moneybags branch operations workspace.';
+        });
+
+        self.sidebarExpanded = ko.observable(false);
+        self.expandSidebar = function () {
+            self.sidebarExpanded(true);
+            return true;
+        };
+        self.collapseSidebar = function (data, event) {
+            var nav = event && event.currentTarget;
+            window.setTimeout(function () {
+                if (!nav || (!nav.matches(':hover') && !nav.contains(document.activeElement))) {
+                    self.sidebarExpanded(false);
+                }
+            }, 0);
+            return true;
+        };
+
         // Keep the document title in step with the route.
         ko.computed(function () {
             document.title = self.pageLabel() + ' · Moneybags';

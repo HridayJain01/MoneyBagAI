@@ -80,8 +80,9 @@
   --mb-weight-strong: 600;
 
   /* Layout */
-  --mb-nav-width: 240px;
-  --mb-topbar-height: 64px;
+  --mb-nav-width: 76px;
+  --mb-nav-width-expanded: 248px;
+  --mb-topbar-height: 88px;
   --mb-content-max: 1440px;
 
   /* The only gradient in the app. Hero surfaces only. */

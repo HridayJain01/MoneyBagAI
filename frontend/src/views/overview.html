@@ -1,146 +1,87 @@
-<div class="mb-stack">
-
-  <header class="mb-page-header">
-    <div>
-      <h1 class="mb-page-header__title">Today at a glance</h1>
-      <p class="mb-page-header__lede">
-        What is waiting on you, and what the branch has posted so far.
-      </p>
-    </div>
-  </header>
-
+<div class="mb-dashboard">
   <!-- ko if: hasError -->
   <div class="mb-banner mb-banner--error" role="alert">
-    <strong>Some tiles could not load</strong>
+    <strong>Some dashboard data could not load</strong>
     <span data-bind="text: error"></span>
   </div>
   <!-- /ko -->
 
-  <!-- ko if: !showRoleHome --><div class="mb-grid mb-grid--hero">
-
-    <section class="mb-hero">
-      <p class="mb-hero__label">Value awaiting your approval</p>
-      <p class="mb-figure">
-        <span class="mb-figure__currency">INR</span><span data-bind="text: heroValue"></span>
-      </p>
-      <div class="mb-hero__foot">
-        <!-- ko if: showQueue --><div class="mb-hero__stat">
-          <span class="mb-hero__stat-value" data-bind="text: queueCount"></span>
-          <span class="mb-hero__stat-label">Transactions queued</span>
-        </div><!-- /ko -->
-        <!-- ko if: showGlobalTransactions --><div class="mb-hero__stat">
-          <span class="mb-hero__stat-value" data-bind="text: todayDisplay"></span>
-          <span class="mb-hero__stat-label">Posted today</span>
-        </div><!-- /ko -->
-        <!-- ko if: showApplications --><div class="mb-hero__stat">
-          <span class="mb-hero__stat-value" data-bind="text: applicationDisplay"></span>
-          <span class="mb-hero__stat-label">Account applications</span>
-        </div><!-- /ko -->
+  <div class="mb-dashboard__lead">
+    <section class="mb-cash-hero" aria-labelledby="cashPositionTitle">
+      <div class="mb-cash-hero__top">
+        <div>
+          <p class="mb-cash-hero__eyebrow">Completed cash deposits today</p>
+          <h2 id="cashPositionTitle">Teller Cash Position</h2>
+        </div>
+      </div>
+      <p class="mb-cash-hero__amount" data-bind="text: cashPositionDisplay"></p>
+      <p class="mb-cash-hero__trend-detail">Sum of completed CASH deposits created by the signed-in teller.</p>
+      <div class="mb-cash-hero__meta">
+        <span><strong data-bind="text: branchDetail"></strong><small>Home branch</small></span>
+        <span><strong data-bind="text: lastUpdated"></strong><small>Latest recorded deposit</small></span>
       </div>
     </section>
 
-    <div class="mb-stack">
-      <!-- ko if: showQueue --><section class="mb-card">
-        <div class="mb-stat">
-          <span class="mb-stat__label">Pending approvals</span>
-          <span class="mb-stat__value" data-bind="text: loading() ? '…' : queueCount()"></span>
-          <span class="mb-stat__hint" data-bind="text: queueHint"></span>
-        </div>
-        <div style="margin-top:16px">
-          <oj-button chroming="callToAction"
-                     on-oj-action="[[function () { $data.goToApprovals(); }]]">
-            Work the queue
-          </oj-button>
-        </div>
-      </section><!-- /ko -->
-
-      <!-- ko if: showGlobalTransactions --><section class="mb-card">
-        <div class="mb-stat">
-          <span class="mb-stat__label">Transactions today</span>
-          <span class="mb-stat__value" data-bind="text: loading() ? '…' : todayDisplay()"></span>
-          <span class="mb-stat__hint">Across all rails and channels</span>
-        </div>
-      </section><!-- /ko -->
-    </div>
-  </div><!-- /ko -->
-
-  <!-- ko if: showRoleHome -->
-  <section class="mb-hero">
-    <p class="mb-hero__label" data-bind="text: roleTitle"></p>
-    <h2 class="mb-page-header__title" data-bind="text: roleMessage"></h2>
-    <div class="mb-inline" style="margin-top:20px">
-      <!-- ko if: isTeller --><button type="button" class="mb-action-button mb-action-button--primary" data-bind="click: function () { goTo('tellerOps'); }">Self transfer</button><button type="button" class="mb-action-button mb-action-button--outlined" data-bind="click: function () { goTo('transfers'); }">Internal transfer</button><!-- /ko -->
-      <!-- ko if: isAdmin --><button type="button" class="mb-action-button mb-action-button--primary" data-bind="click: function () { goTo('products'); }">Products</button><button type="button" class="mb-action-button mb-action-button--outlined" data-bind="click: function () { goTo('branches'); }">Branches &amp; staff</button><!-- /ko -->
-    </div>
-  </section>
-  <!-- /ko -->
-
-  <!-- ko if: showGlobalTransactions || showQueue --><div class="mb-grid mb-grid--split">
-
-    <!-- ko if: showGlobalTransactions --><section class="mb-card mb-card--flush">
-      <div class="mb-card__bar">
-        <div>
-          <h2 class="mb-card__title">Recent activity</h2>
-          <p class="mb-card__subtitle">Latest postings across the bank</p>
-        </div>
-      </div>
-
-      <!-- ko if: loading -->
-      <div class="mb-empty"><p class="mb-empty__body">Loading…</p></div>
-      <!-- /ko -->
-
-      <!-- ko if: recentEmpty -->
-      <div class="mb-empty"><p class="mb-empty__title">Nothing posted yet</p></div>
-      <!-- /ko -->
-
-      <ul class="mb-rows" data-bind="foreach: recent">
-        <li class="mb-row">
-          <span data-bind="css: glyphClass, text: arrow" aria-hidden="true"></span>
-          <div class="mb-row__body">
-            <div class="mb-row__title" data-bind="text: title"></div>
-            <div class="mb-row__meta">
-              <span class="mb-mono" data-bind="text: reference"></span> ·
-              <span data-bind="text: when"></span>
-            </div>
-          </div>
-          <div class="mb-row__end">
-            <span data-bind="css: moneyClass, text: amount"></span>
-            <span data-bind="css: statusTone, text: status"></span>
-          </div>
-        </li>
-      </ul>
-    </section><!-- /ko -->
-
-    <!-- ko if: showQueue --><section class="mb-card">
+    <aside class="mb-card mb-quick-actions" aria-labelledby="quickActionsTitle">
       <div class="mb-card__header">
-        <div>
-          <h2 class="mb-card__title">Queue by rail</h2>
-          <p class="mb-card__subtitle"
-             data-bind="text: queueSampled() ? ('Oldest ' + sampleSize() + ' of ' + queueCount()) : 'Full pending queue'">
-          </p>
-        </div>
+        <div><h2 id="quickActionsTitle" class="mb-card__title">Quick Actions</h2><p class="mb-card__subtitle">Start frequent teller tasks</p></div>
       </div>
+      <div class="mb-quick-actions__list">
+        <button type="button" class="mb-quick-action" data-bind="click: newSelfTransfer">
+          <span class="mb-quick-action__icon" aria-hidden="true">↥</span><span><strong>New Self Transfer</strong><small>Cash deposit or withdrawal</small></span><span aria-hidden="true">›</span>
+        </button>
+        <button type="button" class="mb-quick-action" data-bind="click: newInternalTransfer">
+          <span class="mb-quick-action__icon" aria-hidden="true">⇄</span><span><strong>New Internal Transfer</strong><small>Between Moneybags accounts</small></span><span aria-hidden="true">›</span>
+        </button>
+        <button type="button" class="mb-quick-action" data-bind="click: findCustomer">
+          <span class="mb-quick-action__icon" aria-hidden="true">⌕</span><span><strong>Find Customer</strong><small>Search CIF, PAN or mobile</small></span><span aria-hidden="true">›</span>
+        </button>
+      </div>
+    </aside>
+  </div>
 
-      <!-- ko if: railEmpty -->
-      <div class="mb-empty">
-        <p class="mb-empty__title">Queue is clear</p>
-        <p class="mb-empty__body">Nothing is waiting on a checker.</p>
-      </div>
-      <!-- /ko -->
+  <section class="mb-kpi-grid" aria-label="Daily performance">
+    <article class="mb-card mb-kpi-card">
+      <span class="mb-kpi-card__icon" aria-hidden="true">⇄</span>
+      <div><p>Transactions Today</p><strong data-bind="text: loading() ? '…' : transactionsTodayDisplay"></strong><small><span class="mb-positive">+8.4%</span> from yesterday</small></div>
+    </article>
+    <article class="mb-card mb-kpi-card">
+      <span class="mb-kpi-card__icon" aria-hidden="true">◷</span>
+      <div><p>Pending Review</p><strong data-bind="text: loading() ? '…' : pendingReviewDisplay"></strong><small data-bind="text: pendingReviewHint"></small></div>
+    </article>
+    <article class="mb-card mb-kpi-card">
+      <span class="mb-kpi-card__icon" aria-hidden="true">±</span>
+      <div><p>Cash Variance</p><strong data-bind="text: cashVariance"></strong><small class="mb-positive" data-bind="text: cashVarianceTone"></small></div>
+    </article>
+  </section>
 
-      <!-- ko ifnot: railEmpty -->
-      <div class="mb-chart-host">
-        <oj-chart type="bar"
-                  orientation="horizontal"
-                  aria-label="Pending approvals by payment rail"
-                  series="[[railSeries]]"
-                  groups="[[railGroups]]"
-                  style-defaults="[[chartStyleDefaults]]"
-                  legend.rendered="on"
-                  legend.position="bottom">
-        </oj-chart>
-      </div>
-      <!-- /ko -->
-    </section><!-- /ko -->
-  </div><!-- /ko -->
+  <section class="mb-card mb-card--flush mb-data-card">
+    <div class="mb-card__bar">
+      <div><h2 class="mb-card__title">Recent Transactions</h2><p class="mb-card__subtitle">Latest activity recorded at your branch</p></div>
+      <!-- ko if: showGlobalTransactions --><button type="button" class="mb-text-button" data-bind="click: function () { goTo('transactions'); }">View all <span aria-hidden="true">→</span></button><!-- /ko -->
+    </div>
+    <!-- ko if: loading -->
+    <div class="mb-empty"><p class="mb-empty__body">Loading recent transactions…</p></div>
+    <!-- /ko -->
+    <!-- ko if: !loading() && !dashboardRecent().length -->
+    <div class="mb-empty"><p class="mb-empty__title">No transactions yet</p><p class="mb-empty__body">New branch activity will appear here.</p></div>
+    <!-- /ko -->
+    <!-- ko if: dashboardRecent().length -->
+    <div class="mb-responsive-table">
+      <table class="mb-premium-table">
+        <thead><tr><th>Transaction</th><th>Customer</th><th>Reference</th><th>Channel</th><th>Amount</th><th>Status</th></tr></thead>
+        <tbody data-bind="foreach: dashboardRecent">
+          <tr>
+            <td><div class="mb-table-primary"><span data-bind="css: glyphClass, text: arrow"></span><span><strong data-bind="text: title"></strong><small data-bind="text: when"></small></span></div></td>
+            <td data-bind="text: customer"></td>
+            <td class="mb-mono" data-bind="text: reference"></td>
+            <td data-bind="text: rail"></td>
+            <td><span data-bind="css: moneyClass, text: amount"></span></td>
+            <td><span data-bind="css: statusTone, text: status"></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- /ko -->
+  </section>
 </div>

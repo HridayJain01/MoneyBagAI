@@ -1,79 +1,74 @@
-<div>
-
-  <header class="mb-page-header">
-    <div>
-      <h1 class="mb-page-header__title">Customers</h1>
-      <p class="mb-page-header__lede">
-        Search by name, CIF, mobile or PAN. Search returns every match at once — narrow the term
-        rather than paging.
-      </p>
-    </div>
-    <!-- ko if: canCreate --><button type="button" class="mb-action-button mb-action-button--primary" data-bind="click: beginCreate">New customer</button><!-- /ko -->
-  </header>
+<div class="mb-workspace-page">
+  <div class="mb-page-actions">
+    <p>Customer relationship workspace</p>
+    <!-- ko if: canCreate --><button type="button" class="mb-action-button mb-action-button--primary mb-action-button--large" data-bind="click: beginCreate"><span aria-hidden="true">＋</span> Add Customer</button><!-- /ko -->
+  </div>
 
   <!-- ko if: hasBanner --><div data-bind="css: bannerClass" role="status"><div><strong data-bind="text: banner().title"></strong><span data-bind="text: banner().detail"></span></div><button type="button" class="mb-banner__close" data-bind="click: dismissBanner" aria-label="Dismiss">×</button></div><!-- /ko -->
 
-  <section class="mb-card mb-card--flush">
+  <section class="mb-customer-summary" aria-label="Customer summary">
+    <button type="button" class="mb-card mb-customer-summary__card" data-bind="click: showActiveCustomers, css: { 'is-selected': quickFilter() === 'active' }">
+      <span class="mb-customer-summary__icon" aria-hidden="true">◎</span>
+      <span><small>Active Customers</small><strong data-bind="text: loading() ? '…' : activeCount"></strong><em>In the current result set</em></span>
+      <span aria-hidden="true">→</span>
+    </button>
+    <button type="button" class="mb-card mb-customer-summary__card" data-bind="click: showKycDue, css: { 'is-selected': quickFilter() === 'kyc' }">
+      <span class="mb-customer-summary__icon mb-customer-summary__icon--warning" aria-hidden="true">!</span>
+      <span><small>KYC Due</small><strong data-bind="text: loading() ? '…' : kycDueCount"></strong><em>Requires teller or checker action</em></span>
+      <span aria-hidden="true">→</span>
+    </button>
+  </section>
+
+  <section class="mb-card mb-customer-search-card">
+    <div class="mb-customer-search" data-bind="event: { keyup: onKeyUp }">
+      <span aria-hidden="true">⌕</span>
+      <input aria-label="Search customers" placeholder="Search by name, CIF, PAN or mobile number…" data-bind="textInput: term" />
+      <button type="button" class="mb-action-button mb-action-button--primary" data-bind="click: search">Search Customers</button>
+    </div>
+    <div class="mb-customer-search__meta">
+      <span data-bind="text: subtitle"></span>
+      <!-- ko if: quickFilter() !== 'all' --><button type="button" class="mb-text-button" data-bind="click: showAllCustomers">Clear quick filter</button><!-- /ko -->
+    </div>
+  </section>
+
+  <section class="mb-card mb-card--flush mb-data-card">
     <div class="mb-card__bar">
-      <div>
-        <h2 class="mb-card__title" data-bind="text: heading"></h2>
-        <p class="mb-card__subtitle" data-bind="text: subtitle"></p>
-      </div>
-
-      <div class="mb-inline" style="flex-wrap:nowrap" data-bind="event: { keyup: onKeyUp }">
-        <input class="mb-field"
-               style="width:260px"
-               aria-label="Search customers"
-               placeholder="Name, CIF, mobile, PAN…"
-               data-bind="textInput: term" />
-        <oj-button chroming="callToAction" on-oj-action="[[search]]">Search</oj-button>
-      </div>
+      <div><h2 class="mb-card__title" data-bind="text: heading"></h2><p class="mb-card__subtitle">Customer profiles, KYC posture and relationship risk</p></div>
+      <div class="mb-inline"><button type="button" class="mb-filter-chip" data-bind="click: showAllCustomers, css: { 'is-selected': quickFilter() === 'all' }">All</button><button type="button" class="mb-filter-chip" data-bind="click: showKycDue, css: { 'is-selected': quickFilter() === 'kyc' }">Verify KYC</button></div>
     </div>
 
-    <!-- ko if: loading -->
-    <div class="mb-empty"><p class="mb-empty__body">Loading…</p></div>
-    <!-- /ko -->
+    <!-- ko if: loading --><div class="mb-empty"><p class="mb-empty__body">Loading customer profiles…</p></div><!-- /ko -->
+    <!-- ko if: hasError --><div class="mb-empty"><p class="mb-empty__title" style="color:var(--mb-danger)">Could not load customers</p><p class="mb-empty__body" data-bind="text: error"></p></div><!-- /ko -->
+    <!-- ko if: filteredEmpty --><div class="mb-empty"><p class="mb-empty__title">No customers found</p><p class="mb-empty__body" data-bind="text: emptyMessage"></p></div><!-- /ko -->
 
-    <!-- ko if: hasError -->
-    <div class="mb-empty">
-      <p class="mb-empty__title" style="color:var(--mb-danger)">Could not load customers</p>
-      <p class="mb-empty__body" data-bind="text: error"></p>
+    <!-- ko if: displayRows().length -->
+    <div class="mb-responsive-table">
+      <table class="mb-premium-table mb-customer-table">
+        <thead><tr><th>Customer</th><th>Relationships</th><th>KYC Status</th><th>Risk Level</th><th>Actions</th></tr></thead>
+        <tbody data-bind="foreach: displayRows">
+          <tr>
+            <td>
+              <div class="mb-customer-profile">
+                <span class="mb-customer-avatar" aria-hidden="true" data-bind="text: initials"></span>
+                <span><strong data-bind="text: name"></strong><small class="mb-mono" data-bind="text: cifNo"></small><small class="mb-truncate" data-bind="text: meta"></small></span>
+              </div>
+            </td>
+            <td><strong data-bind="text: relationshipCount"></strong><small class="mb-table-sub">Active relationship</small></td>
+            <td><span data-bind="css: kycClass, text: kycStatus"></span><!-- ko if: kycWorkflowLabel --><small class="mb-table-sub" data-bind="text: kycWorkflowLabel"></small><!-- /ko --></td>
+            <td><span data-bind="css: riskClass"><i aria-hidden="true"></i><span data-bind="text: riskLevel"></span></span></td>
+            <td>
+              <div class="mb-table-actions">
+                <!-- ko if: showTellerKycAction --><button type="button" class="mb-action-button mb-action-button--primary" data-bind="text: tellerKycLabel, click: function () { $parent.openTellerKyc($data.cifNo); }"></button><!-- /ko -->
+                <!-- ko if: showReviewKycAction --><button type="button" class="mb-action-button mb-action-button--primary" data-bind="click: function () { $parent.openKycReview($data); }">Review KYC</button><!-- /ko -->
+                <button type="button" class="mb-action-button mb-action-button--outlined" data-bind="click: function () { $parent.openCustomer($data.cifNo); }">View Documents</button>
+                <button type="button" class="mb-icon-more" aria-label="Open customer" data-bind="click: function () { $parent.openCustomer($data.cifNo); }">›</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
     <!-- /ko -->
-
-    <!-- ko if: isEmpty -->
-    <div class="mb-empty">
-      <p class="mb-empty__title">No customers found</p>
-      <p class="mb-empty__body" data-bind="text: emptyMessage"></p>
-    </div>
-    <!-- /ko -->
-
-    <ul class="mb-rows" data-bind="foreach: rows">
-      <li class="mb-row">
-        <span class="mb-glyph" aria-hidden="true" data-bind="text: initials"></span>
-        <div class="mb-row__body">
-          <div class="mb-row__title" data-bind="text: name"></div>
-          <div class="mb-row__meta mb-truncate" data-bind="text: meta"></div>
-          <!-- ko if: kycWorkflowLabel --><div class="mb-row__meta" data-bind="text: kycWorkflowLabel"></div><!-- /ko -->
-        </div>
-        <div class="mb-row__end">
-          <div class="mb-inline" style="flex-wrap:nowrap">
-            <span data-bind="css: kycClass, text: kycStatus"></span>
-            <span data-bind="css: statusClass, text: status"></span>
-          </div>
-        </div>
-        <!-- ko if: showTellerKycAction -->
-        <button type="button" class="mb-action-button mb-action-button--primary"
-                data-bind="text: tellerKycLabel, click: function () { $parent.openTellerKyc($data.cifNo); }"></button>
-        <!-- /ko -->
-        <!-- ko if: showReviewKycAction -->
-        <button type="button" class="mb-action-button mb-action-button--primary"
-                data-bind="click: function () { $parent.openKycReview($data); }">Review KYC</button>
-        <!-- /ko -->
-        <oj-button chroming="outlined"
-                   on-oj-action="[[function () { $parent.openCustomer($data.cifNo); }]]">Open</oj-button>
-      </li>
-    </ul>
   </section>
 
   <oj-dialog id="customerOnboardingDialog" dialog-title="Create customer" cancel-behavior="none" initial-visibility="hide">

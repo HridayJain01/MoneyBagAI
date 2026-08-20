@@ -28,7 +28,7 @@ define(['ojs/ojcorerouter', 'ojs/ojurlparamadapter', './session'], function (
     { path: 'transfers', detail: { label: 'Internal transfers', permission: 'TRANSACTION_CREATE', roles: ['TELLER'] } },
     { path: 'approvals', detail: { label: 'Approvals', permission: 'TRANSACTION_APPROVE', excludedRoles: ['OPS_ADMIN'] } },
     { path: 'openAccount', detail: { label: 'Open account', permission: 'ACCOUNT_OPEN' } },
-    { path: 'applications', detail: { label: 'Account applications', permission: 'ACCOUNT_VIEW', excludedRoles: ['OPS_ADMIN'] } },
+    { path: 'applications', detail: { label: 'Applications', permission: 'ACCOUNT_VIEW', excludedRoles: ['OPS_ADMIN'] } },
     { path: 'customers', detail: { label: 'Customers', permission: 'CUSTOMER_READ', excludedRoles: ['OPS_ADMIN'] } },
     { path: 'customerDetail', detail: { label: 'Customer', permission: 'CUSTOMER_READ', excludedRoles: ['OPS_ADMIN'] } },
     { path: 'accounts', detail: { label: 'Accounts', permission: 'ACCOUNT_VIEW', excludedRoles: ['OPS_ADMIN'] } },
