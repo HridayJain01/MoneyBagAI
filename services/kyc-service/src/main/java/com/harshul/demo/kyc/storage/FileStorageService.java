@@ -40,6 +40,7 @@ public interface FileStorageService {
     void deleteSession(String sessionId) throws IOException;
     KycSessionEntity createSession(KycSessionEntity session);
     KycSessionEntity getSession(KycSessionEntity session);
+    List<KycSessionEntity> findSessions(String cifNo);
     List<KycSessionEntity> findPendingSessions(String cifNo);
     List<KycSessionEntity> findSessions(String cifNo);
     KycSessionEntity updateSession(KycSessionEntity session);

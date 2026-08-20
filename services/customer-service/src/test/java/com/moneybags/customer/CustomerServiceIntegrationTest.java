@@ -148,6 +148,9 @@ class CustomerServiceIntegrationTest {
     @Test
     void synchronizesExternalKycDecisionsIdempotentlyAndIgnoresStaleDecisions() {
         String cif = createCustomer();
+        Customer awaitingKyc = customers.findById(cif).orElseThrow();
+        awaitingKyc.setStatus(CustomerStatus.INACTIVE);
+        customers.save(awaitingKyc);
         Instant rejectedAt = Instant.parse("2026-08-17T08:00:00Z");
         KycDecisionRequest rejected = new KycDecisionRequest(
                 "kyc-session-1", "REJECTED", "EMP001", "image-mismatch", null, rejectedAt);
@@ -155,11 +158,13 @@ class CustomerServiceIntegrationTest {
         assertThat(externalKycSyncService.synchronize(cif, rejected).applied()).isTrue();
         assertThat(externalKycSyncService.synchronize(cif, rejected).applied()).isFalse();
         assertThat(customers.findById(cif).orElseThrow().getKycFailureCount()).isEqualTo(1);
+        assertThat(customers.findById(cif).orElseThrow().getStatus()).isEqualTo(CustomerStatus.INACTIVE);
 
         KycDecisionRequest verified = new KycDecisionRequest(
                 "kyc-session-2", "VERIFIED", "EMP001", "manual-review", "Documents match",
                 rejectedAt.plusSeconds(60));
         assertThat(externalKycSyncService.synchronize(cif, verified).applied()).isTrue();
+        assertThat(customers.findById(cif).orElseThrow().getStatus()).isEqualTo(CustomerStatus.ACTIVE);
 
         KycDecisionRequest stale = new KycDecisionRequest(
                 "kyc-session-old", "REJECTED", "EMP002", "late-callback", null,

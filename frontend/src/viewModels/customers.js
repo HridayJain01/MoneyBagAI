@@ -176,7 +176,7 @@ define([
     };
 
     function returnToCustomers() {
-      return window.location.pathname + window.location.search;
+      return window.location.origin + '/?ojr=customers';
     }
 
     self.openTellerKyc = function (cifNo) {
