@@ -54,6 +54,7 @@
         <div class="mb-row__body">
           <div class="mb-row__title" data-bind="text: name"></div>
           <div class="mb-row__meta mb-truncate" data-bind="text: meta"></div>
+          <!-- ko if: kycWorkflowLabel --><div class="mb-row__meta" data-bind="text: kycWorkflowLabel"></div><!-- /ko -->
         </div>
         <div class="mb-row__end">
           <div class="mb-inline" style="flex-wrap:nowrap">
@@ -61,9 +62,13 @@
             <span data-bind="css: statusClass, text: status"></span>
           </div>
         </div>
-        <!-- ko if: kycStatus === 'PENDING' -->
-        <oj-button chroming="callToAction"
-                   on-oj-action="[[function () { $parent.openKyc($data.cifNo); }]]">Approve KYC</oj-button>
+        <!-- ko if: showTellerKycAction -->
+        <button type="button" class="mb-action-button mb-action-button--primary"
+                data-bind="text: tellerKycLabel, click: function () { $parent.openTellerKyc($data.cifNo); }"></button>
+        <!-- /ko -->
+        <!-- ko if: showReviewKycAction -->
+        <button type="button" class="mb-action-button mb-action-button--primary"
+                data-bind="click: function () { $parent.openKycReview($data); }">Review KYC</button>
         <!-- /ko -->
         <oj-button chroming="outlined"
                    on-oj-action="[[function () { $parent.openCustomer($data.cifNo); }]]">Open</oj-button>
