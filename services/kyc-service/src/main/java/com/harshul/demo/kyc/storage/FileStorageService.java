@@ -41,5 +41,6 @@ public interface FileStorageService {
     KycSessionEntity createSession(KycSessionEntity session);
     KycSessionEntity getSession(KycSessionEntity session);
     List<KycSessionEntity> findPendingSessions(String cifNo);
+    List<KycSessionEntity> findSessions(String cifNo);
     KycSessionEntity updateSession(KycSessionEntity session);
 }

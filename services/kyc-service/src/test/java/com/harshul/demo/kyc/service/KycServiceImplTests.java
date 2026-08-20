@@ -65,6 +65,10 @@ class KycServiceImplTests {
         KycVerificationResultResponse rejectedResult = kycService.getResult(session.getSessionId());
         assertThat(rejectedResult.decision()).isEqualTo("Rejected manually");
         assertThat(rejectedResult.verified()).isFalse();
+
+        assertThat(kycService.findSessions("CIF900101"))
+                .extracting(KycSessionResponse::getSessionId)
+                .contains(session.getSessionId());
     }
 
     @Test

@@ -166,6 +166,7 @@ class CustomerServiceIntegrationTest {
                 rejectedAt.minusSeconds(60));
         assertThat(externalKycSyncService.synchronize(cif, stale).applied()).isFalse();
         assertThat(customers.findById(cif).orElseThrow().getKycStatus()).isEqualTo(KycStatus.VERIFIED);
+        assertThat(customers.findById(cif).orElseThrow().getStatus()).isEqualTo(CustomerStatus.ACTIVE);
         assertThat(domainEvents.findAll()).extracting(CustomerDomainEvent::getEventType)
                 .containsExactly("KycRejected", "KycVerified");
     }

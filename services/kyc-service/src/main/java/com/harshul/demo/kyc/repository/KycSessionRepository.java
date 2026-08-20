@@ -13,4 +13,5 @@ import com.harshul.demo.kyc.entity.KycSessionStatus;
 public interface KycSessionRepository extends JpaRepository<KycSessionEntity, String> {
     Optional<KycSessionEntity> findByCifNo(String cifNo);
     List<KycSessionEntity> findByCifNoAndStatusInOrderByCreatedAtDesc(String cifNo, List<KycSessionStatus> statuses);
+    List<KycSessionEntity> findByCifNoOrderByCreatedAtDesc(String cifNo);
 }
