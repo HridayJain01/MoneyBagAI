@@ -26,15 +26,15 @@ define(['ojs/ojcorerouter', 'ojs/ojurlparamadapter', './session'], function (
     { path: 'overview', detail: { label: 'Overview', roles: ['TELLER', 'CHECKER', 'BRANCH_MANAGER', 'OPS_ADMIN'] } },
     { path: 'tellerOps', detail: { label: 'Teller operations', permission: 'TRANSACTION_CREATE', roles: ['TELLER'] } },
     { path: 'transfers', detail: { label: 'Internal transfers', permission: 'TRANSACTION_CREATE', roles: ['TELLER'] } },
-    { path: 'approvals', detail: { label: 'Approvals', permission: 'TRANSACTION_APPROVE' } },
+    { path: 'approvals', detail: { label: 'Approvals', permission: 'TRANSACTION_APPROVE', excludedRoles: ['OPS_ADMIN'] } },
     { path: 'openAccount', detail: { label: 'Open account', permission: 'ACCOUNT_OPEN' } },
-    { path: 'applications', detail: { label: 'Account applications', permission: 'ACCOUNT_VIEW' } },
-    { path: 'customers', detail: { label: 'Customers', permission: 'CUSTOMER_READ' } },
-    { path: 'customerDetail', detail: { label: 'Customer', permission: 'CUSTOMER_READ' } },
-    { path: 'accounts', detail: { label: 'Accounts', permission: 'ACCOUNT_VIEW' } },
-    { path: 'accountDetail', detail: { label: 'Account', permission: 'ACCOUNT_VIEW' } },
-    { path: 'transactions', detail: { label: 'Transactions', permission: 'TRANSACTION_VIEW' } },
-    { path: 'transactionDetail', detail: { label: 'Transaction', permission: 'TRANSACTION_VIEW' } },
+    { path: 'applications', detail: { label: 'Account applications', permission: 'ACCOUNT_VIEW', excludedRoles: ['OPS_ADMIN'] } },
+    { path: 'customers', detail: { label: 'Customers', permission: 'CUSTOMER_READ', excludedRoles: ['OPS_ADMIN'] } },
+    { path: 'customerDetail', detail: { label: 'Customer', permission: 'CUSTOMER_READ', excludedRoles: ['OPS_ADMIN'] } },
+    { path: 'accounts', detail: { label: 'Accounts', permission: 'ACCOUNT_VIEW', excludedRoles: ['OPS_ADMIN'] } },
+    { path: 'accountDetail', detail: { label: 'Account', permission: 'ACCOUNT_VIEW', excludedRoles: ['OPS_ADMIN'] } },
+    { path: 'transactions', detail: { label: 'Transactions', permission: 'TRANSACTION_VIEW', excludedRoles: ['TELLER', 'CHECKER', 'OPS_ADMIN'] } },
+    { path: 'transactionDetail', detail: { label: 'Transaction', permission: 'TRANSACTION_VIEW', excludedRoles: ['OPS_ADMIN'] } },
     { path: 'ledger', detail: { label: 'Ledger', roles: ['OPS_ADMIN'] } },
     { path: 'products', detail: { label: 'Products', permission: 'PRODUCT_READ' } },
     { path: 'branches', detail: { label: 'Branches & staff', roles: ['BRANCH_MANAGER', 'OPS_ADMIN'] } },
@@ -47,8 +47,10 @@ define(['ojs/ojcorerouter', 'ojs/ojurlparamadapter', './session'], function (
   function isAllowed(detail) {
     var required = detail && detail.permission;
     var roles = (detail && detail.roles) || [];
+    var excludedRoles = (detail && detail.excludedRoles) || [];
     return (!required || session.hasPermission(required)) &&
-      (!roles.length || roles.some(function (role) { return session.hasRole(role); }));
+      (!roles.length || roles.some(function (role) { return session.hasRole(role); })) &&
+      !excludedRoles.some(function (role) { return session.hasRole(role); });
   }
 
   // Client-side gate. Cosmetic only — the gateway is the real authority, so

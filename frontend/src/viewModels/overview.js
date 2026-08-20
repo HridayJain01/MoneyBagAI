@@ -26,6 +26,23 @@ define([
 
   function OverviewViewModel() {
     var self = this;
+    var isTeller = session.hasRole('TELLER');
+    var isChecker = session.hasRole('CHECKER');
+    var isManager = session.hasRole('BRANCH_MANAGER');
+    var isAdmin = session.hasRole('OPS_ADMIN');
+
+    self.showQueue = (isChecker || isManager) && session.hasPermission('TRANSACTION_APPROVE');
+    self.showGlobalTransactions = isManager && session.hasPermission('TRANSACTION_VIEW');
+    self.showApplications = (isChecker || isManager) && session.hasPermission('ACCOUNT_VIEW');
+    self.showRoleHome = !self.showQueue && !self.showGlobalTransactions && !self.showApplications;
+    self.isTeller = isTeller;
+    self.isAdmin = isAdmin;
+    self.roleTitle = isTeller ? 'Teller workspace' : isAdmin ? 'Administration workspace' : 'Branch workspace';
+    self.roleMessage = isTeller
+      ? 'Start a counter transaction or an internal account transfer.'
+      : isAdmin
+        ? 'Manage products, branches, staff and operational controls.'
+        : 'Your permitted branch operations are ready.';
 
     self.loading = ko.observable(true);
     self.error = ko.observable(null);
@@ -78,6 +95,7 @@ define([
     self.goToApprovals = function () {
       navigation.go('approvals');
     };
+    self.goTo = function (path) { navigation.go(path); };
 
     function loadQueue() {
       return endpoints.transactions.approvals({ page: 0, size: QUEUE_SAMPLE }).then(function (page) {
@@ -180,7 +198,14 @@ define([
         unsubscribe();
         unsubscribe = null;
       }
-      Promise.all([guard(loadQueue()), guard(loadToday()), guard(loadRecent()), guard(loadApplications())]).then(
+      var calls = [];
+      if (self.showQueue) { calls.push(guard(loadQueue())); }
+      if (self.showGlobalTransactions) {
+        calls.push(guard(loadToday()));
+        calls.push(guard(loadRecent()));
+      }
+      if (self.showApplications) { calls.push(guard(loadApplications())); }
+      Promise.all(calls).then(
         function () {
           self.loading(false);
         }

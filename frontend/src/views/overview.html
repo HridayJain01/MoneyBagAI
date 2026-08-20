@@ -16,7 +16,7 @@
   </div>
   <!-- /ko -->
 
-  <div class="mb-grid mb-grid--hero">
+  <!-- ko if: !showRoleHome --><div class="mb-grid mb-grid--hero">
 
     <section class="mb-hero">
       <p class="mb-hero__label">Value awaiting your approval</p>
@@ -24,23 +24,23 @@
         <span class="mb-figure__currency">INR</span><span data-bind="text: heroValue"></span>
       </p>
       <div class="mb-hero__foot">
-        <div class="mb-hero__stat">
+        <!-- ko if: showQueue --><div class="mb-hero__stat">
           <span class="mb-hero__stat-value" data-bind="text: queueCount"></span>
           <span class="mb-hero__stat-label">Transactions queued</span>
-        </div>
-        <div class="mb-hero__stat">
+        </div><!-- /ko -->
+        <!-- ko if: showGlobalTransactions --><div class="mb-hero__stat">
           <span class="mb-hero__stat-value" data-bind="text: todayDisplay"></span>
           <span class="mb-hero__stat-label">Posted today</span>
-        </div>
-        <div class="mb-hero__stat">
+        </div><!-- /ko -->
+        <!-- ko if: showApplications --><div class="mb-hero__stat">
           <span class="mb-hero__stat-value" data-bind="text: applicationDisplay"></span>
           <span class="mb-hero__stat-label">Account applications</span>
-        </div>
+        </div><!-- /ko -->
       </div>
     </section>
 
     <div class="mb-stack">
-      <section class="mb-card">
+      <!-- ko if: showQueue --><section class="mb-card">
         <div class="mb-stat">
           <span class="mb-stat__label">Pending approvals</span>
           <span class="mb-stat__value" data-bind="text: loading() ? '…' : queueCount()"></span>
@@ -52,21 +52,32 @@
             Work the queue
           </oj-button>
         </div>
-      </section>
+      </section><!-- /ko -->
 
-      <section class="mb-card">
+      <!-- ko if: showGlobalTransactions --><section class="mb-card">
         <div class="mb-stat">
           <span class="mb-stat__label">Transactions today</span>
           <span class="mb-stat__value" data-bind="text: loading() ? '…' : todayDisplay()"></span>
           <span class="mb-stat__hint">Across all rails and channels</span>
         </div>
-      </section>
+      </section><!-- /ko -->
     </div>
-  </div>
+  </div><!-- /ko -->
 
-  <div class="mb-grid mb-grid--split">
+  <!-- ko if: showRoleHome -->
+  <section class="mb-hero">
+    <p class="mb-hero__label" data-bind="text: roleTitle"></p>
+    <h2 class="mb-page-header__title" data-bind="text: roleMessage"></h2>
+    <div class="mb-inline" style="margin-top:20px">
+      <!-- ko if: isTeller --><button type="button" class="mb-action-button mb-action-button--primary" data-bind="click: function () { goTo('tellerOps'); }">Self transfer</button><button type="button" class="mb-action-button mb-action-button--outlined" data-bind="click: function () { goTo('transfers'); }">Internal transfer</button><!-- /ko -->
+      <!-- ko if: isAdmin --><button type="button" class="mb-action-button mb-action-button--primary" data-bind="click: function () { goTo('products'); }">Products</button><button type="button" class="mb-action-button mb-action-button--outlined" data-bind="click: function () { goTo('branches'); }">Branches &amp; staff</button><!-- /ko -->
+    </div>
+  </section>
+  <!-- /ko -->
 
-    <section class="mb-card mb-card--flush">
+  <!-- ko if: showGlobalTransactions || showQueue --><div class="mb-grid mb-grid--split">
+
+    <!-- ko if: showGlobalTransactions --><section class="mb-card mb-card--flush">
       <div class="mb-card__bar">
         <div>
           <h2 class="mb-card__title">Recent activity</h2>
@@ -98,9 +109,9 @@
           </div>
         </li>
       </ul>
-    </section>
+    </section><!-- /ko -->
 
-    <section class="mb-card">
+    <!-- ko if: showQueue --><section class="mb-card">
       <div class="mb-card__header">
         <div>
           <h2 class="mb-card__title">Queue by rail</h2>
@@ -130,6 +141,6 @@
         </oj-chart>
       </div>
       <!-- /ko -->
-    </section>
-  </div>
+    </section><!-- /ko -->
+  </div><!-- /ko -->
 </div>

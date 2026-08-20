@@ -5,45 +5,39 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3ed1cd6b-f7be-4008-9942-5ef42f39a0a8" name="Changes" comment="UI integration has been completed">
-      <change afterPath="$PROJECT_DIR$/frontend/ojet-serve.err.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/ojet-serve.out.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/PROGRESS.md" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/PROGRESS.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/TEST-FLOW.md" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/TEST-FLOW.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_12-08-2026_11_27_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_12-08-2026_11_27__Changes_.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/oraclejetconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/oraclejetconfig.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/appController.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/appController.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/main.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/services/endpoints.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/endpoints.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/services/format.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/format.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/services/navigation.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/navigation.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/services/txn.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/txn.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/styles/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/styles/app.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/styles/layout.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/styles/layout.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/audit.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/audit.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/accountDetail.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/accountDetail.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/accounts.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/accounts.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/applications.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/applications.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/branches.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/branches.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/customerDetail.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/customerDetail.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/customers.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/customers.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/genericList.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/ledger.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/ledger.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/login.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/login.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/notifications.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/notifications.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/products.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/products.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/support/confirm.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/support/confirm.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/audit.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/audit.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/overview.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/overview.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/accountDetail.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/accountDetail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/accounts.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/accounts.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/views/branches.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/branches.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/views/customers.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/customers.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/ledger.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/ledger.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/notifications.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/notifications.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/overview.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/overview.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/views/products.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/products.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/views/tellerOps.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/tellerOps.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/views/transfers.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/transfers.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/BranchController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/BranchController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/EmployeeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/controller/EmployeeController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/exception/GlobalExceptionHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/service/EmployeeService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/branch-employee-service/src/main/java/com/moneybags/branch_employee_service/service/EmployeeService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/product-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/services/product-service/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="8684" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -61,8 +55,8 @@
 }</component>
   <component name="GithubPullRequestsUISettings"><![CDATA[{
   "selectedUrlAndAccountId": {
-    "url": "https://github.com/jay-sharmaa/money-bag-mumbai.git",
-    "accountId": "86834721-eef2-4527-b495-0efd36c950ce"
+    "url": "https://github.com/HridayJain01/MoneyBagAI.git",
+    "accountId": "6506da90-e302-4f75-b908-b43d2bb293bc"
   }
 }]]></component>
   <component name="MavenImportPreferences">
@@ -71,6 +65,69 @@
         <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
       </MavenGeneralSettings>
     </option>
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.6472584404158965" />
+      <entry key="MS500" value="2.4089073732676995" />
+      <entry key="S2" value="2.817511243061605" />
+      <entry key="S5" value="2.9236345910104107" />
+      <entry key="S10" value="2.9612300930523023" />
+      <entry key="S30" value="3.0276120863415885" />
+      <entry key="S60" value="4.227976865458215" />
+      <entry key="M2" value="10.103986257177912" />
+      <entry key="M5" value="23.600135918119694" />
+      <entry key="M10" value="33.33587872858282" />
+      <entry key="M15" value="40.2880240943887" />
+      <entry key="M30" value="64.53773776278341" />
+      <entry key="H1" value="112.75728935719901" />
+      <entry key="H2" value="182.15234343037977" />
+      <entry key="H4" value="255.12066090751566" />
+      <entry key="D1" value="362.2911104025441" />
+      <entry key="W1" value="387.53966356419244" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="2.539802098761294E-296" />
+      <entry key="S10" value="1.5936756567009773E-148" />
+      <entry key="S30" value="5.421673976227979E-50" />
+      <entry key="S60" value="2.3294815195771155E-25" />
+      <entry key="M2" value="4.927032629777813E-13" />
+      <entry key="M5" value="1.438849810220763E-5" />
+      <entry key="M10" value="0.005255553838593191" />
+      <entry key="M15" value="0.041679047977683084" />
+      <entry key="M30" value="0.3936432754357235" />
+      <entry key="H1" value="1.3869153077187983" />
+      <entry key="H2" value="2.862708998335683" />
+      <entry key="H4" value="4.3449654741192125" />
+      <entry key="D1" value="6.432991241634009" />
+      <entry key="W1" value="6.915118561896049" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="1.5300818184842981" />
+      <entry key="MS500" value="2.3767045525135653" />
+      <entry key="S2" value="2.8085438229490087" />
+      <entry key="S5" value="2.9199564542331187" />
+      <entry key="S10" value="2.959375022865841" />
+      <entry key="S30" value="3.026953991690316" />
+      <entry key="S60" value="4.227099687184516" />
+      <entry key="M2" value="10.102167846578581" />
+      <entry key="M5" value="23.598126503629683" />
+      <entry key="M10" value="33.339600943687635" />
+      <entry key="M15" value="40.32833052752424" />
+      <entry key="M30" value="64.9297355704982" />
+      <entry key="H1" value="114.14216974886561" />
+      <entry key="H2" value="185.01317687349936" />
+      <entry key="H4" value="259.464278521442" />
+      <entry key="D1" value="368.72378507660335" />
+      <entry key="W1" value="394.4547339480019" />
+    </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7,
@@ -88,6 +145,7 @@
     "RequestMappingsPanelOrder1": "1",
     "RequestMappingsPanelWidth0": "75",
     "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
@@ -106,9 +164,13 @@
     "Spring Boot.StatementReportingApplication.executor": "Run",
     "Spring Boot.TransactionServiceApplication.executor": "Run",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "UI-TRIAL",
+    "git-widget-placeholder": "jeffry",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/Hriday Jain/Documents/Projects/money-bag-mumbai",
+    "last_opened_file_path": "C:/Users/Jeffry Patrick/Downloads/MoneyBagAI",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "project.structure.last.edited": "Project",
     "project.structure.proportion": "0.0",
@@ -116,6 +178,11 @@
     "run.configurations.included.in.services": "true",
     "settings.editor.selected.configurable": "settings.sync",
     "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "oracle"
+    ]
   }
 }]]></component>
   <component name="RunDashboard">
@@ -256,8 +323,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-63390994e64e-intellij.indexing.shared.core-IU-262.8665.337" />
-        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-IU-262.8665.337" />
+        <option value="bundled-jdk-30f59d01ecdd-37e91769500f-intellij.indexing.shared.core-IU-261.26222.65" />
+        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-IU-261.26222.65" />
       </set>
     </attachedChunks>
   </component>
@@ -272,11 +339,17 @@
       <workItem from="1786853533759" duration="7534000" />
       <workItem from="1786873696374" duration="6218000" />
       <workItem from="1786940288841" duration="2337000" />
+      <workItem from="1787208767094" duration="104000" />
+      <workItem from="1787208882108" duration="6237000" />
+      <workItem from="1787224451222" duration="6465000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName=".env" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Reference material added" />

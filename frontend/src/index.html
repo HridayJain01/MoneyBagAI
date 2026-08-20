@@ -68,10 +68,16 @@
                 <span class="mb-topbar__name" data-bind="text: userName"></span>
                 <span class="mb-topbar__meta" data-bind="text: userMeta"></span>
               </div>
-              <span class="mb-glyph" aria-hidden="true" data-bind="text: userInitials"></span>
-              <oj-button display="label" chroming="outlined" on-oj-action="[[signOut]]">
-                Sign out
-              </oj-button>
+              <details class="mb-profile-menu">
+                <summary class="mb-glyph" aria-label="Open profile menu" data-bind="text: userInitials"></summary>
+                <div class="mb-profile-menu__dropdown">
+                  <div class="mb-profile-menu__identity">
+                    <strong data-bind="text: userName"></strong>
+                    <span data-bind="text: userMeta"></span>
+                  </div>
+                  <button type="button" class="mb-profile-menu__action" data-bind="click: signOut">Sign out</button>
+                </div>
+              </details>
             </div>
           </header>
 

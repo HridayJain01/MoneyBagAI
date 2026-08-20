@@ -90,8 +90,8 @@
         <div><label class="mb-label" for="customerEmail">Email / login</label><input id="customerEmail" type="email" class="mb-field mb-field--block" data-bind="textInput: formEmail" /></div>
         <div><label class="mb-label" for="customerPassword">Temporary password</label><input id="customerPassword" type="password" class="mb-field mb-field--block" autocomplete="new-password" data-bind="textInput: formPassword" /></div>
         <div class="mb-form-span"><label class="mb-label" for="customerAddress">Residential address</label><input id="customerAddress" class="mb-field mb-field--block" data-bind="textInput: formAddress" /></div>
-        <div><label class="mb-label" for="customerCity">City</label><input id="customerCity" class="mb-field mb-field--block" data-bind="textInput: formCity" /></div>
-        <div><label class="mb-label" for="customerState">State</label><input id="customerState" class="mb-field mb-field--block" data-bind="textInput: formState" /></div>
+        <div><label class="mb-label" for="customerState">State</label><select id="customerState" class="mb-field mb-field--block" data-bind="value: formState, options: stateOptions, optionsCaption: 'Choose…'"></select></div>
+        <div><label class="mb-label" for="customerCity">City</label><select id="customerCity" class="mb-field mb-field--block" data-bind="value: formCity, options: cityOptions, optionsCaption: formState() ? 'Choose…' : 'Choose a state first', disable: !formState()"></select></div>
         <div><label class="mb-label" for="customerPincode">Pincode</label><input id="customerPincode" inputmode="numeric" class="mb-field mb-field--block" data-bind="textInput: formPincode" /></div>
       </div>
     </div>

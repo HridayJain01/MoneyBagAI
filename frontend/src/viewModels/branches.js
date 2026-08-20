@@ -1,8 +1,8 @@
 /** Branch, employee and access administration with permission-gated writes. */
 define([
-  'knockout', '../services/endpoints', '../services/format', '../services/http', '../services/session',
+  'knockout', '../services/endpoints', '../services/format', '../services/http', '../services/session', '../services/locations',
   './support/banner', './support/confirm', 'ojs/ojdialog'
-], function (ko, endpoints, fmt, http, session, Banner, Confirm) {
+], function (ko, endpoints, fmt, http, session, locations, Banner, Confirm) {
   'use strict';
 
   var DAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
@@ -43,6 +43,13 @@ define([
     self.formCity = ko.observable('');
     self.formState = ko.observable('');
     self.formPincode = ko.observable('');
+    self.stateOptions = locations.states;
+    self.cityOptions = ko.pureComputed(function () {
+      var choices = locations.citiesFor(self.formState()).slice();
+      var current = self.formCity();
+      if (current && choices.indexOf(current) === -1) { choices.unshift(current); }
+      return choices;
+    });
     self.formIfsc = ko.observable('');
     self.formHolidayDate = ko.observable('');
     self.formHolidayDescription = ko.observable('');
@@ -213,7 +220,7 @@ define([
 
     function clearForm() {
       self.formError(''); self.createdUserId(null);
-      self.formBranchCode(''); self.formBranchName(''); self.formAddress(''); self.formCity(''); self.formState(''); self.formPincode(''); self.formIfsc('');
+      self.formBranchCode(''); self.formBranchName(''); self.formAddress(''); self.formState(''); self.formCity(''); self.formPincode(''); self.formIfsc('');
       self.formHolidayDate(''); self.formHolidayDescription(''); self.hoursRows([]);
       self.formUsername(''); self.formEmail(''); self.formPassword(''); self.formFullName(''); self.formMobile(''); self.formEmployeeCode(''); self.formEmployeeDob('');
       self.formBranchId(''); self.formDesignation(''); self.formManagerId(''); self.formJoiningDate(''); self.formEmployeeStatus('ACTIVE'); self.formRoleName('TELLER');
@@ -234,7 +241,7 @@ define([
     self.beginCreateBranch = function () { clearForm(); open('createBranch'); };
     self.beginEditBranch = function () {
       var row = self.selectedBranch(); clearForm();
-      self.formBranchName(row.name || ''); self.formAddress(row.address || ''); self.formCity(row.city || ''); self.formState(row.state || ''); self.formPincode(row.pincode || '');
+      self.formBranchName(row.name || ''); self.formAddress(row.address || ''); self.formState(row.state || ''); self.formCity(row.city || ''); self.formPincode(row.pincode || '');
       open('editBranch', row);
     };
     self.beginBranchStatus = function () { clearForm(); open('branchStatus', self.selectedBranch()); };
@@ -275,7 +282,7 @@ define([
     };
 
     function branchBody(create) {
-      var body = { name: textValue(self.formBranchName, 'Branch name'), address: self.formAddress().trim() || null, city: self.formCity().trim() || null, state: self.formState().trim() || null, pincode: self.formPincode().trim() || null };
+      var body = { name: textValue(self.formBranchName, 'Branch name'), address: (self.formAddress() || '').trim() || null, city: (self.formCity() || '').trim() || null, state: (self.formState() || '').trim() || null, pincode: (self.formPincode() || '').trim() || null };
       if (create) { body.branchCode = textValue(self.formBranchCode, 'Branch code').toUpperCase(); body.ifscCode = textValue(self.formIfsc, 'IFSC').toUpperCase(); }
       return body;
     }

@@ -7,33 +7,27 @@
  */
 define([
   'knockout',
-  '../services/providers',
+  '../services/endpoints',
   '../services/format',
+  '../services/http',
   '../services/navigation',
+  'ojs/ojarraydataprovider',
   'ojs/ojtable',
   'ojs/ojbutton'
-], function (ko, providers, fmt, navigation) {
+], function (ko, endpoints, fmt, http, navigation, ArrayDataProvider) {
   'use strict';
 
   function AccountsViewModel() {
     var self = this;
 
-    self.cifNo = ko.observable('');
+    self.accountNumber = ko.observable('');
     self.status = ko.observable('');
+    self.loading = ko.observable(true);
+    self.error = ko.observable('');
+    self.rows = ko.observableArray([]);
     self.statusList = ['', 'ACTIVE', 'FROZEN', 'BLOCKED', 'DORMANT', 'CLOSED'];
 
-    self.provider = providers.pagedProvider({
-      url: '/api/v1/accounts',
-      idKey: 'accountId',
-      shape: 'envelope',
-      pageSize: 25,
-      query: function () {
-        return {
-          cifNo: self.cifNo() || undefined,
-          status: self.status() || undefined
-        };
-      }
-    });
+    self.provider = new ArrayDataProvider(self.rows, { keyAttributes: 'accountId' });
 
     self.columns = [
       { headerText: 'Account', field: 'accountName', template: 'nameTemplate' },
@@ -45,7 +39,22 @@ define([
     ];
 
     self.applyFilters = function () {
-      providers.refreshProvider(self.provider);
+      self.loading(true);
+      self.error('');
+      var number = String(self.accountNumber() || '').trim();
+      var request = number
+        ? endpoints.accounts.byNumber(number).then(function (account) { return account ? [account] : []; })
+        : endpoints.accounts.search({ status: self.status() || undefined, page: 0, size: 100 })
+            .then(function (envelope) { return (envelope && envelope.items) || []; });
+
+      request.then(function (rows) {
+        self.rows(rows.filter(function (row) {
+          return !self.status() || row.status === self.status();
+        }));
+      }).catch(function (err) {
+        if (!err || !err.isSessionExpired) { self.error(http.messageFor(err)); }
+        self.rows([]);
+      }).then(function () { self.loading(false); });
     };
 
     // Navigation goes through the navigation module rather than $root: inside
@@ -60,6 +69,8 @@ define([
     self.statusClassFor = function (row) {
       return 'mb-pill mb-pill--' + fmt.toneFor(row.status);
     };
+
+    self.applyFilters();
   }
 
   return AccountsViewModel;

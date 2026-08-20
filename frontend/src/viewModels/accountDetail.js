@@ -35,6 +35,7 @@ define([
     // ModuleRouterAdapter does not pass router params into the module context,
     // so the navigation module is the reliable source.
     var accountId = params.id || navigation.param('id');
+    var tellerView = session.hasRole('TELLER');
 
     Banner.call(self);
     Confirm.call(self, { dialogId: 'accountServicingDialog' });
@@ -59,6 +60,7 @@ define([
     self.held = ko.observable(null);
     self.asOf = ko.observable('');
     self.canManage = session.hasPermission('ACCOUNT_STATUS_MANAGE');
+    self.showExtendedDetails = !tellerView;
     self.holders = ko.observableArray([]);
     self.holds = ko.observableArray([]);
     self.statusHistory = ko.observableArray([]);
@@ -345,7 +347,7 @@ define([
       self.asOf(fmt.dateTime(balance.asOf));
     });
 
-    var loadHistory = endpoints.accounts
+    var loadHistory = tellerView ? Promise.resolve() : endpoints.accounts
       .balanceHistory(accountId, { page: 0, size: 30 })
       .then(function (envelope) {
         var items = (envelope && envelope.items) || [];
@@ -366,7 +368,7 @@ define([
         ]);
       });
 
-    var loadMini = endpoints.transactions.miniStatement(accountId, 8).then(function (rows) {
+    var loadMini = tellerView ? Promise.resolve() : endpoints.transactions.miniStatement(accountId, 8).then(function (rows) {
       self.mini(
         (rows || []).map(function (tx) {
           var dir = fmt.direction(tx, accountId);
@@ -383,7 +385,7 @@ define([
       );
     });
 
-    var loadServiceData = loadServicing();
+    var loadServiceData = tellerView ? Promise.resolve() : loadServicing();
 
     Promise.all([guard(loadDetail), guard(loadBalance), guard(loadHistory), guard(loadMini), guard(loadServiceData)]).then(function () {
       self.loading(false);
