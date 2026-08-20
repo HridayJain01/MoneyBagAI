@@ -11,9 +11,10 @@ define([
   '../services/format',
   '../services/http',
   '../services/navigation',
+  '../services/session',
   'ojs/ojbutton',
   'ojs/ojprogress-bar'
-], function (ko, endpoints, fmt, http, navigation) {
+], function (ko, endpoints, fmt, http, navigation, session) {
   'use strict';
 
   function CustomerDetailViewModel(context) {
@@ -22,9 +23,10 @@ define([
     // ModuleRouterAdapter does not pass router params into the module context,
     // so the navigation module is the reliable source.
     var cifNo = params.cif || navigation.param('cif');
+    var tellerView = session.hasRole('TELLER');
 
     self.cifNo = cifNo;
-    self.tab = ko.observable('profile');
+    self.tab = ko.observable(tellerView ? 'accounts' : 'profile');
     self.loading = ko.observable(true);
     self.error = ko.observable(null);
     self.hasError = ko.pureComputed(function () {
@@ -63,11 +65,13 @@ define([
       return self.accountsLoaded() && self.accounts().length === 0;
     });
 
-    self.tabs = [
-      { id: 'profile', label: 'Profile' },
-      { id: 'accounts', label: 'Accounts' },
-      { id: 'kyc', label: 'KYC & risk' }
-    ];
+    self.tabs = tellerView
+      ? [{ id: 'accounts', label: 'Accounts' }]
+      : [
+          { id: 'profile', label: 'Profile' },
+          { id: 'accounts', label: 'Accounts' },
+          { id: 'kyc', label: 'KYC & risk' }
+        ];
 
     self.isTab = function (id) {
       return self.tab() === id;
@@ -148,7 +152,7 @@ define([
       ]);
     });
 
-    var loadCompleteness = endpoints.customers.completeness(cifNo).then(function (map) {
+    var loadCompleteness = tellerView ? Promise.resolve() : endpoints.customers.completeness(cifNo).then(function (map) {
       var entries = Object.keys(map || {}).map(function (key) {
         return { key: fmt.labelize(key), value: String(map[key]) };
       });
@@ -166,7 +170,7 @@ define([
       }
     });
 
-    var loadSummary = endpoints.customers.summary(cifNo).then(function (map) {
+    var loadSummary = tellerView ? Promise.resolve() : endpoints.customers.summary(cifNo).then(function (map) {
       self.summaryRows(
         Object.keys(map || {}).map(function (key) {
           var value = map[key];
@@ -183,7 +187,8 @@ define([
       );
     });
 
-    Promise.all([guard(loadCustomer), guard(loadCompleteness), guard(loadSummary)]).then(function () {
+    var initialAccounts = tellerView ? loadAccounts() : Promise.resolve();
+    Promise.all([guard(loadCustomer), guard(loadCompleteness), guard(loadSummary), initialAccounts]).then(function () {
       self.loading(false);
     });
   }

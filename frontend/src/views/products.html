@@ -9,7 +9,14 @@
     <div class="mb-card__bar mb-card__bar--wrap"><div><h2 class="mb-card__title">Product catalogue</h2><p class="mb-card__subtitle">Commercial terms are read from the current product version.</p></div><div class="mb-filter-row"><select class="mb-field" aria-label="Product type" data-bind="value: productType, options: productTypes, optionsText: function (v) { return v === '' ? 'All product types' : v.split('_').join(' '); }"></select><select class="mb-field" aria-label="Product status" data-bind="value: status, options: statuses, optionsText: function (v) { return v === '' ? 'All statuses' : v; }"></select><button type="button" class="mb-action-button mb-action-button--primary" data-bind="click: applyFilters, disable: loading">Apply</button><button type="button" class="mb-action-button mb-action-button--outlined" data-bind="click: clearFilters, disable: loading">Clear</button></div></div>
     <!-- ko if: loading --><div class="mb-empty"><p class="mb-empty__body">Loading product catalogue…</p></div><!-- /ko -->
     <!-- ko if: !loading() && !products().length --><div class="mb-empty"><p class="mb-empty__title">No products match</p></div><!-- /ko -->
-    <!-- ko if: products().length --><div class="mb-scroll-x"><table class="mb-plain-table"><thead><tr><th>Product</th><th>Type</th><th>Rate</th><th>Opening minimum</th><th>Funding</th><th>Status</th><th></th></tr></thead><tbody data-bind="foreach: products"><tr><td><span class="mb-mono" data-bind="text: productCode"></span><div data-bind="text: productName"></div></td><td data-bind="text: typeDisplay"></td><td data-bind="text: rateDisplay"></td><td class="mb-money" data-bind="text: minimumDisplay"></td><td data-bind="text: fundingDisplay"></td><td><span data-bind="css: statusClass, text: status"></span></td><td><button type="button" class="mb-table-link" data-bind="click: inspect">Inspect</button></td></tr></tbody></table></div><!-- /ko -->
+    <!-- ko if: products().length --><div class="mb-product-grid" data-bind="foreach: products">
+      <article class="mb-product-card">
+        <div class="mb-product-card__header"><div><span class="mb-label mb-mono" data-bind="text: productCode"></span><h3 class="mb-product-card__title" data-bind="text: productName"></h3></div><span data-bind="css: statusClass, text: status"></span></div>
+        <p class="mb-product-card__description" data-bind="text: description || 'No product description available.'"></p>
+        <dl class="mb-product-card__facts"><div><dt>Type</dt><dd data-bind="text: typeDisplay"></dd></div><div><dt>Interest rate</dt><dd data-bind="text: rateDisplay"></dd></div><div><dt>Opening minimum</dt><dd class="mb-money" data-bind="text: minimumDisplay"></dd></div><div><dt>Funding</dt><dd data-bind="text: fundingDisplay"></dd></div></dl>
+        <button type="button" class="mb-action-button mb-action-button--outlined" data-bind="click: inspect">View details</button>
+      </article>
+    </div><!-- /ko -->
   </section>
 
   <!-- ko with: selectedProduct -->

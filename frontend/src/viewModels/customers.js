@@ -14,11 +14,12 @@ define([
   '../services/format',
   '../services/http',
   '../services/navigation',
+  '../services/locations',
   './support/banner',
   './support/confirm',
   'ojs/ojbutton',
   'ojs/ojdialog'
-], function (ko, endpoints, session, fmt, http, navigation, Banner, Confirm) {
+], function (ko, endpoints, session, fmt, http, navigation, locations, Banner, Confirm) {
   'use strict';
 
   var MAX_ROWS = 100;
@@ -35,7 +36,7 @@ define([
     self.error = ko.observable(null);
     self.rows = ko.observableArray([]);
     self.totalFound = ko.observable(0);
-    self.canCreate = session.hasPermission('CUSTOMER_UPDATE');
+    self.canCreate = session.hasPermission('CUSTOMER_UPDATE') && !session.hasRole('CHECKER');
     self.formFirstName = ko.observable('');
     self.formLastName = ko.observable('');
     self.formDob = ko.observable('');
@@ -48,6 +49,10 @@ define([
     self.formCity = ko.observable('');
     self.formState = ko.observable('');
     self.formPincode = ko.observable('');
+    self.stateOptions = locations.states;
+    self.cityOptions = ko.pureComputed(function () {
+      return locations.citiesFor(self.formState());
+    });
     self.formError = ko.observable('');
     self.createdIdentityId = ko.observable(null);
 

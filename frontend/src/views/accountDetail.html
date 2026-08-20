@@ -59,7 +59,7 @@
     </section>
   </div>
 
-  <div class="mb-grid mb-grid--split">
+  <!-- ko if: showExtendedDetails --><div class="mb-grid mb-grid--split">
     <section class="mb-card">
       <div class="mb-card__header">
         <div>
@@ -113,7 +113,7 @@
         </li>
       </ul>
     </section>
-  </div>
+  </div><!-- /ko -->
 
   <section class="mb-card mb-card--flush">
     <div class="mb-card__bar">
@@ -160,7 +160,7 @@
     </div>
   </section>
 
-  <header class="mb-page-header" style="margin-top:8px">
+  <!-- ko if: showExtendedDetails --><header class="mb-page-header" style="margin-top:8px">
     <div><h2 class="mb-page-header__title" style="font-size:22px">Account servicing</h2><p class="mb-page-header__lede">Holders, active holds, limits, owned products, and lifecycle evidence.</p></div>
   </header>
 
@@ -196,7 +196,7 @@
       <!-- ko if: ownedProducts().length === 0 --><div class="mb-empty"><p class="mb-empty__title">No owned products</p></div><!-- /ko -->
       <ul class="mb-rows" data-bind="foreach: ownedProducts"><li class="mb-row"><div class="mb-row__body"><div class="mb-row__title" data-bind="text: productName"></div><div class="mb-row__meta" data-bind="text: productCode + ' · ' + productType + ' · ' + acquisitionType"></div></div><span data-bind="css: 'mb-pill mb-pill--' + ($parent.statusClassFor({status: status}).split('--')[1]), text: status"></span></li></ul>
     </section>
-  </div>
+  </div><!-- /ko -->
 
   <oj-dialog id="accountServicingDialog" dialog-title="[[dialogTitle]]" cancel-behavior="none" initial-visibility="hide">
     <div slot="body" class="mb-stack mb-stack--tight">

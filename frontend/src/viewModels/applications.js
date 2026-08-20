@@ -27,7 +27,7 @@ define([
     self.cifNo = ko.observable('');
     self.statusList = STATUSES;
     self.reason = ko.observable('');
-    self.canOpen = session.hasPermission('ACCOUNT_OPEN');
+    self.canOpen = session.hasPermission('ACCOUNT_OPEN') && !session.hasRole('CHECKER');
     self.canApprove = session.hasPermission('ACCOUNT_APPROVE');
 
     self.provider = providers.pagedProvider({

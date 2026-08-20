@@ -2,7 +2,7 @@
   <header class="mb-page-header">
     <div>
       <h1 class="mb-page-header__title">Accounts</h1>
-      <p class="mb-page-header__lede">Every account on the books, filterable by customer and status.</p>
+      <p class="mb-page-header__lede">Find an account by its account number or browse by status.</p>
     </div>
   </header>
 
@@ -10,8 +10,8 @@
     <div class="mb-card__bar">
       <h2 class="mb-card__title">Accounts</h2>
       <div class="mb-inline" style="flex-wrap:nowrap">
-        <input class="mb-field" style="width:140px" aria-label="CIF number" placeholder="CIF"
-               data-bind="textInput: cifNo" />
+        <input class="mb-field" style="width:190px" aria-label="Account number" placeholder="Account number"
+               inputmode="numeric" data-bind="textInput: accountNumber" />
         <select class="mb-field" aria-label="Status"
                 data-bind="value: status,
                            options: statusList,
@@ -20,7 +20,11 @@
       </div>
     </div>
 
-    <div class="mb-table-host">
+    <!-- ko if: error --><div class="mb-banner mb-banner--error" role="alert"><span data-bind="text: error"></span></div><!-- /ko -->
+    <!-- ko if: loading --><div class="mb-empty"><p class="mb-empty__body">Loading accounts…</p></div><!-- /ko -->
+    <!-- ko if: !loading() && !error() && !rows().length --><div class="mb-empty"><p class="mb-empty__title">No accounts found</p></div><!-- /ko -->
+
+    <!-- ko if: !loading() && rows().length --><div class="mb-table-host">
       <oj-table aria-label="Accounts"
                 data="[[provider]]"
                 columns="[[columns]]"
@@ -50,6 +54,6 @@
         </template>
 
       </oj-table>
-    </div>
+    </div><!-- /ko -->
   </section>
 </div>
