@@ -1,686 +1,803 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KYC Service Portal</title>
-    <link rel="stylesheet" href="https://static.oracle.com/cdn/jet/19.0.0/default/css/redwood/oj-redwood-min.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Verity KYC</title>
     <style>
         :root {
-            --ink: #1f2937;
-            --muted: #5f6b7a;
-            --surface: #ffffff;
-            --page: #f6f8fb;
-            --line: #d6dee8;
-            --bank: #064e3b;
-            --bank-dark: #043527;
-            --customer: #0b5cab;
-            --customer-dark: #083f75;
-            --warn: #b54708;
-            --danger: #b42318;
-            --ok: #067647;
+            --n: #17324d;
+            --b: #315b7d;
+            --bg: #f4f6f8;
+            --line: #d9e1e8;
+            --m: #647486;
+            --g: #3f6f5b;
+            --a: #8a6b32;
+            --r: #8a4a4a
         }
 
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box
+        }
 
         body {
             margin: 0;
-            background: var(--page);
-            color: var(--ink);
-            font-family: Arial, Helvetica, sans-serif;
+            background: var(--bg);
+            color: #142235;
+            font: 14px system-ui, -apple-system, Segoe UI, sans-serif
         }
 
-        .shell { min-height: 100vh; }
+        .top {
+            height: 72px;
+            background: #fff;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 34px
+        }
 
-        .topbar {
-            background: #0f172a;
+        .brand {
+            font-weight: 800;
+            font-size: 20px;
+            color: var(--n)
+        }
+
+        .mark {
+            display: inline-grid;
+            place-items: center;
+            background: var(--b);
             color: #fff;
-            padding: 18px 28px;
+            border-radius: 9px;
+            width: 30px;
+            height: 30px;
+            margin-right: 9px
+        }
+
+        .user {
+            color: var(--m)
+        }
+
+        .layout {
+            display: flex;
+            min-height: calc(100vh - 72px)
+        }
+
+        .side {
+            width: 235px;
+            background: var(--n);
+            padding: 28px 14px;
+            color: #b6c8d9
+        }
+
+        .side small {
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 10px;
+            padding: 0 14px 10px;
+            color: #8298ae
+        }
+
+        .nav {
+            display: flex;
+            width: 100%;
+            border: 0;
+            background: transparent;
+            color: #b6c8d9;
+            padding: 12px 14px;
+            border-radius: 9px;
+            gap: 12px;
+            align-items: center;
+            text-align: left;
+            font: inherit;
+            cursor: pointer
+        }
+
+        .nav.active, .nav:hover {
+            background: #244461;
+            color: #fff
+        }
+
+        .main {
+            flex: 1;
+            padding: 34px 42px;
+            max-width: 1400px;
+            margin: auto
+        }
+
+        .view {
+            display: none
+        }
+
+        .view.active {
+            display: block
+        }
+
+        .head {
             display: flex;
             justify-content: space-between;
-            gap: 18px;
-            align-items: center;
+            align-items: flex-end;
+            margin-bottom: 28px
         }
 
-        .brand h1 {
+        .eyebrow {
+            color: var(--b);
+            font-weight: 800;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .8px
+        }
+
+        .title {
+            font-size: 28px;
+            letter-spacing: -.6px;
+            margin: 7px 0;
+            color: var(--n)
+        }
+
+        .sub {
             margin: 0;
-            font-size: 24px;
-            letter-spacing: 0;
+            color: var(--m);
+            line-height: 1.5
         }
 
-        .brand p {
-            margin: 6px 0 0;
-            color: #dbe4f0;
-            font-size: 14px;
-        }
-
-        .role-switch {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .role-switch button,
-        button.native {
-            min-height: 40px;
-            border: 1px solid transparent;
-            border-radius: 6px;
-            padding: 8px 14px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .role-switch button {
-            background: #334155;
-            color: white;
-        }
-
-        .role-switch button.active.customer { background: var(--customer); }
-        .role-switch button.active.banker { background: var(--bank); }
-
-        main {
-            max-width: 1440px;
-            margin: 0 auto;
-            padding: 18px;
-            display: grid;
-            grid-template-columns: minmax(320px, 430px) minmax(0, 1fr);
-            gap: 18px;
-        }
-
-        section,
-        .panel {
-            background: var(--surface);
+        .card {
+            background: #fff;
             border: 1px solid var(--line);
-            border-radius: 8px;
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 14px 40px #18334b0d
         }
 
-        section { padding: 16px; }
-
-        .panel { padding: 14px; margin-bottom: 14px; }
-
-        h2 {
-            margin: 0 0 12px;
-            font-size: 18px;
+        .grid {
+            display: grid;
+            grid-template-columns:1.2fr .8fr;
+            gap: 20px
         }
 
-        h3 {
-            margin: 0 0 10px;
-            font-size: 15px;
-            color: #334155;
-        }
-
-        label {
+        .label {
             display: block;
-            margin: 10px 0 5px;
-            color: #334155;
-            font-size: 13px;
+            color: #405166;
+            font-size: 12px;
             font-weight: 700;
+            margin: 15px 0 7px
         }
 
-        input,
-        select,
-        textarea {
+        .input, .select, .textarea {
             width: 100%;
-            min-height: 40px;
-            border: 1px solid #b8c4d3;
-            border-radius: 6px;
-            padding: 8px 10px;
-            font: inherit;
-            background: white;
-            color: var(--ink);
+            border: 1px solid #cfd9e4;
+            border-radius: 8px;
+            padding: 12px;
+            background: #fff;
+            color: inherit;
+            font: inherit
         }
 
-        textarea { min-height: 82px; resize: vertical; }
+        .textarea {
+            min-height: 100px;
+            resize: vertical
+        }
 
-        button.native.primary { background: var(--customer); color: white; }
-        button.native.primary:hover { background: var(--customer-dark); }
-        button.native.bank { background: var(--bank); color: white; }
-        button.native.bank:hover { background: var(--bank-dark); }
-        button.native.secondary { background: #e8eef5; color: #172033; border-color: #cad4e0; }
-        button.native.danger { background: var(--danger); color: white; }
+        .btn {
+            border: 0;
+            border-radius: 8px;
+            padding: 11px 16px;
+            font-weight: 750;
+            cursor: pointer;
+            font: inherit
+        }
+
+        .primary {
+            background: var(--b);
+            color: #fff
+        }
+
+        .ghost {
+            background: #fff;
+            border: 1px solid #cfdae6;
+            color: #33475d
+        }
+
+        .green {
+            background: var(--g);
+            color: #fff
+        }
+
+        .red {
+            background: #fff0f0;
+            color: var(--r);
+            border: 1px solid #f2c9c9
+        }
 
         .actions {
             display: flex;
+            gap: 9px;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 12px;
+            margin-top: 18px
         }
 
-        .role-view { display: none; }
-        .role-view.active { display: block; }
-
-        .status-grid {
-            display: grid;
-            grid-template-columns: 120px minmax(0, 1fr);
-            gap: 8px;
-            padding: 12px;
-            background: #eef4fa;
-            border: 1px solid #d7e2ee;
-            border-radius: 8px;
-            font-size: 13px;
-            margin-bottom: 14px;
-        }
-
-        .status-grid strong { color: #334155; }
-        .pill { display: inline-block; padding: 3px 8px; border-radius: 999px; background: #dbeafe; color: #0b3b75; font-weight: 700; }
-        .pill.bank { background: #d1fae5; color: #064e3b; }
-        .pill.warn { background: #fff7ed; color: #9a3412; }
-
-        .journey {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 8px;
-            margin-bottom: 14px;
+        .stepper {
+            display: flex;
+            gap: 18px;
+            margin-bottom: 26px;
+            color: #8999a9;
+            font-weight: 700;
+            font-size: 12px
         }
 
         .step {
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            padding: 10px;
-            background: #fbfdff;
-            min-height: 72px;
-        }
-
-        .step strong { display: block; margin-bottom: 4px; }
-        .step span { color: var(--muted); font-size: 12px; }
-
-        video {
-            width: 100%;
-            max-height: 300px;
-            border-radius: 8px;
-            border: 1px solid var(--line);
-            background: #111827;
-        }
-
-        .frame-list {
-            display: grid;
-            gap: 8px;
-            margin-top: 10px;
-        }
-
-        .frame-item {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            gap: 7px
+        }
+
+        .dot {
+            width: 24px;
+            height: 24px;
+            border: 1px solid #cad7e4;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-style: normal
+        }
+
+        .done {
+            color: var(--g)
+        }
+
+        .done .dot {
+            background: #e4f7ee;
+            border-color: #9dd9be
+        }
+
+        .camera {
+            background: #12202d;
+            border-radius: 11px;
+            aspect-ratio: 16/10;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            color: #9badbd
+        }
+
+        .camera video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover
+        }
+
+        .upload {
+            display: block;
+            border: 1.5px dashed #afc8e5;
+            border-radius: 11px;
+            background: #f7fbff;
+            padding: 27px;
+            text-align: center;
+            color: var(--m);
+            cursor: pointer
+        }
+
+        .upload strong {
+            display: block;
+            color: #315170;
+            margin-bottom: 6px
+        }
+
+        .upload input {
+            display: none
+        }
+
+        .notice {
+            padding: 12px 14px;
+            border-radius: 9px;
+            background: #eaf3ff;
+            color: #34618f;
+            font-size: 12px;
+            margin-top: 15px
+        }
+
+        .badge {
+            display: inline-flex;
+            padding: 5px 9px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 750
+        }
+
+        .pending {
+            background: #fff5df;
+            color: var(--a)
+        }
+
+        .verified {
+            background: #e5f7ef;
+            color: var(--g)
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 18px
+        }
+
+        .table th, .table td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--line)
+        }
+
+        .table th {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #8593a3
+        }
+
+        .search {
+            display: flex;
             gap: 10px;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            padding: 10px;
-            background: #fbfdff;
+            max-width: 600px
         }
 
-        .small { color: var(--muted); font-size: 12px; }
+        .search .input {
+            flex: 1
+        }
 
-        .response {
-            min-height: 420px;
-            max-height: 720px;
-            overflow: auto;
-            margin: 0;
+        .review {
+            display: grid;
+            grid-template-columns:260px 1fr 310px;
+            gap: 18px
+        }
+
+        .session {
             padding: 14px;
-            background: #0b1220;
-            color: #dbeafe;
-            border-radius: 8px;
-            white-space: pre-wrap;
-            word-break: break-word;
-            font-size: 13px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 8px
         }
 
-        .message {
-            display: none;
-            padding: 10px;
-            margin-bottom: 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            border: 1px solid transparent;
+        .session.active, .session:hover {
+            border-color: #96bdf4;
+            background: #f7fbff
         }
 
-        .message.show { display: block; }
-        .message.ok { color: var(--ok); background: #ecfdf3; border-color: #abefc6; }
-        .message.bad { color: var(--danger); background: #fff1f0; border-color: #fecdca; }
-
-        oj-form-layout { max-width: none; }
-        oj-button { margin-right: 8px; margin-top: 8px; }
-
-        @media (max-width: 980px) {
-            .topbar { align-items: flex-start; flex-direction: column; }
-            main { grid-template-columns: 1fr; }
-            .journey { grid-template-columns: 1fr 1fr; }
+        .session b {
+            display: block;
+            margin-bottom: 6px
         }
 
-        @media (max-width: 560px) {
-            .journey { grid-template-columns: 1fr; }
-            .status-grid { grid-template-columns: 1fr; }
+        .session small {
+            color: var(--m)
+        }
+
+        .preview {
+            height: 250px;
+            background: #f1f5f9;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            color: var(--m);
+            overflow: hidden
+        }
+
+        .preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain
+        }
+
+        .toast {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            background: var(--n);
+            color: #fff;
+            padding: 13px 17px;
+            border-radius: 9px;
+            display: none
+        }
+
+        @media (max-width: 1000px) {
+            .review {
+                grid-template-columns:1fr 1fr
+            }
+
+            .decision {
+                grid-column: 1/-1
+            }
+        }
+
+        @media (max-width: 700px) {
+            .side {
+                width: 58px
+            }
+
+            .side small, .nav span {
+                display: none
+            }
+
+            .nav {
+                justify-content: center
+            }
+
+            .main {
+                padding: 24px 16px
+            }
+
+            .grid, .review {
+                grid-template-columns:1fr
+            }
+
+            .head {
+                align-items: flex-start;
+                gap: 12px;
+                flex-direction: column
+            }
+
+            .user {
+                display: none
+            }
+
+            .search {
+                flex-direction: column
+            }
         }
     </style>
 </head>
 <body>
-<div class="shell">
-    <header class="topbar">
-        <div class="brand">
-            <h1>KYC Service Portal</h1>
-            <p>Accessible KYC workspace for customer onboarding and banker review.</p>
-        </div>
-        <div class="role-switch" aria-label="Choose workspace">
-            <button id="customerRole" class="active customer" type="button" onclick="showRole('customer')">Customer View</button>
-            <button id="bankerRole" type="button" onclick="showRole('banker')">Banker View</button>
-        </div>
-    </header>
-
-    <main>
-        <section aria-label="KYC actions">
-            <div class="status-grid">
-                <strong>Current role</strong><span id="roleLabel" class="pill">Customer</span>
-                <strong>Session ID</strong><span id="currentSession">None</span>
-                <strong>Status</strong><span id="currentStatus">Not started</span>
-                <strong>Document</strong><span id="currentDocument">AADHAAR</span>
-            </div>
-            <div id="message" class="message"></div>
-
-            <div id="customerView" class="role-view active">
-                <div class="journey" aria-label="Customer KYC journey">
-                    <div class="step"><strong>1. Start</strong><span>Create a session.</span></div>
-                    <div class="step"><strong>2. Document</strong><span>Upload identity proof.</span></div>
-                    <div class="step"><strong>3. Selfie</strong><span>Upload or capture frames.</span></div>
-                    <div class="step"><strong>4. Result</strong><span>Check review outcome.</span></div>
+<header class="top">
+    <div class="brand"><span class="mark">V</span>Verity <span style="font-weight:400;color:#7b8a9b">/ KYC</span></div>
+    <div class="user">Harshul Mehta · Banker</div>
+</header>
+<div class="layout">
+    <aside class="side"><small>Workspace</small>
+        <button class="nav active" data-view="capture">⌁ <span>New capture</span></button>
+        <button class="nav" data-view="customers">◉ <span>Customer history</span></button>
+    </aside>
+    <main class="main">
+        <section id="capture" class="view active">
+            <div class="head">
+                <div>
+                    <div class="eyebrow">Banker workspace</div>
+                    <h1 class="title">Start a customer verification</h1>
+                    <p class="sub">Capture identity proof and face frames in a few simple steps.</p></div>
+                <span class="badge pending">All sessions pending review</span></div>
+            <div class="card">
+                <div class="stepper">
+                    <div class="step done"><i class="dot">1</i>Customer</div>
+                    <div class="step"><i class="dot">2</i>Identity proof</div>
+                    <div class="step"><i class="dot">3</i>Face capture</div>
+                    <div class="step"><i class="dot">4</i>Submit</div>
                 </div>
-
-                <div class="panel">
-                    <h2>Customer Onboarding</h2>
-                    <oj-form-layout max-columns="2" label-edge="top" class="oj-formlayout-full-width">
-                        <oj-input-text id="cifNoOj" label-hint="Customer CIF" value="CIF900101"></oj-input-text>
-                        <oj-input-text id="purposeOj" label-hint="Purpose" value="ACCOUNT_OPENING"></oj-input-text>
-                    </oj-form-layout>
-                    <label for="documentType">Document Type</label>
-                    <select id="documentType" onchange="syncDocumentType()">
-                        <option>AADHAAR</option>
-                        <option>PAN</option>
-                        <option>PASSPORT</option>
-                        <option>DRIVING_LICENSE</option>
-                        <option>VOTER_ID</option>
-                    </select>
-                    <div class="actions">
-                        <oj-button chroming="callToAction" onclick="createSession()"><span>Create Session</span></oj-button>
-                        <button class="native secondary" type="button" onclick="getSession()">Refresh Session</button>
+                <div class="grid">
+                    <div><h2 style="color:var(--n)">Customer details</h2>
+                        <p class="sub">Use the account ID you know. The technical session is managed in the
+                            background.</p><label class="label">Account ID *</label><input id="accountId" class="input"
+                                                                                           placeholder="e.g. ACC-104829"><label
+                                class="label">Verification purpose</label><select id="purpose" class="select">
+                            <option value="PROFILE_UPDATE">Profile update</option>
+                            <option value="PERIODIC_REVIEW">Periodic review</option>
+                        </select><label class="label">Proof type</label><select id="docType" class="select">
+                            <option>AADHAAR</option>
+                            <option>PAN</option>
+                            <option>PASSPORT</option>
+                            <option>DRIVING_LICENSE</option>
+                            <option>VOTER_ID</option>
+                        </select>
+                        <div class="actions">
+                            <button class="btn primary" onclick="createSession()">Create verification</button>
+                        </div>
                     </div>
-                </div>
-
-                <div class="panel">
-                    <h2>Document Upload</h2>
-                    <label for="documentFile">Identity Document PDF</label>
-                    <input id="documentFile" type="file" accept="application/pdf">
-                    <div class="actions">
-                        <button class="native primary" type="button" onclick="uploadDocument()">Upload Document</button>
-                        <button class="native secondary" type="button" onclick="downloadDocument()">Download Uploaded Document</button>
-                    </div>
-                </div>
-
-                <div class="panel">
-                    <h2>Face Frames</h2>
-                    <label for="frameFiles">Upload Frame Images</label>
-                    <input id="frameFiles" type="file" accept="image/*" multiple>
-                    <div class="actions">
-                        <button class="native primary" type="button" onclick="uploadFrameFiles()">Upload Selected Frames</button>
-                        <button class="native secondary" type="button" onclick="listFrames()">List Frames</button>
-                    </div>
-
-                    <h3>Camera Capture</h3>
-                    <video id="video" autoplay playsinline muted aria-label="Camera preview"></video>
-                    <div class="actions">
-                        <button class="native secondary" type="button" onclick="startCamera()">Start Camera</button>
-                        <button class="native primary" type="button" onclick="captureFrames()">Capture 5 Frames</button>
-                        <button class="native secondary" type="button" onclick="stopCamera()">Stop Camera</button>
-                    </div>
+                    <div><h2 style="color:var(--n)">Before you begin</h2>
+                        <div class="notice">Ask the customer to have their original proof ready and sit facing a
+                            well-lit background.
+                        </div>
+                        <p class="sub" style="line-height:2.1;margin-top:18px">✓ One original identity proof<br>✓ Camera
+                            permissions enabled<br>✓ A clear, front-facing view</p></div>
                 </div>
             </div>
-
-            <div id="bankerView" class="role-view">
-                <div class="panel">
-                    <h2>Banker Review Queue</h2>
-                    <p class="small">Search by the customer’s account ID. Session IDs stay internal to the service.</p>
-                    <label for="accountIdInput">Customer CIF</label>
-                    <input id="accountIdInput" placeholder="e.g. CIF900101" autocomplete="off">
+        </section>
+        <section id="captureSession" class="view">
+            <div class="head">
+                <div>
+                    <div class="eyebrow">Capture in progress</div>
+                    <h1 class="title" id="captureTitle">Customer verification</h1>
+                    <p class="sub" id="captureSub">Account ID</p></div>
+                <span class="badge pending">Pending review</span></div>
+            <div class="grid">
+                <div class="card"><h2 style="color:var(--n)">1. Upload identity proof</h2>
+                    <p class="sub">PDF format · Max 10 MB</p><label class="upload" for="documentFile"><strong>Drop proof
+                        here or browse</strong><span id="fileName">Choose the customer’s document</span><input
+                            id="documentFile" type="file" accept="application/pdf"></label>
                     <div class="actions">
-                        <button class="native bank" type="button" onclick="fetchPendingByAccount()">Find pending reviews</button>
+                        <button class="btn primary" onclick="uploadDocument()">Save proof</button>
                     </div>
-                    <div id="pendingQueue" class="frame-list"></div>
-                </div>
-
-                <div class="panel">
-                    <h2>Evidence Review</h2>
-                    <label for="bankerDocumentType">Document Type</label>
-                    <select id="bankerDocumentType" onchange="copyBankerDocumentType()">
-                        <option>AADHAAR</option>
-                        <option>PAN</option>
-                        <option>PASSPORT</option>
-                        <option>DRIVING_LICENSE</option>
-                        <option>VOTER_ID</option>
-                    </select>
-                    <label for="frameNumber">Frame Number</label>
-                    <input id="frameNumber" type="number" min="1" value="1">
+                    <hr style="border:0;border-top:1px solid var(--line);margin:26px 0">
+                    <h2 style="color:var(--n)">2. Capture face frames</h2>
+                    <p class="sub">Capture 5 frames while the customer looks at the camera.</p>
+                    <div class="camera">
+                        <video id="video" autoplay playsinline muted></video>
+                        <span id="cameraHint">Camera preview will appear here</span></div>
                     <div class="actions">
-                        <button class="native secondary" type="button" onclick="downloadDocument()">Open Document</button>
-                        <button class="native secondary" type="button" onclick="listFrames()">List Frames</button>
-                        <button class="native secondary" type="button" onclick="downloadFrame()">Open Frame</button>
+                        <button class="btn ghost" onclick="startCamera()">Start camera</button>
+                        <button class="btn primary" onclick="captureFrames()">Capture 5 frames</button>
+                        <button class="btn ghost" onclick="stopCamera()">Stop</button>
                     </div>
-                    <div id="frameList" class="frame-list"></div>
                 </div>
-
-                <div class="panel">
-                    <h2>Manual Decision</h2>
-                    <oj-form-layout max-columns="2" label-edge="top" class="oj-formlayout-full-width">
-                        <oj-input-text id="reasonOj" label-hint="Reason" value="manual-review"></oj-input-text>
-                        <oj-text-area id="remarksOj" label-hint="Remarks" value="Checked manually"></oj-text-area>
-                    </oj-form-layout>
-                    <div class="actions">
-                        <button class="native bank" type="button" onclick="approveSession()">Approve</button>
-                        <button class="native danger" type="button" onclick="rejectSession()">Reject</button>
+                <div class="card"><h2 style="color:var(--n)">Verification checklist</h2>
+                    <div style="line-height:3;color:var(--m)">✓ Verification created<br>◷ Identity proof uploaded<br>◷
+                        Face frames captured<br>◷ Reviewer decision
+                    </div>
+                    <div class="notice">You can return to this customer from Customer history. Bankers never need the
+                        session ID.
                     </div>
                 </div>
             </div>
         </section>
-
-        <section aria-label="API response">
-            <div style="display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:12px;">
-                <h2 style="margin:0;">API Response</h2>
-                <button class="native secondary" type="button" onclick="clearOutput()">Clear</button>
+        <section id="customers" class="view">
+            <div class="head">
+                <div>
+                    <div class="eyebrow">Banker workspace</div>
+                    <h1 class="title">Customer history</h1>
+                    <p class="sub">Find every verification for an account and see its latest status.</p></div>
             </div>
-            <pre id="output" class="response">Ready.</pre>
+            <div class="card">
+                <div class="search"><input id="historyAccount" class="input" placeholder="Search by account ID">
+                    <button class="btn primary" onclick="loadHistory()">Search</button>
+                </div>
+                <div id="historyResult" class="notice">Enter an account ID to view all sessions.</div>
+                <table class="table" id="historyTable" style="display:none">
+                    <thead>
+                    <tr>
+                        <th>Verification</th>
+                        <th>Created</th>
+                        <th>Proof</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+        <section id="review" class="view">
+            <div class="head">
+                <div>
+                    <div class="eyebrow">Reviewer workspace</div>
+                    <h1 class="title">Review queue</h1>
+                    <p class="sub">Search an account, inspect evidence, and record one clear decision.</p></div>
+                <span class="badge pending">Awaiting review</span></div>
+            <div class="card">
+                <div class="search"><input id="reviewAccount" class="input" placeholder="Search by customer account ID">
+                    <button class="btn primary" onclick="loadReviewQueue()">Find sessions</button>
+                </div>
+            </div>
+            <div class="review" style="margin-top:18px">
+                <div class="card"><h3 style="color:var(--n)">Sessions</h3>
+                    <div id="sessionList"><p class="sub">Search for an account to begin.</p></div>
+                </div>
+                <div class="card">
+                    <div class="eyebrow">Evidence</div>
+                    <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:12px">
+                        <div><p class="sub">Identity proof</p>
+                            <div id="docPreview" class="preview">Select a session</div>
+                            <button class="btn ghost" style="margin-top:10px" onclick="downloadDocument()">Download
+                                proof
+                            </button>
+                        </div>
+                        <div><p class="sub">Face frames</p>
+                            <div id="framePreview" class="preview">No frame selected</div>
+                            <div id="frameButtons" class="actions"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card decision">
+                    <div class="eyebrow">Decision</div>
+                    <h2 style="color:var(--n)">Complete review</h2>
+                    <p class="sub">Your remark is saved and visible to the banker.</p><label class="label">Reviewer
+                    remark *</label><textarea id="remark" class="textarea"
+                                              placeholder="Add a concise reason for your decision"></textarea><label
+                        class="label">Reviewer name</label><input id="reviewer" class="input" value="reviewer-1">
+                    <div class="actions">
+                        <button class="btn green" onclick="decide('approve')">Approve</button>
+                        <button class="btn red" onclick="decide('reject')">Reject</button>
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
 </div>
-
-<script src="https://static.oracle.com/cdn/jet/19.0.0/3rdparty/require/require.js"></script>
+<div id="toast" class="toast"></div>
 <script>
-    requirejs.config({
-        paths: {
-            knockout: "https://static.oracle.com/cdn/jet/19.0.0/3rdparty/knockout/knockout-3.5.1",
-            jquery: "https://static.oracle.com/cdn/jet/19.0.0/3rdparty/jquery/jquery-3.7.1.min",
-            "jqueryui-amd": "https://static.oracle.com/cdn/jet/19.0.0/3rdparty/jquery/jqueryui-amd-1.13.2.min",
-            ojs: "https://static.oracle.com/cdn/jet/19.0.0/default/js/min",
-            ojL10n: "https://static.oracle.com/cdn/jet/19.0.0/default/js/ojL10n",
-            ojtranslations: "https://static.oracle.com/cdn/jet/19.0.0/default/js/resources",
-            text: "https://static.oracle.com/cdn/jet/19.0.0/3rdparty/require/text",
-            css: "https://static.oracle.com/cdn/jet/19.0.0/3rdparty/require-css/css.min"
-        }
-    });
-    require(["ojs/ojcore", "knockout", "jquery", "ojs/ojknockout", "ojs/ojbutton", "ojs/ojinputtext", "ojs/ojformlayout"], function () {});
-</script>
+    let sessionId = null, stream = null, selected = null, draftFrames = [], submitted = false, documentReady = false;
+    const $ = id => document.getElementById(id);
 
-<script>
-    let sessionId = null;
-    let stream = null;
-    const FRAME_COUNT = 5;
-    const FRAME_INTERVAL = 700;
+    function showView(id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === id));
+        document.querySelectorAll('.nav').forEach(n => n.classList.toggle('active', n.dataset.view === id || id === 'captureSession' && n.dataset.view === 'capture'))
+    }
 
-    function readOjValue(id) {
-        const element = document.getElementById(id);
-        return (element && element.value !== undefined ? element.value : "").toString().trim();
+    document.querySelectorAll('.nav').forEach(n => n.onclick = () => showView(n.dataset.view));
+
+    function toast(t) {
+        $('toast').textContent = t;
+        $('toast').style.display = 'block';
+        setTimeout(() => $('toast').style.display = 'none', 2800)
+    }
+
+    async function api(u, o) {
+        const r = await fetch(u, o),
+            b = r.headers.get('content-type')?.includes('json') ? await r.json() : await r.text();
+        if (!r.ok) throw Error(typeof b === 'string' ? b : 'Request failed');
+        return b
     }
 
     async function createSession() {
-        const response = await fetch("/api/v1/kyc/sessions", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                cifNo: readOjValue("cifNoOj"),
-                purpose: readOjValue("purposeOj"),
-                documentType: document.getElementById("documentType").value
-            })
-        });
-        const result = await readResponse(response);
-        print(result);
-        if (result.ok) {
-            setSession(result.body.sessionId, result.body.status, result.body.documentType);
-            showMessage("Customer session created.", false);
+        const a = $('accountId').value.trim();
+        if (!a) return toast('Enter an account ID first.');
+        try {
+            const s = await api('/api/v1/kyc/sessions', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({cifNo: a, purpose: $('purpose').value, documentType: $('docType').value})
+            });
+            sessionId = s.sessionId;
+            $('captureTitle').textContent = 'Verification for ' + a;
+            $('captureSub').textContent = 'Proof type: ' + $('docType').value;
+            showView('captureSession');
+            toast('Verification created.')
+        } catch (e) {
+            toast(e.message)
         }
     }
 
-    function useTypedSession() {
-        const typedSessionId = document.getElementById("sessionIdInput").value.trim();
-        if (!typedSessionId) {
-            showMessage("Enter a session ID first.", true);
-            return;
-        }
-        setSession(typedSessionId, "Loaded", document.getElementById("bankerDocumentType").value);
-        print({message: "Session loaded for banker review", sessionId});
-    }
-
-    async function fetchPendingByAccount() {
-        const accountId = document.getElementById("accountIdInput").value.trim();
-        if (!accountId) { showMessage("Enter a customer account ID first.", true); return; }
-        const response = await fetch("/api/v1/kyc/customers/" + encodeURIComponent(accountId) + "/sessions/pending");
-        const result = await readResponse(response);
-        print(result);
-        renderPendingQueue(result);
-        showMessage(result.ok ? (result.body.length ? "Pending reviews loaded." : "No pending reviews for this account.") : "Unable to load the review queue.", !result.ok);
-    }
-
-    function renderPendingQueue(result) {
-        const queue = document.getElementById("pendingQueue");
-        queue.innerHTML = "";
-        if (!result.ok || !Array.isArray(result.body)) return;
-        result.body.forEach(item => {
-            const row = document.createElement("div"); row.className = "frame-item";
-            row.innerHTML = '<div><strong>' + (item.purpose || "KYC review") + '</strong><div class="small">' +
-                item.cifNo + ' · ' + item.documentType + ' · <span class="pill warn">' + item.status + '</span></div></div>';
-            const button = document.createElement("button"); button.className = "native bank"; button.type = "button"; button.textContent = "Review";
-            button.onclick = () => { setSession(item.sessionId, item.status, item.documentType); document.getElementById("accountIdInput").value = item.cifNo; getSession(); };
-            row.appendChild(button); queue.appendChild(row);
-        });
-    }
-
-    async function getSession() {
-        if (!hasSession()) return;
-        const response = await fetch("/api/v1/kyc/sessions/" + encodeURIComponent(sessionId));
-        const result = await readResponse(response);
-        print(result);
-        if (result.ok) setSession(result.body.sessionId, result.body.status, result.body.documentType || document.getElementById("documentType").value);
-    }
+    $('documentFile').onchange = e => $('fileName').textContent = e.target.files[0]?.name || 'Choose the customer’s document';
 
     async function uploadDocument() {
-        if (!hasSession()) return;
-        const file = document.getElementById("documentFile").files[0];
-        if (!file) {
-            showMessage("Choose a PDF document first.", true);
-            return;
+        if (!sessionId) return toast('Create a verification first.');
+        const f = $('documentFile').files[0];
+        if (!f) return toast('Choose a PDF first.');
+        const x = new FormData;
+        x.append('file', f);
+        x.append('documentType', $('docType').value);
+        try {
+            await api('/api/v1/kyc/sessions/' + sessionId + '/documents', {method: 'POST', body: x});
+            documentReady = true;
+            const submit = document.getElementById('submitFrames');
+            if (submit) submit.disabled = draftFrames.length !== 5;
+            toast('Identity proof saved.')
+        } catch (e) {
+            toast(e.message)
         }
-        const form = new FormData();
-        form.append("documentType", document.getElementById("documentType").value);
-        form.append("file", file);
-        const response = await fetch("/api/v1/kyc/sessions/" + encodeURIComponent(sessionId) + "/documents", {method: "POST", body: form});
-        const result = await readResponse(response);
-        print(result);
-        showMessage(result.ok ? "Document uploaded." : "Document upload failed.", !result.ok);
-    }
-
-    function downloadDocument() {
-        if (!hasSession()) return;
-        const type = document.getElementById("documentType").value;
-        window.open("/api/v1/kyc/sessions/" + encodeURIComponent(sessionId) + "/documents/" + encodeURIComponent(type), "_blank");
-        print({message: "Document opened in a new tab", sessionId, documentType: type});
-    }
-
-    async function uploadFrameFiles() {
-        if (!hasSession()) return;
-        const files = Array.from(document.getElementById("frameFiles").files);
-        if (files.length === 0) {
-            showMessage("Choose one or more frame images first.", true);
-            return;
-        }
-        const form = new FormData();
-        files.forEach(file => form.append("frames", file));
-        const response = await fetch("/api/v1/kyc/sessions/" + encodeURIComponent(sessionId) + "/frames", {method: "POST", body: form});
-        const result = await readResponse(response);
-        print(result);
-        showMessage(result.ok ? "Frames uploaded." : "Frame upload failed.", !result.ok);
     }
 
     async function startCamera() {
         try {
-            stream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
-            document.getElementById("video").srcObject = stream;
-            showMessage("Camera started.", false);
-        } catch (error) {
-            showMessage(error.message || "Camera could not start.", true);
+            stream = await navigator.mediaDevices.getUserMedia({video: true});
+            $('video').srcObject = stream;
+            $('cameraHint').style.display = 'none';
+            toast('Camera ready.')
+        } catch (e) {
+            toast('Camera permission is required.')
         }
     }
 
     function stopCamera() {
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-            stream = null;
-            document.getElementById("video").srcObject = null;
-        }
-        showMessage("Camera stopped.", false);
+        stream?.getTracks().forEach(t => t.stop());
+        stream = null;
+        $('video').srcObject = null;
+        $('cameraHint').style.display = 'block'
     }
 
     async function captureFrames() {
-        if (!hasSession()) return;
-        if (!stream) {
-            showMessage("Start the camera first.", true);
-            return;
+        if (!sessionId || !stream) return toast('Start the camera first.');
+        if (submitted) return toast('This verification was already submitted.');
+        const c = document.createElement('canvas'), v = $('video');
+        c.width = 640;
+        c.height = 480;
+        draftFrames = [];
+        for (let i = 1; i <= 5; i++) {
+            await new Promise(r => setTimeout(r, 550));
+            c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+            const b = await new Promise(r => c.toBlob(r, 'image/jpeg', .82));
+            draftFrames.push(b)
         }
-        const video = document.getElementById("video");
-        const canvas = document.createElement("canvas");
-        canvas.width = 640;
-        canvas.height = 480;
-        const context = canvas.getContext("2d");
-        const form = new FormData();
-        for (let i = 1; i <= FRAME_COUNT; i += 1) {
-            await sleep(FRAME_INTERVAL);
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.8));
-            form.append("frames", blob, "frame-" + i + ".jpg");
-        }
-        const response = await fetch("/api/v1/kyc/sessions/" + encodeURIComponent(sessionId) + "/frames", {method: "POST", body: form});
-        const result = await readResponse(response);
-        print(result);
-        showMessage(result.ok ? "Camera frames uploaded." : "Camera frame upload failed.", !result.ok);
+        toast('Five frames captured. Submitting for review...');
+        await submitFrames()
     }
 
-    async function listFrames() {
-        if (!hasSession()) return;
-        const response = await fetch("/api/v1/kyc/sessions/" + encodeURIComponent(sessionId) + "/frames");
-        const result = await readResponse(response);
-        print(result);
-        renderFrameList(result);
-    }
-
-    function downloadFrame(frameNumber) {
-        if (!hasSession()) return;
-        const target = frameNumber || document.getElementById("frameNumber").value;
-        window.open("/api/v1/kyc/sessions/" + encodeURIComponent(sessionId) + "/frames/" + encodeURIComponent(target), "_blank");
-        print({message: "Frame opened in a new tab", sessionId, frameNumber: target});
-    }
-
-    async function getResult() {
-        if (!hasSession()) return;
-        const response = await fetch("/api/v1/kyc/sessions/" + encodeURIComponent(sessionId) + "/result");
-        const result = await readResponse(response);
-        print(result);
-    }
-
-    async function approveSession() { await sendDecision("approve"); }
-    async function rejectSession() { await sendDecision("reject"); }
-
-    async function sendDecision(action) {
-        if (!hasSession()) return;
-        const response = await fetch("/api/v1/kyc/sessions/" + encodeURIComponent(sessionId) + "/" + action, {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                reason: readOjValue("reasonOj"),
-                remarks: readOjValue("remarksOj")
-            })
-        });
-        const result = await readResponse(response);
-        print(result);
-        if (result.ok) setSession(sessionId, action === "approve" ? "VERIFIED" : "REJECTED", document.getElementById("documentType").value);
-        showMessage(result.ok ? "Decision saved." : "Decision failed.", !result.ok);
-    }
-
-    async function readResponse(response) {
-        const contentType = response.headers.get("content-type") || "";
-        const body = contentType.includes("application/json") ? await response.json() : await response.text();
-        return {status: response.status, ok: response.ok, body};
-    }
-
-    function renderFrameList(result) {
-        const container = document.getElementById("frameList");
-        container.innerHTML = "";
-        if (!result.ok || !Array.isArray(result.body)) return;
-        if (result.body.length === 0) {
-            container.innerHTML = '<p class="small">No frames found for this session.</p>';
-            return;
-        }
-        result.body.forEach(frame => {
-            const row = document.createElement("div");
-            row.className = "frame-item";
-            row.innerHTML = '<div><strong>Frame ' + frame.frameNumber + '</strong><div class="small">' +
-                (frame.fileName || "unnamed") + ' | ' + (frame.contentType || "unknown") + ' | ' + frame.size +
-                ' bytes</div></div>';
-            const button = document.createElement("button");
-            button.className = "native secondary";
-            button.type = "button";
-            button.textContent = "Open";
-            button.onclick = () => downloadFrame(frame.frameNumber);
-            row.appendChild(button);
-            container.appendChild(row);
-        });
-    }
-
-    function showRole(role) {
-        const isCustomer = role === "customer";
-        document.getElementById("customerView").classList.toggle("active", isCustomer);
-        document.getElementById("bankerView").classList.toggle("active", !isCustomer);
-        document.getElementById("customerRole").classList.toggle("active", isCustomer);
-        document.getElementById("bankerRole").classList.toggle("active", !isCustomer);
-        const roleLabel = document.getElementById("roleLabel");
-        roleLabel.textContent = isCustomer ? "Customer" : "Banker";
-        roleLabel.className = isCustomer ? "pill" : "pill bank";
-    }
-
-    function setSession(nextSessionId, status, documentType) {
-        sessionId = nextSessionId;
-        document.getElementById("sessionIdInput").value = nextSessionId || "";
-        document.getElementById("currentSession").textContent = nextSessionId || "None";
-        document.getElementById("currentStatus").textContent = status || "Loaded";
-        if (documentType) {
-            document.getElementById("documentType").value = documentType;
-            document.getElementById("bankerDocumentType").value = documentType;
-            document.getElementById("currentDocument").textContent = documentType;
+    async function submitFrames() {
+        if (!documentReady) return toast('Save the identity proof before submitting.');
+        if (draftFrames.length !== 5 || submitted) return toast('Exactly five frames are required.');
+        const f = new FormData;
+        draftFrames.forEach((b, i) => f.append('frames', b, 'frame-' + (i + 1) + '.jpg'));
+        try {
+            await api('/api/v1/kyc/sessions/' + sessionId + '/frames', {method: 'POST', body: f});
+            submitted = true;
+            stopCamera();
+            location.href = reviewerUrl()
+        } catch (e) {
+            toast(e.message)
         }
     }
 
-    function syncDocumentType() {
-        const type = document.getElementById("documentType").value;
-        document.getElementById("bankerDocumentType").value = type;
-        document.getElementById("currentDocument").textContent = type;
-    }
-
-    function copyBankerDocumentType() {
-        const type = document.getElementById("bankerDocumentType").value;
-        document.getElementById("documentType").value = type;
-        document.getElementById("currentDocument").textContent = type;
-    }
-
-    function hasSession() {
-        if (!sessionId) {
-            showMessage("Create or load a session first.", true);
-            return false;
+    async function loadHistory() {
+        const a = $('historyAccount').value.trim();
+        if (!a) return toast('Enter an account ID.');
+        try {
+            const r = await api('/api/v1/kyc/customers/' + encodeURIComponent(a) + '/sessions');
+            $('historyResult').style.display = 'none';
+            $('historyTable').style.display = 'table';
+            $('historyTable').querySelector('tbody').innerHTML = r.map(x => '<tr><td>Verification</td><td>' + new Date(x.createdAt || Date.now()).toLocaleDateString() + '</td><td>' + x.documentType + '</td><td><span class="badge pending">' + x.status + '</span></td></tr>').join('') || '<tr><td colspan="4">No pending sessions found.</td></tr>'
+        } catch (e) {
+            toast(e.message)
         }
-        return true;
     }
 
-    function showMessage(text, bad) {
-        const message = document.getElementById("message");
-        message.textContent = text;
-        message.className = "message show " + (bad ? "bad" : "ok");
+    async function loadReviewQueue() {
+        const a = $('reviewAccount').value.trim();
+        if (!a) return toast('Enter an account ID.');
+        try {
+            const r = await api('/api/v1/kyc/customers/' + encodeURIComponent(a) + '/sessions');
+            $('sessionList').innerHTML = r.map(x => '<div class="session" onclick="selectSession(' + JSON.stringify(x).replace(/"/g, '&quot;') + ')"><b>Verification</b><small>' + x.documentType + ' · ' + x.status + '</small></div>').join('') || '<p class="sub">No pending sessions.</p>';
+            if (r[0]) selectSession(r[0])
+        } catch (e) {
+            toast(e.message)
+        }
     }
 
-    function print(obj) { document.getElementById("output").textContent = JSON.stringify(obj, null, 2); }
-    function clearOutput() { document.getElementById("output").textContent = "Ready."; }
-    function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
+    async function selectSession(x) {
+        selected = x;
+        sessionId = x.sessionId;
+        try {
+            const r = await api('/api/v1/kyc/sessions/' + sessionId + '/frames');
+            $('frameButtons').innerHTML = r.map(f => '<button class="btn ghost" onclick="showFrame(' + f.frameNumber + ')">Frame ' + f.frameNumber + '</button>').join('');
+            if (r[0]) showFrame(r[0].frameNumber)
+        } catch (e) {
+            toast('Could not load frames.')
+        }
+    }
+
+    function showFrame(n) {
+        $('framePreview').innerHTML = '<img src="/api/v1/kyc/sessions/' + sessionId + '/frames/' + n + '" alt="Customer face frame ' + n + '">'
+    }
+
+    function downloadDocument() {
+        if (sessionId) window.open('/api/v1/kyc/sessions/' + sessionId + '/documents/' + (selected?.documentType || $('docType').value), '_blank')
+    }
+
+    async function decide(a) {
+        if (!sessionId) return toast('Select a session.');
+        const m = $('remark').value.trim();
+        if (!m) return toast('Add a remark before saving.');
+        try {
+            await api('/api/v1/kyc/sessions/' + sessionId + '/' + a, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({reviewerId: $('reviewer').value, reason: 'manual-review', remarks: m})
+            });
+            toast('Decision saved. Banker status updated.');
+            loadReviewQueue()
+        } catch (e) {
+            toast(e.message)
+        }
+    }
+
+    function reviewerUrl() {
+        const params = new URLSearchParams(window.location.search);
+        params.set('cif', $('accountId').value.trim());
+        params.set('sessionId', sessionId);
+        return 'reviewer.html?' + params.toString()
+    }
+
+    (function initializeMoneybagsLaunch() {
+        const cif = new URLSearchParams(window.location.search).get('cif');
+        if (!cif) return;
+        $('accountId').value = cif;
+        $('historyAccount').value = cif;
+        toast('KYC opened for ' + cif + '.')
+    }());
 </script>
 </body>
 </html>

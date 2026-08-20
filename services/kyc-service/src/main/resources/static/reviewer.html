@@ -1,0 +1,844 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Verity KYC</title>
+    <style>
+        :root {
+            --n: #17324d;
+            --b: #315b7d;
+            --bg: #f4f6f8;
+            --line: #d9e1e8;
+            --m: #647486;
+            --g: #3f6f5b;
+            --a: #8a6b32;
+            --r: #8a4a4a
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: #142235;
+            font: 14px system-ui, -apple-system, Segoe UI, sans-serif
+        }
+
+        .top {
+            height: 72px;
+            background: #fff;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 34px
+        }
+
+        .brand {
+            font-weight: 800;
+            font-size: 20px;
+            color: var(--n)
+        }
+
+        .mark {
+            display: inline-grid;
+            place-items: center;
+            background: var(--b);
+            color: #fff;
+            border-radius: 9px;
+            width: 30px;
+            height: 30px;
+            margin-right: 9px
+        }
+
+        .user {
+            color: var(--m)
+        }
+
+        .layout {
+            display: flex;
+            min-height: calc(100vh - 72px)
+        }
+
+        .side {
+            width: 235px;
+            background: var(--n);
+            padding: 28px 14px;
+            color: #b6c8d9
+        }
+
+        .side small {
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 10px;
+            padding: 0 14px 10px;
+            color: #8298ae
+        }
+
+        .nav {
+            display: flex;
+            width: 100%;
+            border: 0;
+            background: transparent;
+            color: #b6c8d9;
+            padding: 12px 14px;
+            border-radius: 9px;
+            gap: 12px;
+            align-items: center;
+            text-align: left;
+            font: inherit;
+            cursor: pointer
+        }
+
+        .nav.active, .nav:hover {
+            background: #244461;
+            color: #fff
+        }
+
+        .main {
+            flex: 1;
+            padding: 34px 42px;
+            max-width: 1400px;
+            margin: auto
+        }
+
+        .view {
+            display: none
+        }
+
+        .view.active {
+            display: block
+        }
+
+        .head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 28px
+        }
+
+        .eyebrow {
+            color: var(--b);
+            font-weight: 800;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .8px
+        }
+
+        .title {
+            font-size: 28px;
+            letter-spacing: -.6px;
+            margin: 7px 0;
+            color: var(--n)
+        }
+
+        .sub {
+            margin: 0;
+            color: var(--m);
+            line-height: 1.5
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 14px 40px #18334b0d
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns:1.2fr .8fr;
+            gap: 20px
+        }
+
+        .label {
+            display: block;
+            color: #405166;
+            font-size: 12px;
+            font-weight: 700;
+            margin: 15px 0 7px
+        }
+
+        .input, .select, .textarea {
+            width: 100%;
+            border: 1px solid #cfd9e4;
+            border-radius: 8px;
+            padding: 12px;
+            background: #fff;
+            color: inherit;
+            font: inherit
+        }
+
+        .textarea {
+            min-height: 100px;
+            resize: vertical
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 8px;
+            padding: 11px 16px;
+            font-weight: 750;
+            cursor: pointer;
+            font: inherit
+        }
+
+        .primary {
+            background: var(--b);
+            color: #fff
+        }
+
+        .ghost {
+            background: #fff;
+            border: 1px solid #cfdae6;
+            color: #33475d
+        }
+
+        .green {
+            background: var(--g);
+            color: #fff
+        }
+
+        .red {
+            background: #fff0f0;
+            color: var(--r);
+            border: 1px solid #f2c9c9
+        }
+
+        .actions {
+            display: flex;
+            gap: 9px;
+            flex-wrap: wrap;
+            margin-top: 18px
+        }
+
+        .stepper {
+            display: flex;
+            gap: 18px;
+            margin-bottom: 26px;
+            color: #8999a9;
+            font-weight: 700;
+            font-size: 12px
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 7px
+        }
+
+        .dot {
+            width: 24px;
+            height: 24px;
+            border: 1px solid #cad7e4;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-style: normal
+        }
+
+        .done {
+            color: var(--g)
+        }
+
+        .done .dot {
+            background: #e4f7ee;
+            border-color: #9dd9be
+        }
+
+        .camera {
+            background: #12202d;
+            border-radius: 11px;
+            aspect-ratio: 16/10;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            color: #9badbd
+        }
+
+        .camera video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover
+        }
+
+        .upload {
+            display: block;
+            border: 1.5px dashed #afc8e5;
+            border-radius: 11px;
+            background: #f7fbff;
+            padding: 27px;
+            text-align: center;
+            color: var(--m);
+            cursor: pointer
+        }
+
+        .upload strong {
+            display: block;
+            color: #315170;
+            margin-bottom: 6px
+        }
+
+        .upload input {
+            display: none
+        }
+
+        .notice {
+            padding: 12px 14px;
+            border-radius: 9px;
+            background: #eaf3ff;
+            color: #34618f;
+            font-size: 12px;
+            margin-top: 15px
+        }
+
+        .badge {
+            display: inline-flex;
+            padding: 5px 9px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 750
+        }
+
+        .pending {
+            background: #fff5df;
+            color: var(--a)
+        }
+
+        .verified {
+            background: #e5f7ef;
+            color: var(--g)
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 18px
+        }
+
+        .table th, .table td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--line)
+        }
+
+        .table th {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #8593a3
+        }
+
+        .search {
+            display: flex;
+            gap: 10px;
+            max-width: 600px
+        }
+
+        .search .input {
+            flex: 1
+        }
+
+        .review {
+            display: grid;
+            grid-template-columns:260px 1fr 310px;
+            gap: 18px
+        }
+
+        .session {
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 8px
+        }
+
+        .session.active, .session:hover {
+            border-color: #96bdf4;
+            background: #f7fbff
+        }
+
+        .session b {
+            display: block;
+            margin-bottom: 6px
+        }
+
+        .session small {
+            color: var(--m)
+        }
+
+        .preview {
+            height: 250px;
+            background: #f1f5f9;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            color: var(--m);
+            overflow: hidden
+        }
+
+        .preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain
+        }
+
+        .toast {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            background: var(--n);
+            color: #fff;
+            padding: 13px 17px;
+            border-radius: 9px;
+            display: none
+        }
+
+        @media (max-width: 1000px) {
+            .review {
+                grid-template-columns:1fr 1fr
+            }
+
+            .decision {
+                grid-column: 1/-1
+            }
+        }
+
+        @media (max-width: 700px) {
+            .side {
+                width: 58px
+            }
+
+            .side small, .nav span {
+                display: none
+            }
+
+            .nav {
+                justify-content: center
+            }
+
+            .main {
+                padding: 24px 16px
+            }
+
+            .grid, .review {
+                grid-template-columns:1fr
+            }
+
+            .head {
+                align-items: flex-start;
+                gap: 12px;
+                flex-direction: column
+            }
+
+            .user {
+                display: none
+            }
+
+            .search {
+                flex-direction: column
+            }
+        }
+
+        iframe.preview {
+            height: 250px;
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 10px
+        }
+
+        canvas.preview {
+            display: block;
+            width: 100%;
+            height: 250px
+        }
+
+        #capture, #captureSession, #customers {
+            display: none !important
+        }
+
+        aside .nav[data-view="capture"], aside .nav[data-view="customers"] {
+            display: none !important
+        }</style>
+</head>
+<body onload="showView('review')">
+<header class="top">
+    <div class="brand"><span class="mark">V</span>Verity <span style="font-weight:400;color:#7b8a9b">/ KYC</span></div>
+    <div class="user">Harshul Mehta · Banker</div>
+</header>
+<div class="layout">
+    <aside class="side"><small>Workspace</small>
+        <button class="nav active" data-view="capture">⌁ <span>New capture</span></button>
+        <button class="nav" data-view="customers">◉ <span>Customer history</span></button>
+        <small style="margin-top:25px">Operations</small>
+        <button class="nav" data-view="review">✓ <span>Review queue</span></button>
+    </aside>
+    <main class="main">
+        <section id="capture" class="view active">
+            <div class="head">
+                <div>
+                    <div class="eyebrow">Banker workspace</div>
+                    <h1 class="title">Start a customer verification</h1>
+                    <p class="sub">Capture identity proof and face frames in a few simple steps.</p></div>
+                <span class="badge pending">All sessions pending review</span></div>
+            <div class="card">
+                <div class="stepper">
+                    <div class="step done"><i class="dot">1</i>Customer</div>
+                    <div class="step"><i class="dot">2</i>Identity proof</div>
+                    <div class="step"><i class="dot">3</i>Face capture</div>
+                    <div class="step"><i class="dot">4</i>Submit</div>
+                </div>
+                <div class="grid">
+                    <div><h2 style="color:var(--n)">Customer details</h2>
+                        <p class="sub">Use the account ID you know. The technical session is managed in the
+                            background.</p><label class="label">Account ID *</label><input id="accountId" class="input"
+                                                                                           placeholder="e.g. AC-104829"><label
+                                class="label">Verification purpose</label><select id="purpose" class="select">
+                            <option value="ACCOUNT_OPENING">Account opening</option>
+                            <option value="PROFILE_UPDATE">Profile update</option>
+                            <option value="PERIODIC_REVIEW">Periodic review</option>
+                        </select><label class="label">Proof type</label><select id="docType" class="select">
+                            <option>AADHAAR</option>
+                            <option>PAN</option>
+                            <option>PASSPORT</option>
+                            <option>DRIVING_LICENSE</option>
+                            <option>VOTER_ID</option>
+                        </select>
+                        <div class="actions">
+                            <button class="btn primary" onclick="createSession()">Create verification</button>
+                        </div>
+                    </div>
+                    <div><h2 style="color:var(--n)">Before you begin</h2>
+                        <div class="notice">Ask the customer to have their original proof ready and sit facing a
+                            well-lit background.
+                        </div>
+                        <p class="sub" style="line-height:2.1;margin-top:18px">✓ One original identity proof<br>✓ Camera
+                            permissions enabled<br>✓ A clear, front-facing view</p></div>
+                </div>
+            </div>
+        </section>
+        <section id="captureSession" class="view">
+            <div class="head">
+                <div>
+                    <div class="eyebrow">Capture in progress</div>
+                    <h1 class="title" id="captureTitle">Customer verification</h1>
+                    <p class="sub" id="captureSub">Account ID</p></div>
+                <span class="badge pending">Pending review</span></div>
+            <div class="grid">
+                <div class="card"><h2 style="color:var(--n)">1. Upload identity proof</h2>
+                    <p class="sub">PDF format · Max 10 MB</p><label class="upload" for="documentFile"><strong>Drop proof
+                        here or browse</strong><span id="fileName">Choose the customer’s document</span><input
+                            id="documentFile" type="file" accept="application/pdf"></label>
+                    <div class="actions">
+                        <button class="btn primary" onclick="uploadDocument()">Save proof</button>
+                    </div>
+                    <hr style="border:0;border-top:1px solid var(--line);margin:26px 0">
+                    <h2 style="color:var(--n)">2. Capture face frames</h2>
+                    <p class="sub">Capture 5 frames while the customer looks at the camera.</p>
+                    <div class="camera">
+                        <video id="video" autoplay playsinline muted></video>
+                        <span id="cameraHint">Camera preview will appear here</span></div>
+                    <div class="actions">
+                        <button class="btn ghost" onclick="startCamera()">Start camera</button>
+                        <button class="btn primary" onclick="captureFrames()">Capture 5 frames</button>
+                        <button class="btn ghost" onclick="stopCamera()">Stop</button>
+                    </div>
+                </div>
+                <div class="card"><h2 style="color:var(--n)">Verification checklist</h2>
+                    <div style="line-height:3;color:var(--m)">✓ Verification created<br>◷ Identity proof uploaded<br>◷
+                        Face frames captured<br>◷ Reviewer decision
+                    </div>
+                    <div class="notice">You can return to this customer from Customer history. Bankers never need the
+                        session ID.
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="customers" class="view">
+            <div class="head">
+                <div>
+                    <div class="eyebrow">Banker workspace</div>
+                    <h1 class="title">Customer history</h1>
+                    <p class="sub">Find every verification for an account and see its latest status.</p></div>
+            </div>
+            <div class="card">
+                <div class="search"><input id="historyAccount" class="input" placeholder="Search by account ID">
+                    <button class="btn primary" onclick="loadHistory()">Search</button>
+                </div>
+                <div id="historyResult" class="notice">Enter an account ID to view all sessions.</div>
+                <table class="table" id="historyTable" style="display:none">
+                    <thead>
+                    <tr>
+                        <th>Verification</th>
+                        <th>Created</th>
+                        <th>Proof</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+        <section id="review" class="view">
+            <div class="head">
+                <div>
+                    <div class="eyebrow">Reviewer workspace</div>
+                    <h1 class="title">Review queue</h1>
+                    <p class="sub">Search an account, inspect evidence, and record one clear decision.</p></div>
+                <span class="badge pending">Awaiting review</span></div>
+            <div class="card">
+                <div class="search"><input id="reviewAccount" class="input" placeholder="Search by customer account ID">
+                    <button class="btn primary" onclick="loadReviewQueue()">Find sessions</button>
+                </div>
+            </div>
+            <div class="review" style="margin-top:18px">
+                <div class="card"><h3 style="color:var(--n)">Sessions</h3>
+                    <div id="sessionList"><p class="sub">Search for an account to begin.</p></div>
+                </div>
+                <div class="card">
+                    <div class="eyebrow">Evidence</div>
+                    <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:12px">
+                        <div><p class="sub">Identity proof</p>
+                            <iframe id="docViewer" class="preview" title="Identity proof viewer"></iframe>
+                            <button class="btn ghost" style="margin-top:10px" onclick="downloadDocument()">Download
+                                proof
+                            </button>
+                        </div>
+                        <div><p class="sub">Face frames</p>
+                            <canvas id="frameCanvas" class="preview"></canvas>
+                            <div id="frameButtons" class="actions"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card decision">
+                    <div class="eyebrow">Decision</div>
+                    <h2 style="color:var(--n)">Complete review</h2>
+                    <p class="sub">Your remark is saved and visible to the banker.</p><label class="label">Reviewer
+                    remark *</label><textarea id="remark" class="textarea"
+                                              placeholder="Add a concise reason for your decision"></textarea><label
+                        class="label">Reviewer name</label><input id="reviewer" class="input" value="reviewer-1">
+                    <div class="actions">
+                        <button class="btn green" onclick="decide('approve')">Approve</button>
+                        <button class="btn red" onclick="decide('reject')">Reject</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+<div id="toast" class="toast"></div>
+<script>
+    let sessionId = null, stream = null, selected = null;
+    const $ = id => document.getElementById(id);
+
+    function showView(id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === id));
+        document.querySelectorAll('.nav').forEach(n => n.classList.toggle('active', n.dataset.view === id || id === 'captureSession' && n.dataset.view === 'capture'))
+    }
+
+    document.querySelectorAll('.nav').forEach(n => n.onclick = () => showView(n.dataset.view));
+
+    function toast(t) {
+        $('toast').textContent = t;
+        $('toast').style.display = 'block';
+        setTimeout(() => $('toast').style.display = 'none', 2800)
+    }
+
+    async function api(u, o) {
+        const r = await fetch(u, o),
+            b = r.headers.get('content-type')?.includes('json') ? await r.json() : await r.text();
+        if (!r.ok) throw Error(typeof b === 'string' ? b : 'Request failed');
+        return b
+    }
+
+    async function createSession() {
+        const a = $('accountId').value.trim();
+        if (!a) return toast('Enter an account ID first.');
+        try {
+            const s = await api('/api/v1/kyc/sessions', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({cifNo: a, purpose: $('purpose').value, documentType: $('docType').value})
+            });
+            sessionId = s.sessionId;
+            $('captureTitle').textContent = 'Verification for ' + a;
+            $('captureSub').textContent = 'Proof type: ' + $('docType').value;
+            showView('captureSession');
+            toast('Verification created.')
+        } catch (e) {
+            toast(e.message)
+        }
+    }
+
+    $('documentFile').onchange = e => $('fileName').textContent = e.target.files[0]?.name || 'Choose the customer’s document';
+
+    async function uploadDocument() {
+        if (!sessionId) return toast('Create a verification first.');
+        const f = $('documentFile').files[0];
+        if (!f) return toast('Choose a PDF first.');
+        const x = new FormData;
+        x.append('file', f);
+        x.append('documentType', $('docType').value);
+        try {
+            await api('/api/v1/kyc/sessions/' + sessionId + '/documents', {method: 'POST', body: x});
+            toast('Identity proof saved.')
+        } catch (e) {
+            toast(e.message)
+        }
+    }
+
+    async function startCamera() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({video: true});
+            $('video').srcObject = stream;
+            $('cameraHint').style.display = 'none';
+            toast('Camera ready.')
+        } catch (e) {
+            toast('Camera permission is required.')
+        }
+    }
+
+    function stopCamera() {
+        stream?.getTracks().forEach(t => t.stop());
+        stream = null;
+        $('video').srcObject = null;
+        $('cameraHint').style.display = 'block'
+    }
+
+    async function captureFrames() {
+        if (!sessionId || !stream) return toast('Start the camera first.');
+        const c = document.createElement('canvas'), v = $('video');
+        c.width = 640;
+        c.height = 480;
+        const f = new FormData;
+        for (let i = 1; i <= 5; i++) {
+            await new Promise(r => setTimeout(r, 550));
+            c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+            const b = await new Promise(r => c.toBlob(r, 'image/jpeg', .82));
+            f.append('frames', b, 'frame-' + i + '.jpg')
+        }
+        try {
+            await api('/api/v1/kyc/sessions/' + sessionId + '/frames', {method: 'POST', body: f});
+            toast('5 face frames saved.')
+        } catch (e) {
+            toast(e.message)
+        }
+    }
+
+    async function loadHistory() {
+        const a = $('historyAccount').value.trim();
+        if (!a) return toast('Enter an account ID.');
+        try {
+            const r = await api('/api/v1/kyc/customers/' + encodeURIComponent(a) + '/sessions');
+            $('historyResult').style.display = 'none';
+            $('historyTable').style.display = 'table';
+            $('historyTable').querySelector('tbody').innerHTML = r.map(x => '<tr><td>Verification</td><td>' + new Date(x.createdAt || Date.now()).toLocaleDateString() + '</td><td>' + x.documentType + '</td><td><span class="badge pending">' + x.status + '</span></td></tr>').join('') || '<tr><td colspan="4">No pending sessions found.</td></tr>'
+        } catch (e) {
+            toast(e.message)
+        }
+    }
+
+    async function loadReviewQueue() {
+        const a = $('reviewAccount').value.trim();
+        if (!a) return toast('Enter an account ID.');
+        try {
+            const r = await api('/api/v1/kyc/customers/' + encodeURIComponent(a) + '/sessions/pending');
+            $('sessionList').innerHTML = r.map(x => '<div class="session" onclick="event.stopPropagation();selectSession(' + JSON.stringify(x).replace(/"/g, '&quot;') + ')"><b>Verification</b><small>' + x.documentType + ' · ' + x.status + '</small></div>').join('') || '<p class="sub">No pending sessions.</p>';
+            const requested = new URLSearchParams(window.location.search).get('sessionId');
+            const target = r.find(x => x.sessionId === requested) || r[0];
+            if (target) selectSession(target)
+        } catch (e) {
+            toast(e.message)
+        }
+    }
+
+    async function selectSession(x) {
+        selected = x;
+        sessionId = x.sessionId;
+        document.getElementById('docViewer').src = '/api/v1/kyc/sessions/' + sessionId + '/documents/' + x.documentType + '?inline=true';
+        try {
+            const r = await api('/api/v1/kyc/sessions/' + sessionId + '/frames');
+            $('frameButtons').innerHTML = r.map(f => '<button class="btn ghost" onclick="event.stopPropagation();showFrame(' + f.frameNumber + ')">Frame ' + f.frameNumber + '</button>').join('');
+            if (r[0]) showFrame(r[0].frameNumber)
+        } catch (e) {
+            toast('Could not load frames.')
+        }
+    }
+
+    function showFrame(n) {
+        $('framePreview').innerHTML = '<img src="/api/v1/kyc/sessions/' + sessionId + '/frames/' + n + '" alt="Customer face frame ' + n + '">'
+    }
+
+    function downloadDocument() {
+        if (sessionId) window.open('/api/v1/kyc/sessions/' + sessionId + '/documents/' + (selected?.documentType || $('docType').value), '_blank')
+    }
+
+    async function decide(a) {
+        if (!sessionId) return toast('Select a session.');
+        const m = $('remark').value.trim();
+        if (!m) return toast('Add a remark before saving.');
+        try {
+            await api('/api/v1/kyc/sessions/' + sessionId + '/' + a, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({reviewerId: $('reviewer').value, reason: 'manual-review', remarks: m})
+            });
+            toast('Decision saved. Banker status updated.');
+            if (a === 'approve') {
+                const returnTo = moneybagsReturnUrl();
+                if (returnTo) return window.setTimeout(() => window.location.assign(returnTo), 650)
+            }
+            loadReviewQueue()
+        } catch (e) {
+            toast(e.message)
+        }
+    }
+
+    function moneybagsReturnUrl() {
+        const raw = new URLSearchParams(window.location.search).get('returnTo');
+        if (!raw) return null;
+        try {
+            const target = new URL(raw);
+            return target.origin === 'http://localhost:8000' && target.pathname === '/'
+                ? target.toString() : null
+        } catch (ignore) {
+            return null
+        }
+    }
+
+    (function initializeReview() {
+        const cif = new URLSearchParams(window.location.search).get('cif');
+        if (!cif) return;
+        $('reviewAccount').value = cif;
+        showView('review');
+        loadReviewQueue()
+    }());
+</script>
+<script>function downloadDocument() {
+    if (sessionId) {
+        const a = document.createElement("a");
+        a.href = "/api/v1/kyc/sessions/" + sessionId + "/documents/" + (selected?.documentType || "AADHAAR");
+        a.download = "identity-proof";
+        a.click()
+    }
+}
+
+async function showFrame(n) {
+    const r = await fetch("/api/v1/kyc/sessions/" + sessionId + "/frames/" + n), b = await r.blob(),
+        u = URL.createObjectURL(b), i = new Image();
+    i.onload = () => {
+        const c = document.getElementById("frameCanvas"), x = c.getContext("2d");
+        c.width = 640;
+        c.height = 400;
+        x.drawImage(i, 0, 0, 640, 400);
+        URL.revokeObjectURL(u)
+    };
+    i.src = u
+}</script>
+</body>
+</html>

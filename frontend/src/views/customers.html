@@ -61,6 +61,10 @@
             <span data-bind="css: statusClass, text: status"></span>
           </div>
         </div>
+        <!-- ko if: kycStatus === 'PENDING' -->
+        <oj-button chroming="callToAction"
+                   on-oj-action="[[function () { $parent.openKyc($data.cifNo); }]]">Approve KYC</oj-button>
+        <!-- /ko -->
         <oj-button chroming="outlined"
                    on-oj-action="[[function () { $parent.openCustomer($data.cifNo); }]]">Open</oj-button>
       </li>

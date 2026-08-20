@@ -139,6 +139,14 @@ define([
       navigation.openCustomer(cifNo);
     };
 
+    self.openKyc = function (cifNo) {
+      var returnTo = 'http://localhost:8000/?ojr=customers&kycApproved=' + encodeURIComponent(cifNo);
+      window.location.assign(
+        'http://localhost:8090/kyc-ui/?cif=' + encodeURIComponent(cifNo) +
+        '&returnTo=' + encodeURIComponent(returnTo)
+      );
+    };
+
     function resetOnboarding() {
       self.formFirstName(''); self.formLastName(''); self.formDob(''); self.formGender('');
       self.formMobile(''); self.formEmail(''); self.formPassword(''); self.formPan('');
@@ -175,7 +183,7 @@ define([
       if (password.length < 8) { throw new Error('Temporary password must contain at least 8 characters.'); }
       return {
         registration: { firstName: firstName, lastName: lastName, email: email, password: password, dob: dob, gender: gender, mobile: mobile },
-        customer: { firstName: firstName, lastName: lastName, dob: dob, gender: gender, mobile: mobile, email: email, panNo: pan, status: 'ACTIVE', kycStatus: 'PENDING' },
+        customer: { firstName: firstName, lastName: lastName, dob: dob, gender: gender, mobile: mobile, email: email, panNo: pan, status: 'INACTIVE', kycStatus: 'PENDING' },
         address: { addressType: 'RESIDENTIAL', line1: value(self.formAddress, 'Address'), city: value(self.formCity, 'City'), state: value(self.formState, 'State'), pincode: value(self.formPincode, 'Pincode'), country: 'India', isCurrent: true }
       };
     }

@@ -15,6 +15,7 @@ public interface KycService {
 
     KycSessionResponse getSession(String sessionId);
     List<KycSessionResponse> findPendingSessions(String cifNo);
+    List<KycSessionResponse> findSessions(String cifNo);
 
     KycDocumentResponse uploadDocument(
             String sessionId,
