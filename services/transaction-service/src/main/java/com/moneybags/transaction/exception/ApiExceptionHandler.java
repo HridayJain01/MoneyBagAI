@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import java.time.Instant;
 import java.util.*;
@@ -18,6 +19,7 @@ public class ApiExceptionHandler {
         return build(HttpStatus.BAD_REQUEST,"REQUEST_VALIDATION_FAILED","Request validation failed",request,fields);
     }
     @ExceptionHandler(NoResourceFoundException.class) ResponseEntity<ErrorResponse> notFound(NoResourceFoundException ex,HttpServletRequest request){return build(HttpStatus.NOT_FOUND,"RESOURCE_NOT_FOUND","The requested resource was not found",request,Map.of());}
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class) ResponseEntity<ErrorResponse> methodNotAllowed(HttpRequestMethodNotSupportedException ex,HttpServletRequest request){return build(HttpStatus.METHOD_NOT_ALLOWED,"METHOD_NOT_ALLOWED",ex.getMessage(),request,Map.of());}
     @ExceptionHandler(Exception.class) ResponseEntity<ErrorResponse> unexpected(Exception ex,HttpServletRequest request){log.error("unhandled_transaction_service_error path={}",request.getRequestURI(),ex);return build(HttpStatus.INTERNAL_SERVER_ERROR,"INTERNAL_ERROR","An unexpected error occurred",request,Map.of());}
     private ResponseEntity<ErrorResponse> build(HttpStatus status,String code,String message,HttpServletRequest request,Map<String,String> fields){
         String cid=Optional.ofNullable(request.getHeader("X-Correlation-Id")).filter(s->!s.isBlank()).orElse("unavailable");
