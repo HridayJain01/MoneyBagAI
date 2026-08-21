@@ -1,35 +1,52 @@
-<div class="mb-stack">
-  <header class="mb-page-header">
-    <div><h1 class="mb-page-header__title">Account applications</h1><p class="mb-page-header__lede">Review account-opening requests and keep maker and checker responsibilities separate.</p></div>
-    <!-- ko if: canOpen --><button type="button" class="mb-action-button mb-action-button--primary" data-bind="click: startApplication">New application</button><!-- /ko -->
-  </header>
+<div class="mb-workspace-page">
+  <div class="mb-page-actions">
+    <p>Branch application worklist</p>
+    <!-- ko if: canOpen --><button type="button" class="mb-action-button mb-action-button--primary mb-action-button--large" data-bind="click: startApplication"><span aria-hidden="true">＋</span> New Application</button><!-- /ko -->
+  </div>
 
   <!-- ko if: hasBanner -->
   <div data-bind="css: bannerClass" role="status"><div><strong data-bind="text: banner().title"></strong><span data-bind="text: banner().detail"></span></div><button type="button" class="mb-banner__close" data-bind="click: dismissBanner" aria-label="Dismiss">×</button></div>
   <!-- /ko -->
 
-  <section class="mb-card mb-card--flush">
-    <div class="mb-card__bar">
-      <h2 class="mb-card__title">Application queue</h2>
-      <div class="mb-inline" style="flex-wrap:nowrap">
-        <input class="mb-field" aria-label="Customer CIF" placeholder="Customer CIF" data-bind="textInput: cifNo" />
-        <select class="mb-field" aria-label="Status" data-bind="value: status, options: statusList, optionsText: function (v) { return v === '' ? 'All statuses' : v.split('_').join(' '); }"></select>
-        <oj-button chroming="outlined" on-oj-action="[[applyFilters]]">Apply</oj-button>
+  <section class="mb-kpi-grid" aria-label="Application summary">
+    <article class="mb-card mb-kpi-card">
+      <span class="mb-kpi-card__icon" aria-hidden="true">▣</span>
+      <div><p>Pending Review</p><strong data-bind="text: pendingReview() === null ? '…' : pendingReview"></strong><small>Awaiting checker decision</small></div>
+    </article>
+    <article class="mb-card mb-kpi-card">
+      <span class="mb-kpi-card__icon" aria-hidden="true">✓</span>
+      <div><p>Approved Today</p><strong data-bind="text: approvedToday() === null ? '…' : approvedToday"></strong><small class="mb-positive">Completed since midnight</small></div>
+    </article>
+    <article class="mb-card mb-kpi-card">
+      <span class="mb-kpi-card__icon mb-kpi-card__icon--warning" aria-hidden="true">!</span>
+      <div><p>SLA Attention</p><strong data-bind="text: slaAttention() === null ? '…' : slaAttention"></strong><small>Waiting longer than 24 hours</small></div>
+    </article>
+  </section>
+
+  <section class="mb-card mb-card--flush mb-data-card">
+    <div class="mb-worklist-toolbar">
+      <div class="mb-segmented" role="group" aria-label="Application status filters" data-bind="foreach: applicationFilters">
+        <button type="button" data-bind="text: label, click: $parent.selectFilter, css: { 'is-selected': $parent.activeFilter() === key }"></button>
+      </div>
+      <div class="mb-worklist-search">
+        <input class="mb-field" aria-label="Filter by customer CIF" placeholder="Search customer CIF…" data-bind="textInput: cifNo" />
+        <button type="button" class="mb-action-button mb-action-button--outlined" data-bind="click: applyFilters">Search</button>
       </div>
     </div>
-    <div class="mb-table-host">
-      <oj-table aria-label="Account applications" data="[[provider]]" columns="[[columns]]" scroll-policy="loadMoreOnScroll" scroll-policy-options.fetch-size="25" selection-mode.row="none" selection-mode.column="none">
-        <template slot="referenceTemplate" data-oj-as="cell"><div><div class="mb-mono" style="font-size:12px" data-bind="text: cell.row.applicationReference"></div><div class="mb-muted" style="font-size:11px" data-bind="text: cell.row.accountName || 'Default account name'"></div></div></template>
+
+    <div class="mb-table-host mb-table-host--premium">
+      <oj-table aria-label="Application worklist" data="[[provider]]" columns="[[columns]]" scroll-policy="loadMoreOnScroll" scroll-policy-options.fetch-size="25" selection-mode.row="none" selection-mode.column="none">
+        <template slot="referenceTemplate" data-oj-as="cell"><div><div class="mb-mono mb-table-ref" data-bind="text: cell.row.applicationReference"></div><div class="mb-muted mb-table-sub" data-bind="text: cell.row.accountName || 'Default account name'"></div></div></template>
         <template slot="statusTemplate" data-oj-as="cell"><span data-bind="css: $data.statusClass(cell.row), text: cell.row.status.split('_').join(' ')"></span></template>
-        <template slot="createdTemplate" data-oj-as="cell"><span class="mb-muted" style="font-size:12px" data-bind="text: $data.fmtCreated(cell.row)"></span></template>
+        <template slot="createdTemplate" data-oj-as="cell"><span class="mb-muted mb-table-time" data-bind="text: $data.fmtCreated(cell.row)"></span></template>
         <template slot="actionsTemplate" data-oj-as="cell">
           <!-- ko if: $data.hasActions(cell.row) -->
-          <div class="mb-inline" style="justify-content:flex-end;flex-wrap:nowrap">
+          <div class="mb-inline mb-row-actions">
             <!-- ko if: $data.canDecide(cell.row) --><oj-button chroming="callToAction" on-oj-action="[[function () { $data.approveRow(cell.row); }]]">Approve</oj-button><oj-button chroming="outlined" on-oj-action="[[function () { $data.rejectRow(cell.row); }]]">Reject</oj-button><!-- /ko -->
             <!-- ko if: $data.canCancel(cell.row) --><oj-button chroming="outlined" on-oj-action="[[function () { $data.cancelRow(cell.row); }]]">Cancel</oj-button><!-- /ko -->
           </div>
           <!-- /ko -->
-          <!-- ko if: !$data.hasActions(cell.row) --><span class="mb-muted" style="font-size:12px" data-bind="text: $data.isOwn(cell.row) && cell.row.status === 'PENDING_APPROVAL' ? 'Made by you' : '—'"></span><!-- /ko -->
+          <!-- ko if: !$data.hasActions(cell.row) --><span class="mb-muted mb-table-time" data-bind="text: $data.isOwn(cell.row) && cell.row.status === 'PENDING_APPROVAL' ? 'Made by you' : 'View'"></span><!-- /ko -->
         </template>
       </oj-table>
     </div>

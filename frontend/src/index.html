@@ -35,25 +35,26 @@
 
       <!-- Signed in -->
       <!-- ko if: authenticated() -->
-      <div class="mb-shell">
+      <div class="mb-shell" data-bind="css: { 'is-nav-expanded': sidebarExpanded }">
 
-        <nav class="mb-nav" aria-label="Main">
+        <nav class="mb-nav" aria-label="Main"
+             data-bind="event: { mouseenter: expandSidebar, mouseleave: collapseSidebar, focusin: expandSidebar, focusout: collapseSidebar }">
           <div class="mb-nav__brand">
-            <span class="mb-nav__mark" aria-hidden="true"></span>
-            <span>Moneybags</span>
+            <span class="mb-nav__mark" aria-hidden="true">M</span>
+            <span class="mb-nav__brand-name">Moneybags</span>
           </div>
 
           <!-- ko foreach: navSections -->
-          <div>
+          <div class="mb-nav__group">
             <div class="mb-nav__section" data-bind="text: title"></div>
             <!-- ko foreach: items -->
             <button type="button"
                     class="mb-nav__item"
                     data-bind="css: { 'is-active': $root.activePath() === path },
-                               attr: { 'aria-current': $root.activePath() === path ? 'page' : null },
+                               attr: { 'aria-current': $root.activePath() === path ? 'page' : null, title: label },
                                click: function () { $root.navigate(path); }">
-              <span aria-hidden="true" data-bind="text: glyph"></span>
-              <span data-bind="text: label"></span>
+              <span class="mb-nav__icon" aria-hidden="true" data-bind="text: glyph"></span>
+              <span class="mb-nav__label" data-bind="text: label"></span>
             </button>
             <!-- /ko -->
           </div>
@@ -62,14 +63,13 @@
 
         <div class="mb-shell__main">
           <header class="mb-topbar">
-            <span class="mb-label" data-bind="text: pageLabel"></span>
-            <div class="mb-topbar__user">
-              <div class="mb-topbar__identity">
-                <span class="mb-topbar__name" data-bind="text: userName"></span>
-                <span class="mb-topbar__meta" data-bind="text: userMeta"></span>
-              </div>
+            <div class="mb-topbar__copy">
+              <h1 class="mb-topbar__title" data-bind="text: pageLabel"></h1>
+              <p class="mb-topbar__subtitle" data-bind="text: pageSubtitle"></p>
+            </div>
+            <div class="mb-topbar__tools">
               <details class="mb-profile-menu">
-                <summary class="mb-glyph" aria-label="Open profile menu" data-bind="text: userInitials"></summary>
+                <summary class="mb-avatar" aria-label="Open profile menu" data-bind="text: userInitials"></summary>
                 <div class="mb-profile-menu__dropdown">
                   <div class="mb-profile-menu__identity">
                     <strong data-bind="text: userName"></strong>
