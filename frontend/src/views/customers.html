@@ -37,7 +37,7 @@
       <div class="mb-inline"><button type="button" class="mb-filter-chip" data-bind="click: showAllCustomers, css: { 'is-selected': quickFilter() === 'all' }">All</button><button type="button" class="mb-filter-chip" data-bind="click: showKycDue, css: { 'is-selected': quickFilter() === 'kyc' }">Verify KYC</button></div>
     </div>
 
-    <!-- ko if: loading --><div class="mb-empty"><p class="mb-empty__body">Loading customer profiles…</p></div><!-- /ko -->
+    <!-- ko if: loading --><div class="mb-empty mb-loading-state"><span class="mb-dot-loader" role="status" aria-label="Loading customer profiles"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span><p class="mb-empty__body">Loading customer profiles…</p></div><!-- /ko -->
     <!-- ko if: hasError --><div class="mb-empty"><p class="mb-empty__title" style="color:var(--mb-danger)">Could not load customers</p><p class="mb-empty__body" data-bind="text: error"></p></div><!-- /ko -->
     <!-- ko if: filteredEmpty --><div class="mb-empty"><p class="mb-empty__title">No customers found</p><p class="mb-empty__body" data-bind="text: emptyMessage"></p></div><!-- /ko -->
 

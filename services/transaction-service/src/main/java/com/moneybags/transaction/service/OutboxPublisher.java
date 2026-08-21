@@ -38,9 +38,13 @@ public class OutboxPublisher {
     }
 
     private void backfillReadyTransactions(){
-        var readyStatuses=List.of(TransactionStatus.PROJECTION_PENDING,TransactionStatus.SETTLED,TransactionStatus.COMPLETED);
-        for(Transaction tx:transactions.findByStatusIn(readyStatuses,PageRequest.of(0,50)).getContent()){
+        // COMPLETED transactions do not need recovery. Including them in a fixed first
+        // page starves newer PROJECTION_PENDING transactions once the table grows.
+        var readyStatuses=List.of(TransactionStatus.PROJECTION_PENDING,TransactionStatus.SETTLED);
+        for(Transaction tx:transactions.findProjectionBackfillCandidates(
+                readyStatuses,PageRequest.of(0,properties.getOutbox().getBatchSize()))){
             List<OutboxEvent> aggregate=events.findByAggregateId(tx.getId());
+            requeueRecoverableFailures(aggregate);
             if(aggregate.isEmpty()||aggregate.stream().anyMatch(e->e.getStatus()!=OutboxStatus.PUBLISHED))continue;
             boolean awaitingSettlement=tx.getType().externallyCleared()&&clearing.findByTransactionId(tx.getId()).map(c->c.getStatus()!=ClearingStatus.SETTLED).orElse(false);
             boolean hasLedger=aggregate.stream().anyMatch(e->OutboxService.LEDGER_POST.equals(e.getEventType()));
@@ -128,8 +132,23 @@ public class OutboxPublisher {
     private void recordFailure(OutboxEvent event,Exception exception){
         int attempts=event.getAttempts()+1;event.setAttempts(attempts);
         String message=exception.getMessage()==null?exception.getClass().getSimpleName():exception.getMessage();event.setLastError(message.substring(0,Math.min(500,message.length())));
-        if(attempts>=properties.getOutbox().getMaxAttempts())event.setStatus(OutboxStatus.FAILED);
+        if(attempts>=properties.getOutbox().getMaxAttempts()){
+            event.setStatus(OutboxStatus.FAILED);
+            event.setNextAttemptAt(Instant.now().plusMillis(properties.getOutbox().getFailedRetryDelayMs()));
+        }
         else{event.setStatus(OutboxStatus.PENDING);event.setNextAttemptAt(Instant.now().plusSeconds(Math.min(300,1L<<Math.min(8,attempts))));}
+    }
+
+    private void requeueRecoverableFailures(List<OutboxEvent> aggregate){
+        Instant now=Instant.now();
+        aggregate.stream()
+                .filter(e->e.getStatus()==OutboxStatus.FAILED)
+                .filter(e->e.getNextAttemptAt()==null||!e.getNextAttemptAt().isAfter(now))
+                .forEach(e->{
+                    e.setStatus(OutboxStatus.PENDING);
+                    e.setAttempts(0);
+                    e.setNextAttemptAt(now);
+                });
     }
 
     private boolean ownershipRequired(Transaction tx){

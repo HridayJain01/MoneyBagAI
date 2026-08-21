@@ -5,31 +5,35 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3ed1cd6b-f7be-4008-9942-5ef42f39a0a8" name="Changes" comment="UI integration has been completed">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_12-08-2026_11_27_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_12-08-2026_11_27__Changes_.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/oraclejetconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/oraclejetconfig.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/appController.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/appController.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/services/navigation.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/navigation.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/styles/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/styles/app.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/styles/layout.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/styles/layout.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/accountDetail.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/accountDetail.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/accounts.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/accounts.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/applications.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/applications.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/branches.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/branches.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/customerDetail.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/customerDetail.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/customers.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/customers.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/viewModels/overview.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/viewModels/overview.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/accountDetail.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/accountDetail.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/views/accounts.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/accounts.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/audit.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/audit.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/views/branches.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/branches.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/customerDetail.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/customerDetail.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/views/customers.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/customers.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/ledger.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/ledger.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/notifications.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/notifications.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/openAccount.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/openAccount.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/views/overview.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/overview.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/views/products.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/products.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/views/tellerOps.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/tellerOps.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/transactionDetail.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/transactionDetail.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/views/transfers.html" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/transfers.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/product-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/services/product-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/account-service/src/main/java/com/moneybags/account/repository/AccountProductOwnershipRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/account-service/src/main/java/com/moneybags/account/repository/AccountProductOwnershipRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/account-service/src/main/java/com/moneybags/account/service/AccountProductOwnershipService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/account-service/src/main/java/com/moneybags/account/service/AccountProductOwnershipService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/transaction-service/src/main/java/com/moneybags/transaction/config/TransactionProperties.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/transaction-service/src/main/java/com/moneybags/transaction/config/TransactionProperties.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/transaction-service/src/main/java/com/moneybags/transaction/repository/OutboxEventRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/transaction-service/src/main/java/com/moneybags/transaction/repository/OutboxEventRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/transaction-service/src/main/java/com/moneybags/transaction/repository/TransactionRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/transaction-service/src/main/java/com/moneybags/transaction/repository/TransactionRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/transaction-service/src/main/java/com/moneybags/transaction/service/OutboxPublisher.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/transaction-service/src/main/java/com/moneybags/transaction/service/OutboxPublisher.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/transaction-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/services/transaction-service/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/transaction-service/src/test/java/com/moneybags/transaction/TransactionServiceIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/transaction-service/src/test/java/com/moneybags/transaction/TransactionServiceIntegrationTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,12 +57,12 @@
     &quot;assignee&quot;: &quot;HridayJain01&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/HridayJain01/MoneyBagAI.git",
-    "accountId": "6506da90-e302-4f75-b908-b43d2bb293bc"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/HridayJain01/MoneyBagAI.git&quot;,
+    &quot;accountId&quot;: &quot;6506da90-e302-4f75-b908-b43d2bb293bc&quot;
   }
-}]]></component>
+}</component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -164,7 +168,7 @@
     "Spring Boot.StatementReportingApplication.executor": "Run",
     "Spring Boot.TransactionServiceApplication.executor": "Run",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "jeffry",
+    "git-widget-placeholder": "master",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/Jeffry Patrick/Downloads/MoneyBagAI",
     "node.js.detected.package.eslint": "true",
@@ -219,6 +223,17 @@
     </option>
   </component>
   <component name="RunManager" selected="Spring Boot.StatementReportingApplication">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="money-bag-mumbai-master" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="money-bag-mumbai-master" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
     <configuration name="AccountServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="account-service" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.moneybags.account.AccountServiceApplication" />

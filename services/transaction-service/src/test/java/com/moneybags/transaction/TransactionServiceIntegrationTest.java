@@ -119,6 +119,22 @@ class TransactionServiceIntegrationTest {
         Transaction tx=orchestrator.create(TransactionType.WITHDRAWAL,PaymentRail.CASH,withdrawal(),"wd-publish",maker);properties.getOutbox().setEnabled(true);publisher.publish();
         assertThat(transactions.findById(tx.getId()).orElseThrow().getStatus()).isEqualTo(TransactionStatus.COMPLETED);assertThat(holds.findByTransactionId(tx.getId()).orElseThrow().getStatus().name()).isEqualTo("CONSUMED");verify(accountClient).project(anyString(),any());verify(accountClient).consume(eq("A1"),anyString(),anyString());verify(ledgerClient).post(eq("transaction-service"),any());verify(statementClient).push(eq("transaction-service"),any());
     }
+    @Test void exhaustedAccountProjectionIsRetriedAndCompletedAfterDependencyRecovers(){
+        Transaction tx=orchestrator.create(TransactionType.DEPOSIT,PaymentRail.CASH,deposit(),"dep-backfill",maker);
+        var projection=outbox.findByAggregateId(tx.getId()).get(0);
+        projection.setStatus(FinancialEnums.OutboxStatus.FAILED);
+        projection.setAttempts(properties.getOutbox().getMaxAttempts());
+        projection.setNextAttemptAt(Instant.now().minusSeconds(1));
+        projection.setLastError("ACCOUNT owning service is temporarily unavailable");
+        outbox.saveAndFlush(projection);
+
+        properties.getOutbox().setEnabled(true);publisher.publish();
+
+        assertThat(transactions.findById(tx.getId()).orElseThrow().getStatus()).isEqualTo(TransactionStatus.COMPLETED);
+        assertThat(outbox.findByAggregateId(tx.getId())).anyMatch(e->OutboxService.LEDGER_POST.equals(e.getEventType()));
+        verify(ledgerClient).post(eq("transaction-service"),argThat(j->j.transactionId().equals(tx.getId())));
+        verify(statementClient).push(eq("transaction-service"),argThat(e->e.transactionId().equals(tx.getId())));
+    }
     @Test void duplicateSettlementCallbackCreatesOneSettlementEffect(){
         Transaction tx=orchestrator.create(TransactionType.NEFT,PaymentRail.NEFT,external(new BigDecimal("500")),"neft-settle",maker);properties.getOutbox().setEnabled(true);publisher.publish();
         CallbackRequest cb=new CallbackRequest("rail-event-1","NEFT-EXT-1",LocalDate.now(),"SETTLED",null);callbacks.settle(tx.getId(),cb);publisher.publish();callbacks.settle(tx.getId(),cb);

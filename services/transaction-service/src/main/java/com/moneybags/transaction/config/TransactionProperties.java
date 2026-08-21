@@ -30,5 +30,6 @@ public class TransactionProperties {
         private boolean enabled = true;
         private int batchSize = 50;
         private int maxAttempts = 10;
+        private long failedRetryDelayMs = 300000;
     }
 }

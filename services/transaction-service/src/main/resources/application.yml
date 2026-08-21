@@ -45,6 +45,7 @@ moneybags:
       batch-size: ${TRANSACTION_OUTBOX_BATCH_SIZE:50}
       fixed-delay-ms: ${TRANSACTION_OUTBOX_DELAY_MS:5000}
       max-attempts: ${TRANSACTION_OUTBOX_MAX_ATTEMPTS:10}
+      failed-retry-delay-ms: ${TRANSACTION_OUTBOX_FAILED_RETRY_DELAY_MS:300000}
     ledger:
       cash-asset: ${GL_CASH_ASSET:110100}
       account-deposit-control: ${GL_ACCOUNT_DEPOSIT_CONTROL:210000}

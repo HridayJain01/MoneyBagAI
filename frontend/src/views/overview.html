@@ -10,50 +10,24 @@
     <section class="mb-cash-hero" aria-labelledby="cashPositionTitle">
       <div class="mb-cash-hero__top">
         <div>
-          <p class="mb-cash-hero__eyebrow">Completed cash deposits today</p>
-          <h2 id="cashPositionTitle">Teller Cash Position</h2>
+          <p class="mb-cash-hero__eyebrow" data-bind="text: heroEyebrow"></p>
+          <h2 id="cashPositionTitle" data-bind="text: heroTitle"></h2>
         </div>
       </div>
-      <p class="mb-cash-hero__amount" data-bind="text: cashPositionDisplay"></p>
-      <p class="mb-cash-hero__trend-detail">Sum of completed CASH deposits created by the signed-in teller.</p>
-      <div class="mb-cash-hero__meta">
-        <span><strong data-bind="text: branchDetail"></strong><small>Home branch</small></span>
-        <span><strong data-bind="text: lastUpdated"></strong><small>Latest recorded deposit</small></span>
-      </div>
+      <p class="mb-cash-hero__amount" data-bind="text: heroValueDisplay"></p>
+      <p class="mb-cash-hero__trend-detail" data-bind="text: heroDetail"></p>
+      <div class="mb-cash-hero__meta" data-bind="foreach: heroMeta"><span><strong data-bind="text: value"></strong><small data-bind="text: label"></small></span></div>
     </section>
 
     <aside class="mb-card mb-quick-actions" aria-labelledby="quickActionsTitle">
       <div class="mb-card__header">
-        <div><h2 id="quickActionsTitle" class="mb-card__title">Quick Actions</h2><p class="mb-card__subtitle">Start frequent teller tasks</p></div>
+        <div><h2 id="quickActionsTitle" class="mb-card__title">Quick Actions</h2><p class="mb-card__subtitle">Start your most frequent tasks</p></div>
       </div>
-      <div class="mb-quick-actions__list">
-        <button type="button" class="mb-quick-action" data-bind="click: newSelfTransfer">
-          <span class="mb-quick-action__icon" aria-hidden="true">↥</span><span><strong>New Self Transfer</strong><small>Cash deposit or withdrawal</small></span><span aria-hidden="true">›</span>
-        </button>
-        <button type="button" class="mb-quick-action" data-bind="click: newInternalTransfer">
-          <span class="mb-quick-action__icon" aria-hidden="true">⇄</span><span><strong>New Internal Transfer</strong><small>Between Moneybags accounts</small></span><span aria-hidden="true">›</span>
-        </button>
-        <button type="button" class="mb-quick-action" data-bind="click: findCustomer">
-          <span class="mb-quick-action__icon" aria-hidden="true">⌕</span><span><strong>Find Customer</strong><small>Search CIF, PAN or mobile</small></span><span aria-hidden="true">›</span>
-        </button>
-      </div>
+      <div class="mb-quick-actions__list" data-bind="foreach: quickActions"><button type="button" class="mb-quick-action" data-bind="click: action"><span class="mb-quick-action__icon" aria-hidden="true" data-bind="text: glyph"></span><span><strong data-bind="text: title"></strong><small data-bind="text: detail"></small></span><span aria-hidden="true">›</span></button></div>
     </aside>
   </div>
 
-  <section class="mb-kpi-grid" aria-label="Daily performance">
-    <article class="mb-card mb-kpi-card">
-      <span class="mb-kpi-card__icon" aria-hidden="true">⇄</span>
-      <div><p>Transactions Today</p><strong data-bind="text: loading() ? '…' : transactionsTodayDisplay"></strong><small><span class="mb-positive">+8.4%</span> from yesterday</small></div>
-    </article>
-    <article class="mb-card mb-kpi-card">
-      <span class="mb-kpi-card__icon" aria-hidden="true">◷</span>
-      <div><p>Pending Review</p><strong data-bind="text: loading() ? '…' : pendingReviewDisplay"></strong><small data-bind="text: pendingReviewHint"></small></div>
-    </article>
-    <article class="mb-card mb-kpi-card">
-      <span class="mb-kpi-card__icon" aria-hidden="true">±</span>
-      <div><p>Cash Variance</p><strong data-bind="text: cashVariance"></strong><small class="mb-positive" data-bind="text: cashVarianceTone"></small></div>
-    </article>
-  </section>
+  <section class="mb-kpi-grid" aria-label="Role performance" data-bind="foreach: kpis"><article class="mb-card mb-kpi-card"><span class="mb-kpi-card__icon" aria-hidden="true" data-bind="text: glyph"></span><div><p data-bind="text: label"></p><strong data-bind="text: value"></strong><small data-bind="text: hint, css: tone"></small></div></article></section>
 
   <section class="mb-card mb-card--flush mb-data-card">
     <div class="mb-card__bar">
@@ -61,7 +35,7 @@
       <!-- ko if: showGlobalTransactions --><button type="button" class="mb-text-button" data-bind="click: function () { goTo('transactions'); }">View all <span aria-hidden="true">→</span></button><!-- /ko -->
     </div>
     <!-- ko if: loading -->
-    <div class="mb-empty"><p class="mb-empty__body">Loading recent transactions…</p></div>
+    <div class="mb-empty mb-loading-state"><span class="mb-dot-loader" role="status" aria-label="Loading recent transactions"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span><p class="mb-empty__body">Loading recent transactions…</p></div>
     <!-- /ko -->
     <!-- ko if: !loading() && !dashboardRecent().length -->
     <div class="mb-empty"><p class="mb-empty__title">No transactions yet</p><p class="mb-empty__body">New branch activity will appear here.</p></div>

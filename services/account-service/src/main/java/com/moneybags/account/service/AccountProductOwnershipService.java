@@ -41,8 +41,8 @@ public class AccountProductOwnershipService {
     public void recordAccountOpening(Account account, ProductClient.EffectiveProduct product,
                                      BigDecimal openingAmount) {
         if (!INTEGRATED_PRODUCTS.contains(product.productCode())) return;
-        if (ownerships.findByOwnerAccountIdAndAcquisitionType(
-                account.getAccountId(), ProductAcquisitionType.ACCOUNT_OPENING).isPresent()) return;
+        if (ownerships.existsByOwnerAccountIdAndAcquisitionType(
+                account.getAccountId(), ProductAcquisitionType.ACCOUNT_OPENING)) return;
 
         ownerships.save(AccountProductOwnership.builder()
                 .ownershipId(UUID.randomUUID().toString())
@@ -75,9 +75,12 @@ public class AccountProductOwnershipService {
 
     @Transactional
     public void syncPrimaryStatus(Account account) {
-        ownerships.findByOwnerAccountIdAndAcquisitionType(
+        // Historical/seed data may contain more than one opening snapshot for an
+        // account. Synchronize every matching snapshot instead of requiring a unique
+        // result and rolling back the financial projection.
+        ownerships.findAllByOwnerAccountIdAndAcquisitionType(
                         account.getAccountId(), ProductAcquisitionType.ACCOUNT_OPENING)
-                .ifPresent(ownership -> ownership.setStatus(statusFor(account.getStatus())));
+                .forEach(ownership -> ownership.setStatus(statusFor(account.getStatus())));
     }
 
     private OwnedProductView activate(OwnedProductProjectionRequest request) {

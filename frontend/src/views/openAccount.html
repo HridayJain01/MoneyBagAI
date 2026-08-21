@@ -49,6 +49,7 @@
       <!-- ko if: isEligible -->
       <div>
         <label class="mb-label" for="openingProduct">Active product</label>
+        <!-- ko if: loadingProducts --><span class="mb-dot-loader mb-dot-loader--inline" role="status" aria-label="Loading products"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span><!-- /ko -->
         <select id="openingProduct" class="mb-field mb-field--block"
                 data-bind="options: products, optionsText: 'productName', optionsValue: 'productCode', value: productCode, optionsCaption: loadingProducts() ? 'Loading products…' : 'Select a product'"></select>
       </div>

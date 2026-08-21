@@ -951,6 +951,168 @@ input:focus-visible {
   margin-top: var(--mb-space-3);
 }
 
+.mb-loading-state {
+  display: grid;
+  justify-items: center;
+  gap: var(--mb-space-3);
+}
+
+.mb-dot-loader {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  display: inline-block;
+  animation: mb-dot-loader-spin 1.15s linear infinite;
+}
+
+.mb-dot-loader span {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--mb-accent);
+  transform-origin: 4px 4px;
+  animation: mb-dot-loader-fade 1.15s ease-in-out infinite;
+}
+
+.mb-dot-loader span:nth-child(1) { transform: rotate(0deg) translateY(-14px); animation-delay: -1s; }
+.mb-dot-loader span:nth-child(2) { transform: rotate(45deg) translateY(-14px); animation-delay: -.86s; }
+.mb-dot-loader span:nth-child(3) { transform: rotate(90deg) translateY(-14px); animation-delay: -.72s; }
+.mb-dot-loader span:nth-child(4) { transform: rotate(135deg) translateY(-14px); animation-delay: -.58s; }
+.mb-dot-loader span:nth-child(5) { transform: rotate(180deg) translateY(-14px); animation-delay: -.44s; }
+.mb-dot-loader span:nth-child(6) { transform: rotate(225deg) translateY(-14px); animation-delay: -.3s; }
+.mb-dot-loader span:nth-child(7) { transform: rotate(270deg) translateY(-14px); animation-delay: -.16s; }
+.mb-dot-loader span:nth-child(8) { transform: rotate(315deg) translateY(-14px); animation-delay: -.02s; }
+
+.mb-dot-loader--inline {
+  width: 22px;
+  height: 22px;
+  margin-left: var(--mb-space-2);
+  vertical-align: middle;
+}
+
+.mb-dot-loader--inline span {
+  top: 8px;
+  left: 8px;
+  width: 6px;
+  height: 6px;
+  transform-origin: 3px 3px;
+}
+
+.mb-dot-loader--inline span:nth-child(1) { transform: rotate(0deg) translateY(-9px); }
+.mb-dot-loader--inline span:nth-child(2) { transform: rotate(45deg) translateY(-9px); }
+.mb-dot-loader--inline span:nth-child(3) { transform: rotate(90deg) translateY(-9px); }
+.mb-dot-loader--inline span:nth-child(4) { transform: rotate(135deg) translateY(-9px); }
+.mb-dot-loader--inline span:nth-child(5) { transform: rotate(180deg) translateY(-9px); }
+.mb-dot-loader--inline span:nth-child(6) { transform: rotate(225deg) translateY(-9px); }
+.mb-dot-loader--inline span:nth-child(7) { transform: rotate(270deg) translateY(-9px); }
+.mb-dot-loader--inline span:nth-child(8) { transform: rotate(315deg) translateY(-9px); }
+
+@keyframes mb-dot-loader-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes mb-dot-loader-fade {
+  0%, 100% { opacity: .25; }
+  45% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mb-dot-loader,
+  .mb-dot-loader span { animation: none; }
+}
+
+/* Teller forms use the available workspace; their contextual help remains
+   accessible without consuming a separate layout column. */
+.mb-teller-operations__card {
+  width: min(100%, 1240px);
+}
+
+.mb-teller-help {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  z-index: 30;
+}
+
+.mb-teller-help > summary {
+  margin-left: 0;
+  box-shadow: 0 8px 20px rgb(58 39 75 / 18%);
+}
+
+.mb-teller-help .mb-help__panel {
+  position: absolute;
+  right: 0;
+  bottom: 48px;
+  width: min(360px, calc(100vw - 48px));
+  margin-top: 0;
+  box-shadow: 0 16px 36px rgb(58 39 75 / 18%);
+}
+
+/* The product catalogue stays in place while details are viewed in a
+   responsive right-side drawer. */
+.mb-product-drawer__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgb(35 22 46 / 18%);
+}
+
+.mb-product-drawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  z-index: 41;
+  width: min(460px, 100vw);
+  display: flex;
+  flex-direction: column;
+  padding: var(--mb-space-6);
+  overflow-y: auto;
+  background: var(--mb-surface);
+  border-left: 1px solid var(--mb-hairline);
+  box-shadow: -18px 0 42px rgb(42 21 54 / 18%);
+  animation: mb-product-drawer-in 180ms ease-out;
+}
+
+.mb-product-drawer .mb-card__header {
+  padding-bottom: var(--mb-space-4);
+  border-bottom: 1px solid var(--mb-hairline);
+}
+
+.mb-product-drawer .mb-grid {
+  gap: var(--mb-space-4);
+}
+
+.mb-product-drawer .mb-grid--3,
+.mb-product-drawer .mb-grid--2 {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.mb-product-drawer .mb-section-gap {
+  margin-top: var(--mb-space-4);
+}
+
+@keyframes mb-product-drawer-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@media (max-width: 620px) {
+  .mb-teller-help {
+    right: 16px;
+    bottom: 16px;
+  }
+
+  .mb-teller-help .mb-help__panel {
+    width: calc(100vw - 32px);
+  }
+
+  .mb-product-drawer {
+    padding: var(--mb-space-4);
+  }
+}
+
 /* Branch holdings --------------------------------------------------------- */
 
 .mb-holdings__hero-copy {
@@ -1074,5 +1236,111 @@ input:focus-visible {
 
   .mb-holdings__product + .mb-holdings__product {
     border-top: 1px solid var(--mb-hairline);
+  }
+}
+/* Subtle interface motion ------------------------------------------------- */
+/* Only page roots are animated, so nested layout stacks do not re-animate. */
+oj-module > .mb-dashboard,
+oj-module > .mb-workspace-page,
+oj-module > .mb-stack {
+  animation: mb-page-enter 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.mb-dashboard__lead,
+.mb-dashboard__kpis,
+.mb-workspace-page > .mb-card,
+oj-module > .mb-stack > .mb-card,
+oj-module > .mb-stack > .mb-grid {
+  animation: mb-content-enter 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.mb-dashboard__kpis,
+.mb-workspace-page > .mb-card:nth-child(n + 2),
+oj-module > .mb-stack > .mb-card:nth-child(n + 2),
+oj-module > .mb-stack > .mb-grid:nth-child(n + 2) {
+  animation-delay: 55ms;
+}
+
+.mb-action-button,
+.mb-text-button,
+.mb-quick-action,
+.mb-product-card__action,
+.mb-table-link {
+  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease,
+    border-color 160ms ease, color 160ms ease;
+}
+
+.mb-action-button:hover:not(:disabled),
+.mb-text-button:hover:not(:disabled),
+.mb-quick-action:hover,
+.mb-product-card__action:hover,
+.mb-table-link:hover {
+  transform: translateY(-1px);
+}
+
+.mb-action-button:active:not(:disabled),
+.mb-text-button:active:not(:disabled),
+.mb-quick-action:active,
+.mb-product-card__action:active {
+  transform: translateY(0) scale(0.985);
+}
+
+.mb-teller-help[open] .mb-help__panel {
+  animation: mb-popover-enter 170ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: bottom right;
+}
+
+@keyframes mb-page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mb-content-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mb-popover-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  oj-module > .mb-dashboard,
+  oj-module > .mb-workspace-page,
+  oj-module > .mb-stack,
+  .mb-dashboard__lead,
+  .mb-dashboard__kpis,
+  .mb-workspace-page > .mb-card,
+  oj-module > .mb-stack > .mb-card,
+  oj-module > .mb-stack > .mb-grid,
+  .mb-teller-help[open] .mb-help__panel {
+    animation: none;
+  }
+
+  .mb-action-button,
+  .mb-text-button,
+  .mb-quick-action,
+  .mb-product-card__action,
+  .mb-table-link {
+    transition: none;
   }
 }

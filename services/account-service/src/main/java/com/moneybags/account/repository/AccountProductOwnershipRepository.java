@@ -13,7 +13,10 @@ public interface AccountProductOwnershipRepository
     List<AccountProductOwnership> findByOwnerAccountIdOrderByAcquiredOnDescCreatedAtDesc(
             String ownerAccountId);
 
-    Optional<AccountProductOwnership> findByOwnerAccountIdAndAcquisitionType(
+    boolean existsByOwnerAccountIdAndAcquisitionType(
+            String ownerAccountId, ProductAcquisitionType acquisitionType);
+
+    List<AccountProductOwnership> findAllByOwnerAccountIdAndAcquisitionType(
             String ownerAccountId, ProductAcquisitionType acquisitionType);
 
     Optional<AccountProductOwnership> findByPurchaseTransactionId(String purchaseTransactionId);

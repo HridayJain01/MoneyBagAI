@@ -71,6 +71,9 @@ define([
     self.cashVarianceTone = ko.observable('Always zero');
     self.lastUpdated = ko.observable('—');
     self.kycPendingCount = ko.observable(null);
+    self.activeBranchCount = ko.observable(null);
+    self.activeEmployeeCount = ko.observable(null);
+    self.activeProductCount = ko.observable(null);
 
     self.transactionsTodayDisplay = ko.pureComputed(function () {
       return self.todayCount() === null ? '—' : self.todayCount();
@@ -109,6 +112,41 @@ define([
     self.applicationDisplay = ko.pureComputed(function () {
       var value = self.applicationCount();
       return value === null ? '—' : value;
+    });
+
+    function countDisplay(value) { return value === null ? '—' : value; }
+    self.heroEyebrow = ko.pureComputed(function () {
+      return isTeller ? 'Completed cash deposits today' : isChecker ? 'Items awaiting your decision' : isManager ? 'Branch operations today' : 'Operations control centre';
+    });
+    self.heroTitle = ko.pureComputed(function () {
+      return isTeller ? 'Teller Cash Position' : isChecker ? 'Your Approval Queue' : isManager ? 'Branch Operations Snapshot' : 'System Control Snapshot';
+    });
+    self.heroValueDisplay = ko.pureComputed(function () {
+      if (isTeller) { return self.cashPositionDisplay(); }
+      if (isChecker) { return countDisplay(self.queueCount()) + ' pending'; }
+      if (isManager) { return countDisplay(self.todayCount()) + ' transactions'; }
+      return countDisplay(self.activeBranchCount()) + ' active branches';
+    });
+    self.heroDetail = ko.pureComputed(function () {
+      return isTeller ? 'Sum of completed CASH deposits created by the signed-in teller.' : isChecker ? 'Review transactions requiring your approval before their service-level deadline.' : isManager ? 'Monitor transaction flow, approvals, and account-opening work for your branch.' : 'Monitor branches, employees, products, and operational controls.';
+    });
+    self.heroMeta = ko.pureComputed(function () {
+      if (isTeller) { return [{ value: self.branchDetail(), label: 'Home branch' }, { value: self.lastUpdated(), label: 'Latest recorded deposit' }]; }
+      if (isChecker) { return [{ value: fmt.money(self.queueValue(), 'INR'), label: 'Value awaiting approval' }, { value: self.pendingReviewDisplay(), label: 'KYC reviews pending' }]; }
+      if (isManager) { return [{ value: self.queueCount(), label: 'Approvals pending' }, { value: self.applicationDisplay(), label: 'Applications pending' }]; }
+      return [{ value: countDisplay(self.activeEmployeeCount()), label: 'Active employees' }, { value: countDisplay(self.activeProductCount()), label: 'Active products' }];
+    });
+    self.kpis = ko.pureComputed(function () {
+      if (isTeller) { return [{ glyph: '⇄', label: 'Transactions Today', value: self.transactionsTodayDisplay(), hint: '+8.4% from yesterday', tone: 'mb-positive' }, { glyph: '◷', label: 'Pending Review', value: self.pendingReviewDisplay(), hint: self.pendingReviewHint(), tone: '' }, { glyph: '±', label: 'Cash Variance', value: self.cashVariance(), hint: self.cashVarianceTone(), tone: 'mb-positive' }]; }
+      if (isChecker) { return [{ glyph: '✓', label: 'Pending Approvals', value: self.queueCount(), hint: self.queueHint(), tone: '' }, { glyph: '₹', label: 'Value Awaiting', value: fmt.money(self.queueValue(), 'INR'), hint: 'Pending approval queue', tone: '' }, { glyph: '◷', label: 'KYC Review', value: self.pendingReviewDisplay(), hint: self.pendingReviewHint(), tone: '' }]; }
+      if (isManager) { return [{ glyph: '⇄', label: 'Branch Transactions', value: self.transactionsTodayDisplay(), hint: 'Processed today', tone: '' }, { glyph: '✓', label: 'Pending Approvals', value: self.queueCount(), hint: self.queueHint(), tone: '' }, { glyph: '□', label: 'Applications Pending', value: self.applicationDisplay(), hint: 'Awaiting a decision', tone: '' }]; }
+      return [{ glyph: '⌂', label: 'Active Branches', value: countDisplay(self.activeBranchCount()), hint: 'Operational locations', tone: '' }, { glyph: '◉', label: 'Active Employees', value: countDisplay(self.activeEmployeeCount()), hint: 'Across the network', tone: '' }, { glyph: '◇', label: 'Active Products', value: countDisplay(self.activeProductCount()), hint: 'Available for opening', tone: '' }];
+    });
+    self.quickActions = ko.pureComputed(function () {
+      if (isTeller) { return [{ glyph: '↥', title: 'New Self Transfer', detail: 'Cash deposit or withdrawal', action: self.newSelfTransfer }, { glyph: '⇄', title: 'New Internal Transfer', detail: 'Between Moneybags accounts', action: self.newInternalTransfer }, { glyph: '⌕', title: 'Find Customer', detail: 'Search CIF, PAN or mobile', action: self.findCustomer }]; }
+      if (isChecker) { return [{ glyph: '✓', title: 'Review Approvals', detail: 'Approve or reject transactions', action: self.goToApprovals }, { glyph: '□', title: 'Review Applications', detail: 'Open account applications', action: function () { self.goTo('applications'); } }, { glyph: '⌕', title: 'Find Customer', detail: 'Search CIF, PAN or mobile', action: self.findCustomer }]; }
+      if (isManager) { return [{ glyph: '⇄', title: 'View Transactions', detail: 'Branch activity and exceptions', action: function () { self.goTo('transactions'); } }, { glyph: '✓', title: 'Review Approvals', detail: 'Items awaiting decision', action: self.goToApprovals }, { glyph: '◉', title: 'Branch Holdings', detail: 'Balances and account mix', action: function () { self.goTo('holdings'); } }]; }
+      return [{ glyph: '⌂', title: 'Branches & Staff', detail: 'Manage branch operations', action: function () { self.goTo('branches'); } }, { glyph: '◇', title: 'Manage Products', detail: 'Review product catalogue', action: function () { self.goTo('products'); } }, { glyph: '◎', title: 'Audit Trail', detail: 'Inspect operational events', action: function () { self.goTo('audit'); } }];
     });
 
     self.recentEmpty = ko.pureComputed(function () {
@@ -278,6 +316,18 @@ define([
         });
     }
 
+    function listRows(value) {
+      return Array.isArray(value) ? value : (value && (value.content || value.items)) || [];
+    }
+
+    function loadAdminSnapshot() {
+      return Promise.all([
+        endpoints.branches.list({}).then(function (rows) { self.activeBranchCount(listRows(rows).filter(function (row) { return row.status === 'ACTIVE'; }).length); }),
+        endpoints.branches.employees({ page: 0, size: 100 }).then(function (rows) { self.activeEmployeeCount(listRows(rows).filter(function (row) { return row.status === 'ACTIVE'; }).length); }),
+        endpoints.products.list({ status: 'ACTIVE' }).then(function (rows) { self.activeProductCount(listRows(rows).length); })
+      ]);
+    }
+
     // Each tile fails independently: one dead endpoint should not blank the page.
     function guard(promise) {
       return promise.catch(function (err) {
@@ -309,9 +359,11 @@ define([
         calls.push(guard(loadToday()));
         calls.push(guard(loadRecent()));
       }
+      if (self.showQueue) { calls.push(guard(loadQueue())); }
       if (isTeller) { calls.push(guard(loadCashPosition())); }
       if (isTeller || isChecker) { calls.push(guard(loadKycPending())); }
       if (self.showApplications) { calls.push(guard(loadApplications())); }
+      if (isAdmin) { calls.push(guard(loadAdminSnapshot())); }
       Promise.all(calls).then(
         function () {
           self.loading(false);

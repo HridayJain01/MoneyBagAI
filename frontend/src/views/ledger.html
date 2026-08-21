@@ -14,7 +14,7 @@
 
   <section class="mb-card mb-card--flush">
     <div class="mb-card__bar"><div><h2 class="mb-card__title">General-ledger accounts</h2><p class="mb-card__subtitle">Balances by account code and normal side.</p></div></div>
-    <!-- ko if: loading --><div class="mb-empty"><p class="mb-empty__body">Loading ledger accounts…</p></div><!-- /ko -->
+    <!-- ko if: loading --><div class="mb-empty mb-loading-state"><span class="mb-dot-loader" role="status" aria-label="Loading ledger accounts"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span><p class="mb-empty__body">Loading ledger accounts…</p></div><!-- /ko -->
     <!-- ko if: !loading() && accounts().length -->
     <div class="mb-scroll-x"><table class="mb-plain-table"><thead><tr><th>Code</th><th>Account</th><th>Type</th><th>Normal side</th><th>Balance</th><th>Status</th></tr></thead><tbody data-bind="foreach: accounts"><tr><td class="mb-mono" data-bind="text: code"></td><td data-bind="text: name"></td><td data-bind="text: typeDisplay"></td><td data-bind="text: sideDisplay"></td><td class="mb-money" data-bind="text: balanceDisplay"></td><td><span data-bind="css: statusClass, text: active ? 'ACTIVE' : 'INACTIVE'"></span></td></tr></tbody></table></div>
     <!-- /ko -->

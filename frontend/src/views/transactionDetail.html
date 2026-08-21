@@ -12,7 +12,7 @@
   <div data-bind="css: bannerClass" role="status"><div><strong data-bind="text: banner().title"></strong><span data-bind="text: banner().detail"></span></div><button type="button" class="mb-banner__close" data-bind="click: dismissBanner" aria-label="Dismiss">×</button></div>
   <!-- /ko -->
 
-  <!-- ko if: loading --><section class="mb-card mb-empty"><p class="mb-empty__title">Loading transaction…</p></section><!-- /ko -->
+  <!-- ko if: loading --><section class="mb-card mb-empty mb-loading-state"><span class="mb-dot-loader" role="status" aria-label="Loading transaction"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span><p class="mb-empty__title">Loading transaction…</p></section><!-- /ko -->
 
   <!-- ko if: transaction -->
   <div class="mb-grid mb-grid--hero">

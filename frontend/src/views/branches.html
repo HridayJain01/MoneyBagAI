@@ -26,7 +26,7 @@
   <!-- ko if: activeTab() === 'branches' -->
   <section class="mb-card mb-card--flush">
     <div class="mb-card__bar"><div><h2 class="mb-card__title">Branch directory</h2><p class="mb-card__subtitle">Open a branch to inspect staff, hours and holidays.</p></div></div>
-    <!-- ko if: loading --><div class="mb-empty"><p class="mb-empty__body">Loading branch network…</p></div><!-- /ko -->
+    <!-- ko if: loading --><div class="mb-empty mb-loading-state"><span class="mb-dot-loader" role="status" aria-label="Loading branch network"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span><p class="mb-empty__body">Loading branch network…</p></div><!-- /ko -->
     <!-- ko if: branches().length --><div class="mb-scroll-x"><table class="mb-plain-table"><thead><tr><th>Branch</th><th>Location</th><th>IFSC</th><th>Staff</th><th>Status</th><th></th></tr></thead><tbody data-bind="foreach: branches"><tr><td><span class="mb-mono" data-bind="text: branchCode"></span><div data-bind="text: name"></div></td><td><span data-bind="text: locationDisplay"></span><div class="mb-muted" data-bind="text: address"></div></td><td class="mb-mono" data-bind="text: ifscCode"></td><td data-bind="text: employeeCount"></td><td><span data-bind="css: statusClass, text: status"></span></td><td><button type="button" class="mb-table-link" data-bind="click: inspect">Inspect</button></td></tr></tbody></table></div><!-- /ko -->
   </section>
   <!-- ko with: selectedBranch -->

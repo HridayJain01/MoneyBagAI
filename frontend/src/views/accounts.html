@@ -21,7 +21,7 @@
     </div>
 
     <!-- ko if: error --><div class="mb-banner mb-banner--error" role="alert"><span data-bind="text: error"></span></div><!-- /ko -->
-    <!-- ko if: loading --><div class="mb-empty"><p class="mb-empty__body">Loading accounts…</p></div><!-- /ko -->
+    <!-- ko if: loading --><div class="mb-empty mb-loading-state"><span class="mb-dot-loader" role="status" aria-label="Loading accounts"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span><p class="mb-empty__body">Loading accounts…</p></div><!-- /ko -->
     <!-- ko if: !loading() && !error() && !rows().length --><div class="mb-empty"><p class="mb-empty__title">No accounts found</p></div><!-- /ko -->
 
     <!-- ko if: !loading() && rows().length --><div class="mb-table-host">
