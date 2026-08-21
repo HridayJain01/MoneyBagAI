@@ -35,6 +35,9 @@ define(['./http'], function (api) {
 
     /* ------------------------------------------ identity administration --- */
     identity: {
+      userSummary: function (userId) {
+        return api.get('/api/v1/users/' + enc(userId));
+      },
       users: function (query) {
         return api.get('/api/v1/users', { query: query });
       },
@@ -374,6 +377,11 @@ define(['./http'], function (api) {
       },
       dailyTransactions: function (date) {
         return api.get('/api/v1/reports/daily-transactions', { query: { date: date } });
+      },
+      branchDailyTransactions: function (branchCode, date) {
+        return api.get('/api/v1/reports/branches/' + enc(branchCode) + '/transactions', {
+          query: { date: date }
+        });
       },
       dormantAccounts: function () {
         return api.get('/api/v1/reports/dormant-accounts');

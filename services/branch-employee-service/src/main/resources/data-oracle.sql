@@ -32,7 +32,8 @@ MERGE INTO employees t USING (
   SELECT 1001 id, 1 user_id, 'EMP-001' code, DATE '1994-08-09' dob, 501 branch_id, 'Teller' designation, 1002 manager_id, DATE '2022-06-15' joining_date FROM dual UNION ALL
   SELECT 1002, 2, 'EMP-002', DATE '1988-11-22', 501, 'Branch Manager', NULL, DATE '2021-03-01' FROM dual UNION ALL
   SELECT 1003, 3, 'EMP-003', DATE '1985-05-14', 502, 'Branch Manager', NULL, DATE '2020-01-15' FROM dual UNION ALL
-  SELECT 1004, 4, 'EMP-004', DATE '1990-02-20', 501, 'Operations Administrator', 1002, DATE '2021-09-01' FROM dual
+  SELECT 1004, 4, 'EMP-004', DATE '1990-02-20', 501, 'Operations Administrator', 1002, DATE '2021-09-01' FROM dual UNION ALL
+  SELECT 1005, 5, 'EMP-005', DATE '1996-04-17', 502, 'Teller', 1003, DATE '2024-07-01' FROM dual
 ) s ON (t.id = s.id)
 WHEN NOT MATCHED THEN INSERT (id, user_id, employee_code, dob, branch_id, designation, reporting_manager_id, joining_date, status)
 VALUES (s.id, s.user_id, s.code, s.dob, s.branch_id, s.designation, s.manager_id, s.joining_date, 'ACTIVE');

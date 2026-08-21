@@ -114,10 +114,6 @@ public class DatabaseStorageService implements FileStorageService{
                         KycSessionStatus.FRAME_CAPTURED, KycSessionStatus.VERIFICATION_IN_PROGRESS));
     }
 
-    @Override public List<KycSessionEntity> findSessions(String cifNo) {
-        return sessionRepository.findByCifNoOrderByCreatedAtDesc(cifNo);
-    }
-
     @Override public KycSessionEntity updateSession(KycSessionEntity session)
     {return sessionRepository.save(session);}
 

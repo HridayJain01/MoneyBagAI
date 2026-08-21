@@ -525,6 +525,12 @@
                         <button class="btn primary" onclick="captureFrames()">Capture 5 frames</button>
                         <button class="btn ghost" onclick="stopCamera()">Stop</button>
                     </div>
+                    <div id="captureWorkflowStatus" class="notice">Save the PDF and capture five frames before submitting.</div>
+                    <div class="actions">
+                        <button id="submitForReviewButton" class="btn green" onclick="submitForReview()" disabled>
+                            Submit for KYC approval
+                        </button>
+                    </div>
                 </div>
                 <div class="card"><h2 style="color:var(--n)">Verification checklist</h2>
                     <div style="line-height:3;color:var(--m)">✓ Verification created<br>◷ Identity proof uploaded<br>◷
@@ -610,7 +616,8 @@
 </div>
 <div id="toast" class="toast"></div>
 <script>
-    let sessionId = null, stream = null, selected = null, draftFrames = [], submitted = false, documentReady = false;
+    let sessionId = null, stream = null, selected = null, draftFrames = [], submitted = false,
+        documentReady = false, framesReady = false, submitting = false;
     const $ = id => document.getElementById(id);
 
     function showView(id) {
@@ -624,6 +631,14 @@
         $('toast').textContent = t;
         $('toast').style.display = 'block';
         setTimeout(() => $('toast').style.display = 'none', 2800)
+    }
+
+    function refreshSubmitState() {
+        const button = $('submitForReviewButton');
+        if (!button) return;
+        button.disabled = submitted || submitting || !documentReady || !framesReady;
+        button.textContent = submitted ? 'Submitted for KYC approval'
+            : submitting ? 'Submitting…' : 'Submit for KYC approval'
     }
 
     async function api(u, o) {
@@ -664,8 +679,7 @@
         try {
             await api('/api/v1/kyc/sessions/' + sessionId + '/documents', {method: 'POST', body: x});
             documentReady = true;
-            const submit = document.getElementById('submitFrames');
-            if (submit) submit.disabled = draftFrames.length !== 5;
+            refreshSubmitState();
             toast('Identity proof saved.')
         } catch (e) {
             toast(e.message)
@@ -703,7 +717,7 @@
             const b = await new Promise(r => c.toBlob(r, 'image/jpeg', .82));
             draftFrames.push(b)
         }
-        toast('Five frames captured. Submitting for review...');
+        toast('Five frames captured. Saving evidence...');
         await submitFrames()
     }
 
@@ -714,10 +728,32 @@
         draftFrames.forEach((b, i) => f.append('frames', b, 'frame-' + (i + 1) + '.jpg'));
         try {
             await api('/api/v1/kyc/sessions/' + sessionId + '/frames', {method: 'POST', body: f});
-            submitted = true;
+            framesReady = true;
             stopCamera();
-            location.href = reviewerUrl()
+            $('captureWorkflowStatus').textContent = 'PDF and five frames saved. Submit them for checker approval.';
+            refreshSubmitState();
+            toast('Five face frames saved. Ready to submit.')
         } catch (e) {
+            toast(e.message)
+        }
+    }
+
+    async function submitForReview() {
+        if (!sessionId) return toast('Create a verification first.');
+        if (!documentReady || !framesReady) return toast('Save the PDF and five frames before submitting.');
+        if (submitted || submitting) return;
+        submitting = true;
+        refreshSubmitState();
+        try {
+            await api('/api/v1/kyc/sessions/' + sessionId + '/submit', {method: 'POST'});
+            submitted = true;
+            $('captureWorkflowStatus').textContent = 'Submitted for KYC approval by a checker.';
+            refreshSubmitState();
+            toast('Submitted for KYC approval.');
+            window.setTimeout(() => window.location.assign(moneybagsReturnUrl()), 650)
+        } catch (e) {
+            submitting = false;
+            refreshSubmitState();
             toast(e.message)
         }
     }
@@ -784,11 +820,18 @@
         }
     }
 
-    function reviewerUrl() {
-        const params = new URLSearchParams(window.location.search);
-        params.set('cif', $('accountId').value.trim());
-        params.set('sessionId', sessionId);
-        return 'reviewer.html?' + params.toString()
+    function moneybagsReturnUrl() {
+        const raw = new URLSearchParams(window.location.search).get('returnTo');
+        const fallback = 'http://localhost:8000/?ojr=customers';
+        if (!raw) return fallback;
+        try {
+            const target = new URL(raw, window.location.origin);
+            const allowedOrigin = target.origin === window.location.origin
+                || target.origin === 'http://localhost:8000';
+            return allowedOrigin && target.pathname === '/' ? target.toString() : fallback
+        } catch (ignore) {
+            return fallback
+        }
     }
 
     (function initializeMoneybagsLaunch() {

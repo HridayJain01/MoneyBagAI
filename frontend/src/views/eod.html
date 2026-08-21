@@ -1,0 +1,73 @@
+<div class="mb-stack">
+  <header class="mb-page-header">
+    <div>
+      <h1 class="mb-page-header__title">End of day</h1>
+      <p class="mb-page-header__lede">Review branch cash movement, teller activity and operational postings before close.</p>
+    </div>
+    <div class="mb-page-header__actions">
+      <input type="date" class="mb-field" aria-label="Business date" data-bind="value: businessDate" />
+      <button type="button" class="mb-action-button mb-action-button--outlined" data-bind="click: refresh, disable: loading">Refresh</button>
+      <button type="button" class="mb-action-button mb-action-button--primary" data-bind="click: downloadCsv, disable: loading() || !report()">Download CSV</button>
+    </div>
+  </header>
+
+  <!-- ko if: hasError -->
+  <div class="mb-banner mb-banner--error" role="alert">
+    <div><strong>Could not load the EOD review</strong><span data-bind="text: error"></span></div>
+  </div>
+  <!-- /ko -->
+
+  <section class="mb-hero">
+    <p class="mb-hero__label">Branch EOD review</p>
+    <h2 class="mb-page-header__title"><span data-bind="text: branchName"></span> · <span data-bind="text: branchCode"></span></h2>
+    <div class="mb-hero__foot">
+      <div class="mb-hero__stat"><span class="mb-hero__stat-value" data-bind="text: dateDisplay"></span><span class="mb-hero__stat-label">Business date</span></div>
+      <div class="mb-hero__stat"><span class="mb-hero__stat-value">—</span><span class="mb-hero__stat-label">Persisted EOD status unavailable</span></div>
+      <div class="mb-hero__stat"><span class="mb-hero__stat-value" data-bind="text: lastRefreshedDisplay"></span><span class="mb-hero__stat-label">Last refreshed</span></div>
+    </div>
+  </section>
+
+  <div class="mb-grid mb-grid--3">
+    <section class="mb-card"><div class="mb-stat"><span class="mb-stat__label">Account postings</span><span class="mb-stat__value" data-bind="text: loading() ? '…' : postingCount()"></span><span class="mb-stat__hint">Branch report records for the selected date</span></div></section>
+    <section class="mb-card"><div class="mb-stat"><span class="mb-stat__label">Total debits</span><span class="mb-stat__value mb-stat__value--word" data-bind="text: loading() ? '…' : debitTotal()"></span><span class="mb-stat__hint">From the reporting projection</span></div></section>
+    <section class="mb-card"><div class="mb-stat"><span class="mb-stat__label">Total credits</span><span class="mb-stat__value mb-stat__value--word" data-bind="text: loading() ? '…' : creditTotal()"></span><span class="mb-stat__hint">From the reporting projection</span></div></section>
+  </div>
+
+  <section class="mb-card">
+    <div class="mb-card__header"><div><h2 class="mb-card__title">Branch cash position</h2><p class="mb-card__subtitle">Only system-recorded cash movement is populated.</p></div></div>
+    <div class="mb-grid mb-grid--4">
+      <div class="mb-stat"><span class="mb-stat__label">Opening cash</span><span class="mb-stat__value">—</span><span class="mb-stat__hint">Not recorded</span></div>
+      <div class="mb-stat"><span class="mb-stat__label">Cash deposits</span><span class="mb-stat__value mb-stat__value--word" data-bind="text: loading() ? '…' : cashDeposits()"></span><span class="mb-stat__hint">Completed cash deposits</span></div>
+      <div class="mb-stat"><span class="mb-stat__label">Cash withdrawals</span><span class="mb-stat__value mb-stat__value--word" data-bind="text: loading() ? '…' : cashWithdrawals()"></span><span class="mb-stat__hint">Completed cash withdrawals</span></div>
+      <div class="mb-stat"><span class="mb-stat__label">Net cash movement</span><span class="mb-stat__value mb-stat__value--word" data-bind="text: loading() ? '…' : netCashMovement()"></span><span class="mb-stat__hint">Deposits less withdrawals</span></div>
+    </div>
+  </section>
+
+  <section class="mb-card mb-card--flush">
+    <div class="mb-card__bar"><div><h2 class="mb-card__title">Teller closure</h2><p class="mb-card__subtitle">System activity by active teller in this branch.</p></div></div>
+    <!-- ko if: !loading() && tellers().length === 0 --><div class="mb-empty"><p class="mb-empty__title">No active tellers found</p><p class="mb-empty__body">No employee with a Teller designation is assigned to this branch.</p></div><!-- /ko -->
+    <!-- ko if: tellers().length -->
+    <div class="mb-scroll-x"><table class="mb-plain-table"><thead><tr><th>Teller</th><th>Completed transactions</th><th>Cash in</th><th>Cash out</th><th>Expected movement</th><th>Actual cash</th><th>Variance</th><th>Closure status</th></tr></thead><tbody data-bind="foreach: tellers"><tr><td><strong data-bind="text: employee"></strong><div class="mb-muted mb-mono" data-bind="text: employeeCode"></div></td><td data-bind="text: completed"></td><td class="mb-money" data-bind="text: cashIn"></td><td class="mb-money" data-bind="text: cashOut"></td><td class="mb-money" data-bind="text: expectedMovement"></td><td data-bind="text: actualCash"></td><td data-bind="text: variance"></td><td data-bind="text: closureStatus"></td></tr></tbody></table></div>
+    <!-- /ko -->
+  </section>
+
+  <div class="mb-grid mb-grid--2">
+    <section class="mb-card">
+      <div class="mb-card__header"><div><h2 class="mb-card__title">Cash reconciliation</h2><p class="mb-card__subtitle">Physical and vault values remain blank until an authoritative source exists.</p></div></div>
+      <div class="mb-kv"><span class="mb-kv__k">System net cash movement</span><span class="mb-kv__v" data-bind="text: netCashMovement"></span><span class="mb-kv__k">Physical cash</span><span class="mb-kv__v">—</span><span class="mb-kv__k">Vault cash</span><span class="mb-kv__v">—</span><span class="mb-kv__k">Difference</span><span class="mb-kv__v">—</span></div>
+    </section>
+
+    <section class="mb-card">
+      <div class="mb-card__header"><div><h2 class="mb-card__title">Close readiness</h2><p class="mb-card__subtitle">Read-only until EOD and physical-cash records are introduced.</p></div></div>
+      <div class="mb-kv"><span class="mb-kv__k">Manager decision</span><span class="mb-kv__v">—</span><span class="mb-kv__k">Physical count completed</span><span class="mb-kv__v">—</span><span class="mb-kv__k">Vault verified</span><span class="mb-kv__v">—</span><span class="mb-kv__k">Branch close time</span><span class="mb-kv__v">—</span></div>
+    </section>
+  </div>
+
+  <section class="mb-card mb-card--flush">
+    <div class="mb-card__bar"><div><h2 class="mb-card__title">Operational report</h2><p class="mb-card__subtitle">Branch postings grouped by transaction type.</p></div></div>
+    <!-- ko if: !loading() && reportRows().length === 0 --><div class="mb-empty"><p class="mb-empty__title">No postings for this date</p></div><!-- /ko -->
+    <!-- ko if: reportRows().length -->
+    <div class="mb-scroll-x"><table class="mb-plain-table"><thead><tr><th>Transaction type</th><th>Postings</th><th>Debits</th><th>Credits</th></tr></thead><tbody data-bind="foreach: reportRows"><tr><td data-bind="text: type"></td><td data-bind="text: count"></td><td class="mb-money" data-bind="text: debit"></td><td class="mb-money" data-bind="text: credit"></td></tr></tbody></table></div>
+    <!-- /ko -->
+  </section>
+</div>

@@ -615,7 +615,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="card decision">
+                <div id="decisionPanel" class="card decision" style="display:none">
                     <div class="eyebrow">Decision</div>
                     <h2 style="color:var(--n)">Complete review</h2>
                     <p class="sub">Your remark is saved and visible to the banker.</p><label class="label">Reviewer
@@ -748,9 +748,11 @@
         if (!a) return toast('Enter an account ID.');
         try {
             const r = await api('/api/v1/kyc/customers/' + encodeURIComponent(a) + '/sessions/pending');
-            $('sessionList').innerHTML = r.map(x => '<div class="session" onclick="event.stopPropagation();selectSession(' + JSON.stringify(x).replace(/"/g, '&quot;') + ')"><b>Verification</b><small>' + x.documentType + ' · ' + x.status + '</small></div>').join('') || '<p class="sub">No pending sessions.</p>';
+            const submitted = r.filter(x => x.status === 'VERIFICATION_IN_PROGRESS');
+            $('sessionList').innerHTML = submitted.map(x => '<div class="session" onclick="event.stopPropagation();selectSession(' + JSON.stringify(x).replace(/"/g, '&quot;') + ')"><b>Verification</b><small>' + x.documentType + ' · Awaiting checker review</small></div>').join('') || '<p class="sub">KYC is pending teller submission.</p>';
             const requested = new URLSearchParams(window.location.search).get('sessionId');
-            const target = r.find(x => x.sessionId === requested) || r[0];
+            const target = submitted.find(x => x.sessionId === requested) || submitted[0];
+            $('decisionPanel').style.display = target ? 'block' : 'none';
             if (target) selectSession(target)
         } catch (e) {
             toast(e.message)
@@ -758,8 +760,13 @@
     }
 
     async function selectSession(x) {
+        if (x.status !== 'VERIFICATION_IN_PROGRESS') {
+            $('decisionPanel').style.display = 'none';
+            return toast('The teller must submit this KYC before review.')
+        }
         selected = x;
         sessionId = x.sessionId;
+        $('decisionPanel').style.display = 'block';
         document.getElementById('docViewer').src = '/api/v1/kyc/sessions/' + sessionId + '/documents/' + x.documentType + '?inline=true';
         try {
             const r = await api('/api/v1/kyc/sessions/' + sessionId + '/frames');
@@ -801,13 +808,15 @@
 
     function moneybagsReturnUrl() {
         const raw = new URLSearchParams(window.location.search).get('returnTo');
-        if (!raw) return null;
+        const fallback = 'http://localhost:8000/?ojr=customers';
+        if (!raw) return fallback;
         try {
-            const target = new URL(raw);
-            return target.origin === 'http://localhost:8000' && target.pathname === '/'
-                ? target.toString() : null
+            const target = new URL(raw, window.location.origin);
+            const allowedOrigin = target.origin === window.location.origin
+                || target.origin === 'http://localhost:8000';
+            return allowedOrigin && target.pathname === '/' ? target.toString() : fallback
         } catch (ignore) {
-            return null
+            return fallback
         }
     }
 

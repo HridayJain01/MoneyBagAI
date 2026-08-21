@@ -35,6 +35,7 @@ define(['ojs/ojcorerouter', 'ojs/ojurlparamadapter', './session'], function (
     { path: 'accountDetail', detail: { label: 'Account', permission: 'ACCOUNT_VIEW', excludedRoles: ['OPS_ADMIN'] } },
     { path: 'transactions', detail: { label: 'Transactions', permission: 'TRANSACTION_VIEW', excludedRoles: ['TELLER', 'CHECKER', 'OPS_ADMIN'] } },
     { path: 'transactionDetail', detail: { label: 'Transaction', permission: 'TRANSACTION_VIEW', excludedRoles: ['OPS_ADMIN'] } },
+    { path: 'eod', detail: { label: 'End of day', permission: 'REPORT_VIEW', roles: ['BRANCH_MANAGER'] } },
     { path: 'ledger', detail: { label: 'Ledger', roles: ['OPS_ADMIN'] } },
     { path: 'products', detail: { label: 'Products', permission: 'PRODUCT_READ' } },
     { path: 'branches', detail: { label: 'Branches & staff', roles: ['BRANCH_MANAGER', 'OPS_ADMIN'] } },

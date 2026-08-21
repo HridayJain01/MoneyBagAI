@@ -126,14 +126,6 @@ public class KycServiceImpl implements KycService {
     }
 
     @Override
-    public List<KycSessionResponse> findSessions(String cifNo) {
-        customerKycClient.context(cifNo);
-        return storageService.findSessions(cifNo).stream().map(session -> new KycSessionResponse(
-                session.getId(), session.getCifNo(), session.getPurpose(), session.getDocumentType(),
-                session.getStatus(), session.getCreatedAt(), session.getUpdatedAt())).toList();
-    }
-
-    @Override
     public KycDocumentEntity getDocument(String sessionId, DocumentType documentType) throws IOException {
         KycSessionEntity target = new KycSessionEntity();
         target.setId(sessionId);

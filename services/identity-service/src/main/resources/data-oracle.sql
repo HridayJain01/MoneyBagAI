@@ -53,7 +53,8 @@ MERGE INTO users t USING (
   SELECT 1 id,'teller1' username,'teller1@moneybags.test' email,'Amit Patel' full_name,'9000000001' mobile,'1001' employee_id,'BR001' branch_code FROM dual UNION ALL
   SELECT 2,'checker1','checker1@moneybags.test','Priya Nair','9000000002','1002','BR001' FROM dual UNION ALL
   SELECT 3,'manager1','manager1@moneybags.test','Rajesh Sharma','9000000003','1003','BR002' FROM dual UNION ALL
-  SELECT 4,'opsadmin','opsadmin@moneybags.test','System Operator','9000000004','1004','BR001' FROM dual
+  SELECT 4,'opsadmin','opsadmin@moneybags.test','System Operator','9000000004','1004','BR001' FROM dual UNION ALL
+  SELECT 5,'teller2','teller2@moneybags.test','Neha Kulkarni','9000000005','1005','BR002' FROM dual
 ) s ON (t.user_id = s.id)
 WHEN NOT MATCHED THEN INSERT
   (user_id,username,email,password_hash,full_name,mobile,status,failed_attempts,employee_id,branch_code,
@@ -63,6 +64,6 @@ VALUES (s.id,s.username,s.email,'$2a$10$fXCPOVT2U/KYqZe3bL4WM.n7ZiJyxyVRCD1x6SRw
 
 MERGE INTO user_roles t USING (
   SELECT 1 user_id,1 role_id FROM dual UNION ALL SELECT 2,2 FROM dual UNION ALL
-  SELECT 3,3 FROM dual UNION ALL SELECT 4,4 FROM dual
+  SELECT 3,3 FROM dual UNION ALL SELECT 4,4 FROM dual UNION ALL SELECT 5,1 FROM dual
 ) s ON (t.user_id=s.user_id AND t.role_id=s.role_id)
 WHEN NOT MATCHED THEN INSERT (user_id,role_id) VALUES (s.user_id,s.role_id);

@@ -170,7 +170,8 @@ define([
                 items: [
                     {path: 'customers', label: 'Customers', glyph: '◐', permission: 'CUSTOMER_READ', excludedRoles: ['OPS_ADMIN']},
                     {path: 'accounts', label: 'Accounts', glyph: '▤', permission: 'ACCOUNT_VIEW', excludedRoles: ['OPS_ADMIN']},
-                    {path: 'transactions', label: 'Transactions', glyph: '⇄', permission: 'TRANSACTION_VIEW', excludedRoles: ['TELLER', 'CHECKER', 'OPS_ADMIN']}
+                    {path: 'transactions', label: 'Transactions', glyph: '⇄', permission: 'TRANSACTION_VIEW', excludedRoles: ['TELLER', 'CHECKER', 'OPS_ADMIN']},
+                    {path: 'eod', label: 'End of day', glyph: '◷', permission: 'REPORT_VIEW', roles: ['BRANCH_MANAGER']}
                 ]
             },
             {
