@@ -82,12 +82,14 @@ public class AccountController {
     @Operation(summary = "Search accounts within scope")
     @GetMapping
     public PageResponse<AccountDetail> search(@RequestParam(required = false) String cifNo,
+                                              @RequestParam(required = false) String branchCode,
                                               @RequestParam(required = false) String productCode,
                                               @RequestParam(required = false) AccountStatus status,
                                               @RequestParam(defaultValue = "0") int page,
                                               @RequestParam(defaultValue = "25") int size,
                                               HttpServletRequest http) {
-        return servicingService.search(actors.resolve(http), cifNo, productCode, status, page, size);
+        return servicingService.search(actors.resolve(http), cifNo, branchCode, productCode,
+                status, page, size);
     }
 
     @GetMapping("/by-number/{accountNumber}")

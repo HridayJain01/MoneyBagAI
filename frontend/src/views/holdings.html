@@ -1,0 +1,97 @@
+<div class="mb-stack mb-holdings">
+  <header class="mb-page-header">
+    <div>
+      <h1 class="mb-page-header__title">Branch holdings</h1>
+      <p class="mb-page-header__lede">Deposit holdings and privacy-safe risk distribution for the signed-in manager's branch.</p>
+    </div>
+    <div class="mb-page-header__actions">
+      <button type="button" class="mb-action-button mb-action-button--outlined" data-bind="click: refresh, disable: loading">Refresh</button>
+    </div>
+  </header>
+
+  <!-- ko if: hasError -->
+  <div class="mb-banner mb-banner--error" role="alert">
+    <div><strong>Could not load branch holdings</strong><span data-bind="text: error"></span></div>
+  </div>
+  <!-- /ko -->
+
+  <section class="mb-hero">
+    <p class="mb-hero__label">Manager branch scope</p>
+    <h2 class="mb-figure mb-figure--sm" data-bind="text: loading() ? '…' : totalDeposits()"></h2>
+    <p class="mb-holdings__hero-copy">Total positive ledger balances held across non-closed deposit accounts.</p>
+    <div class="mb-hero__foot">
+      <div class="mb-hero__stat"><span class="mb-hero__stat-value" data-bind="text: branchName"></span><span class="mb-hero__stat-label" data-bind="text: branchCode"></span></div>
+      <div class="mb-hero__stat"><span class="mb-hero__stat-value" data-bind="text: loading() ? '…' : totalAccounts()"></span><span class="mb-hero__stat-label">Accounts held</span></div>
+      <div class="mb-hero__stat"><span class="mb-hero__stat-value" data-bind="text: loading() ? '…' : activeAccounts()"></span><span class="mb-hero__stat-label">Active accounts</span></div>
+      <div class="mb-hero__stat"><span class="mb-hero__stat-value" data-bind="text: lastRefreshedDisplay"></span><span class="mb-hero__stat-label">Last refreshed</span></div>
+    </div>
+  </section>
+
+  <div class="mb-grid mb-grid--3">
+    <section class="mb-card"><div class="mb-stat"><span class="mb-stat__label">Deposit holdings</span><span class="mb-stat__value mb-stat__value--word" data-bind="text: loading() ? '…' : totalDeposits()"></span><span class="mb-stat__hint">Database ledger balances</span></div></section>
+    <section class="mb-card"><div class="mb-stat"><span class="mb-stat__label">Weighted deposit rate</span><span class="mb-stat__value" data-bind="text: loading() ? '…' : weightedDepositRate()"></span><span class="mb-stat__hint">Balance-weighted account rates</span></div></section>
+    <section class="mb-card"><div class="mb-stat"><span class="mb-stat__label">Liquid cash held</span><span class="mb-stat__value">—</span><span class="mb-stat__hint">Vault/cash-on-hand is not recorded</span></div></section>
+  </div>
+
+  <section class="mb-card mb-card--flush">
+    <div class="mb-card__bar"><div><h2 class="mb-card__title">Holdings by product</h2><p class="mb-card__subtitle">Balances are grouped from account and product records; no customer identity is exposed.</p></div></div>
+    <div class="mb-holdings__product-grid" data-bind="foreach: productRows">
+      <article class="mb-holdings__product">
+        <span class="mb-pill mb-pill--accent" data-bind="text: shortLabel"></span>
+        <h3 data-bind="text: label"></h3>
+        <strong class="mb-holdings__amount" data-bind="text: balance"></strong>
+        <span class="mb-muted"><span data-bind="text: accountCount"></span> accounts</span>
+      </article>
+    </div>
+  </section>
+
+  <div class="mb-grid mb-grid--2">
+    <section class="mb-card">
+      <div class="mb-card__header"><div><h2 class="mb-card__title">Cash visibility</h2><p class="mb-card__subtitle">The system records movement, not the branch's physical cash balance.</p></div></div>
+      <div class="mb-kv">
+        <span class="mb-kv__k">Recorded net cash movement today</span><span class="mb-kv__v mb-money" data-bind="text: netCashMovementDisplay"></span>
+        <span class="mb-kv__k">Opening cash</span><span class="mb-kv__v">—</span>
+        <span class="mb-kv__k">Vault cash</span><span class="mb-kv__v">—</span>
+        <span class="mb-kv__k">Physical teller cash</span><span class="mb-kv__v">—</span>
+      </div>
+    </section>
+    <section class="mb-card">
+      <div class="mb-card__header"><div><h2 class="mb-card__title">Data boundaries</h2><p class="mb-card__subtitle">What this dashboard does and does not infer.</p></div></div>
+      <ul class="mb-holdings__notes">
+        <li>Only accounts matching the manager's branch code are requested.</li>
+        <li>Customer type is derived from the deposit-product classification.</li>
+        <li>Customer names, CIF, PAN, mobile and email are never displayed.</li>
+        <li>Deposit balances are not treated as fully lendable funds.</li>
+      </ul>
+    </section>
+  </div>
+
+  <section class="mb-card mb-card--flush">
+    <div class="mb-card__bar"><div><h2 class="mb-card__title">Privacy-safe account detail</h2><p class="mb-card__subtitle">Masked account, product, derived customer type, risk and ledger balance.</p></div></div>
+    <!-- ko if: !loading() && accountRows().length === 0 --><div class="mb-empty"><p class="mb-empty__title">No accounts found for this branch</p></div><!-- /ko -->
+    <!-- ko if: accountRows().length -->
+    <div class="mb-scroll-x"><table class="mb-plain-table"><thead><tr><th>Account</th><th>Product</th><th>Customer type</th><th>Risk category</th><th>Status</th><th>Ledger balance</th></tr></thead><tbody data-bind="foreach: accountRows"><tr><td class="mb-mono" data-bind="text: maskedNumber"></td><td><strong data-bind="text: productName"></strong><div class="mb-muted" data-bind="text: productType"></div></td><td data-bind="text: customerType"></td><td><span data-bind="text: risk, attr: { class: riskClass }"></span></td><td><span data-bind="text: status, attr: { class: statusClass }"></span></td><td class="mb-money" data-bind="text: balance"></td></tr></tbody></table></div>
+    <!-- /ko -->
+  </section>
+
+  <section>
+    <div class="mb-holdings__section-heading">
+      <div><h2 class="mb-page-header__title">Lending decision support</h2><p class="mb-page-header__lede">Frontend planning scenarios calculated from branch deposit holdings.</p></div>
+    </div>
+    <div class="mb-grid mb-grid--3" data-bind="foreach: riskModels">
+      <article class="mb-card mb-holdings__risk-card">
+        <div class="mb-holdings__risk-head"><span data-bind="text: key, attr: { class: toneClass }"></span><span class="mb-muted" data-bind="text: intent"></span></div>
+        <h3 data-bind="text: label"></h3>
+        <dl class="mb-holdings__facts">
+          <div><dt>Customers in branch pool</dt><dd data-bind="text: customerCount"></dd></div>
+          <div><dt>Deposit relationship</dt><dd data-bind="text: depositRelationship"></dd></div>
+          <div><dt>Fixed loan rate</dt><dd data-bind="text: loanRate"></dd></div>
+          <div><dt>Expected money return</dt><dd data-bind="text: expectedReturn"></dd></div>
+          <div><dt>Recommended new lending</dt><dd data-bind="text: lendingEnvelope"></dd></div>
+          <div><dt>Projected annual gross interest</dt><dd data-bind="text: projectedProfit"></dd></div>
+        </dl>
+        <p class="mb-holdings__model-note">Gross interest excludes defaults, funding, capital and operating costs.</p>
+      </article>
+    </div>
+  </section>
+</div>

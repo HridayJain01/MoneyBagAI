@@ -53,10 +53,15 @@ public class AccountServicingService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<AccountDetail> search(RequestActor actor, String cifNo, String productCode,
-                                              AccountStatus status, int page, int size) {
+    public PageResponse<AccountDetail> search(RequestActor actor, String cifNo, String requestedBranchCode,
+                                              String productCode, AccountStatus status, int page, int size) {
         actor.require(RequestActor.PERMISSION_VIEW);
-        String branchCode = actor.canAccessAllBranches() ? null : actor.branchCode();
+        String branchCode = blankToNull(requestedBranchCode);
+        if (branchCode != null) {
+            actor.requireBranchAccess(branchCode);
+        } else if (!actor.canAccessAllBranches()) {
+            branchCode = actor.branchCode();
+        }
         Page<Account> result = accounts.search(blankToNull(cifNo), branchCode,
                 blankToNull(productCode), status, PageRequest.of(page, size));
         return new PageResponse<>(result.getContent().stream().map(this::toDetail).toList(),

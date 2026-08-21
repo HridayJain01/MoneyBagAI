@@ -176,3 +176,129 @@ input:focus-visible {
 .mb-help__panel {
   margin-top: var(--mb-space-3);
 }
+
+/* Branch holdings --------------------------------------------------------- */
+
+.mb-holdings__hero-copy {
+  max-width: 620px;
+  margin: var(--mb-space-3) 0 0;
+  opacity: 0.76;
+}
+
+.mb-holdings__product-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.mb-holdings__product {
+  min-width: 0;
+  padding: var(--mb-space-5);
+  border-right: 1px solid var(--mb-hairline);
+}
+
+.mb-holdings__product:last-child {
+  border-right: 0;
+}
+
+.mb-holdings__product h3,
+.mb-holdings__risk-card h3 {
+  margin: var(--mb-space-3) 0 var(--mb-space-2);
+  font-size: 15px;
+}
+
+.mb-holdings__amount {
+  display: block;
+  margin-bottom: var(--mb-space-2);
+  font-family: var(--mb-font-num);
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.mb-holdings__notes {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--mb-ink-secondary);
+}
+
+.mb-holdings__notes li + li {
+  margin-top: var(--mb-space-2);
+}
+
+.mb-holdings__section-heading {
+  margin-bottom: var(--mb-space-4);
+}
+
+.mb-holdings__risk-card {
+  min-width: 0;
+}
+
+.mb-holdings__risk-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mb-space-3);
+}
+
+.mb-holdings__facts {
+  display: grid;
+  gap: var(--mb-space-3);
+  margin: var(--mb-space-4) 0 0;
+}
+
+.mb-holdings__facts div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--mb-space-4);
+  padding-top: var(--mb-space-3);
+  border-top: 1px solid var(--mb-hairline);
+}
+
+.mb-holdings__facts dt {
+  color: var(--mb-ink-muted);
+  font-size: 12px;
+}
+
+.mb-holdings__facts dd {
+  margin: 0;
+  font-family: var(--mb-font-num);
+  font-weight: var(--mb-weight-strong);
+  text-align: right;
+}
+
+.mb-holdings__model-note {
+  margin: var(--mb-space-4) 0 0;
+  color: var(--mb-ink-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+@media (max-width: 1180px) {
+  .mb-holdings__product-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .mb-holdings__product:nth-child(3) {
+    border-right: 0;
+  }
+
+  .mb-holdings__product:nth-child(n + 4) {
+    border-top: 1px solid var(--mb-hairline);
+  }
+}
+
+@media (max-width: 720px) {
+  .mb-holdings__product-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .mb-holdings__product,
+  .mb-holdings__product:nth-child(3) {
+    border-right: 0;
+  }
+
+  .mb-holdings__product + .mb-holdings__product {
+    border-top: 1px solid var(--mb-hairline);
+  }
+}

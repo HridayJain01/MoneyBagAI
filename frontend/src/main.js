@@ -20,7 +20,7 @@
       // endinjector
       // Bump with each promoted frontend checkpoint so long-lived branch
       // workstations cannot retain stale permission/navigation modules.
-      urlArgs: 'appVersion=20260819.5',
+      urlArgs: 'appVersion=20260821.2',
       paths:
       /* DO NOT MODIFY
       ** All paths are dynamicaly generated from the path_mappings.json file.
